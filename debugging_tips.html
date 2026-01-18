@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Common ML debugging issues and solutions">
+    <title>Debugging Tips - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span class="separator">/</span>
+                <span>Debugging Tips</span>
+            </nav>
+
+            <h1>Debugging Tips</h1>
+
+            <p>
+                This page documents common errors and issues you may encounter throughout the course,
+                along with their solutions.
+            </p>
+
+            <h2>NumPy Array Issues</h2>
+
+            <h3>Shape Mismatch Errors</h3>
+            <p><code>ValueError: operands could not be broadcast together with shapes (X,) and (Y,Z)</code></p>
+            <p><strong>Cause:</strong> You are trying to perform an operation on arrays with incompatible shapes.</p>
+            <p><strong>Solution:</strong></p>
+            <ul>
+                <li>Print the shapes: <code>print(a.shape, b.shape)</code></li>
+                <li>Use <code>reshape()</code> to fix dimensions: <code>a.reshape(-1, 1)</code></li>
+                <li>Check if you need to transpose: <code>a.T</code></li>
+            </ul>
+
+            <h3>Unexpected 1D vs 2D Arrays</h3>
+            <p>Many operations expect 2D arrays (samples x features). A common mistake:</p>
+            <pre><code># Wrong: 1D array
+X = np.array([1, 2, 3, 4, 5])  # shape: (5,)
+
+# Right: 2D array with one column
+X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)  # shape: (5, 1)</code></pre>
+
+            <h2>Gradient Descent Problems</h2>
+
+            <h3>Loss is NaN or Inf</h3>
+            <p><strong>Causes:</strong></p>
+            <ul>
+                <li>Learning rate too high (gradients explode)</li>
+                <li>Division by zero in your loss function</li>
+                <li>Log of zero or negative number</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Reduce learning rate by factor of 10</li>
+                <li>Add small epsilon to denominators: <code>1 / (x + 1e-8)</code></li>
+                <li>Clip values before log: <code>np.log(np.clip(p, 1e-8, 1))</code></li>
+            </ul>
+
+            <h3>Loss Not Decreasing</h3>
+            <p><strong>Causes:</strong></p>
+            <ul>
+                <li>Learning rate too low</li>
+                <li>Bug in gradient computation</li>
+                <li>Features not normalized</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Try increasing learning rate</li>
+                <li>Verify gradients with numerical gradient checking</li>
+                <li>Normalize features to zero mean and unit variance</li>
+            </ul>
+
+            <h3>Loss Oscillating Wildly</h3>
+            <p><strong>Cause:</strong> Learning rate too high.</p>
+            <p><strong>Solution:</strong> Decrease learning rate.</p>
+
+            <h2>scikit-learn Issues</h2>
+
+            <h3>Expected 2D array, got 1D array</h3>
+            <pre><code># Wrong
+model.fit(X, y)  # where X is 1D
+
+# Right
+model.fit(X.reshape(-1, 1), y)</code></pre>
+
+            <h3>Unknown label type: 'continuous'</h3>
+            <p><strong>Cause:</strong> Using a classifier on regression targets.</p>
+            <p><strong>Solution:</strong> Use a regressor, or convert targets to classes.</p>
+
+            <h2>TensorFlow/Keras Issues</h2>
+
+            <h3>Input Shape Errors</h3>
+            <p><code>ValueError: Input 0 of layer is incompatible with the layer</code></p>
+            <p><strong>Solution:</strong> Check input_shape in your first layer matches your data:</p>
+            <pre><code># If X has shape (num_samples, num_features)
+model.add(Dense(64, input_shape=(num_features,)))</code></pre>
+
+            <h3>Model Not Learning (Accuracy Stuck)</h3>
+            <p><strong>Checklist:</strong></p>
+            <ul>
+                <li>Is your loss function appropriate for your task?</li>
+                <li>Are labels in the correct format? (categorical vs sparse)</li>
+                <li>Is learning rate reasonable? (try 0.001 as default)</li>
+                <li>Is there enough data?</li>
+            </ul>
+
+            <h3>Out of Memory (OOM)</h3>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Reduce batch size</li>
+                <li>Reduce model size (fewer layers/units)</li>
+                <li>Use <code>tf.data</code> for data loading</li>
+            </ul>
+
+            <h2>General Debugging Strategies</h2>
+
+            <h3>Print Shapes Everywhere</h3>
+            <pre><code>print(f"X shape: {X.shape}")
+print(f"y shape: {y.shape}")
+print(f"weights shape: {w.shape}")</code></pre>
+
+            <h3>Start Small</h3>
+            <ul>
+                <li>Test with a tiny subset of data first</li>
+                <li>Use a simple model before adding complexity</li>
+                <li>Train for 1 epoch to verify the pipeline works</li>
+            </ul>
+
+            <h3>Sanity Checks</h3>
+            <ul>
+                <li>Can your model overfit a small batch? (It should be able to)</li>
+                <li>Does random baseline give expected accuracy?</li>
+                <li>Are your labels correct? (Visualize a few examples)</li>
+            </ul>
+
+            <h3>Reproducibility</h3>
+            <pre><code>import numpy as np
+import tensorflow as tf
+
+np.random.seed(42)
+tf.random.set_seed(42)</code></pre>
+
+            <footer>
+                <p><a href="index.html">Back to Course Home</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

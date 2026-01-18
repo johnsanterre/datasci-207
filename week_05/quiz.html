@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 5 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 5</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 5: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "The outputs sum to 1 (valid probability distribution), but they are not uniform unless all logits are equal.",
+                    "b": "Softmax outputs are always positive because of the exponential function, and they are bounded to (0,1).",
+                    "c": "Correct. Softmax applies exponential function (ensuring positivity) and normalizes by the sum, guaranteeing outputs sum to 1 and form a valid probability distribution.",
+                    "d": "Softmax is differentiable everywhere, not just at integer values. This is essential for gradient-based training."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What property does the softmax function guarantee about its outputs?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> All outputs are equal</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> Outputs can be negative</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> Outputs sum to 1 and are all
+                                positive</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> Outputs are only defined for integer
+                                inputs</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Precision measures reliability of positive predictions, not ability to find all positives.",
+                    "b": "Correct. Recall = TP / (TP + FN) measures what fraction of actual positives were correctly identified. High recall means few missed cases.",
+                    "c": "F1 is a balance of precision and recall, not specifically about finding all positives.",
+                    "d": "AUC measures overall discrimination ability across all thresholds, not specifically finding positives."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>If you want to find as many positive cases as possible (e.g., detect all diseases), which metric
+                        should you maximize?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Precision</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Recall</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> F1 Score</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> AUC</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Correct predictions appear on the DIAGONAL, not off-diagonal.",
+                    "b": "Off-diagonal shows prediction errors, not overall accuracy.",
+                    "c": "Probabilities are not shown in a standard confusion matrix—only counts of predictions.",
+                    "d": "Correct. Off-diagonal elements show misclassifications: entry (i,j) counts examples of true class i mistakenly predicted as class j."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>In a confusion matrix, what do the off-diagonal elements represent?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Correct predictions</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Overall accuracy</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Predicted probabilities</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Misclassifications (errors)</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. F1 uses the harmonic mean, which is dominated by the smaller value. If P or R is low, F1 will be low regardless of how high the other is.",
+                    "b": "This describes the arithmetic mean, not the harmonic mean used in F1.",
+                    "c": "F1 is between the two values but closer to the smaller one, not the larger.",
+                    "d": "F1 is well-defined when both P and R are known, even if R is much higher than P."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>If precision is 0.95 and recall is 0.10, what can you say about the F1 score?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> F1 will be low because harmonic mean
+                                penalizes extreme imbalance</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> F1 will be the average of 0.95 and 0.10,
+                                about 0.52</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> F1 will be close to 0.95 since precision is
+                                high</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> F1 cannot be computed when recall is much
+                                lower than precision</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Adding more training data helps if the model can represent the pattern, but linear models fundamentally cannot separate XOR.",
+                    "b": "Lowering the learning rate affects training dynamics but will not change what patterns a linear model can learn.",
+                    "c": "Correct. Adding the feature x1*x2 (a feature cross) makes XOR linearly separable. Alternatively, neural networks can learn non-linear boundaries.",
+                    "d": "Removing features would make the problem even harder, not easier, since we need both x1 and x2 to predict XOR."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Why can logistic regression NOT solve the XOR problem, and what is a solution?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> It needs more training data; solution is to
+                                collect more examples</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> The learning rate is wrong; solution is to
+                                tune hyperparameters</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> Linear boundaries cannot separate XOR;
+                                solution is feature crosses or neural networks</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> There are too many features; solution is to
+                                remove some</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 5</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

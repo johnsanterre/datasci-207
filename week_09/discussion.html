@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 9 - DATASCI 207">
+    <title>Discussion Topics: Module 9 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 9</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 9: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> we represent language as vectors.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Analysis</span>
+                <h3>1. Words as Vectors: What Do We Gain and Lose?</h3>
+                <p>
+                    Word embeddings turn meaning into numbers. This enables computation, but what
+                    happens to meaning when we quantify it?
+                </p>
+                <ul class="probing-questions">
+                    <li>Is "dog" really closer to "cat" than to "philosophy"? By whose judgment?</li>
+                    <li>Word2Vec learns from co-occurrence. Does context fully capture meaning?</li>
+                    <li>Embeddings make analogy possible (king - man + woman = queen). Is this understanding or parlor
+                        trick?</li>
+                    <li>Poetry uses words in unexpected ways. Can embeddings capture metaphor?</li>
+                </ul>
+                <p class="activity-note">Try: Look up word neighbors in embedding space. Discuss surprises.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Critical Analysis</span>
+                <h3>2. Bias in Embeddings</h3>
+                <p>
+                    Word embeddings learned from human text encode human biases.
+                    "Doctor" is closer to "man"; "nurse" is closer to "woman." Now what?
+                </p>
+                <ul class="probing-questions">
+                    <li>Should we "debias" embeddings, or does that hide reality rather than change it?</li>
+                    <li>If embeddings are used for resume screening, what are the implications?</li>
+                    <li>Can we separate "reflecting the world" from "reinforcing the world"?</li>
+                    <li>Who is responsible for bias: the algorithm, the training data, or society?</li>
+                </ul>
+                <p class="activity-note">Try: Test famous bias examples (man:woman::programmer:?). Discuss reactions.
+                </p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Epistemology / Synthesis</span>
+                <h3>3. The Meaning of "Semantic Similarity"</h3>
+                <p>
+                    We say embeddings capture "semantic similarity." But similarity is not a single thing.
+                    What kind of similarity are we actually measuring?
+                </p>
+                <ul class="probing-questions">
+                    <li>"Hot" and "cold" are antonyms but highly related. Should they be near or far in embedding space?
+                    </li>
+                    <li>Synonyms should be close, but perfect synonyms are rare. How close is close enough?</li>
+                    <li>Different embedding methods produce different neighborhoods. Which is "correct"?</li>
+                    <li>If two cultures use words differently, whose usage defines similarity?</li>
+                </ul>
+                <p class="activity-note">Try: Compare word similarities across different embedding models.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Application</span>
+                <h3>4. The Loss of Word Order</h3>
+                <p>
+                    Bag-of-words and averaged embeddings throw away word order.
+                    "Dog bites man" becomes the same as "Man bites dog." When does this matter?
+                </p>
+                <ul class="probing-questions">
+                    <li>For sentiment classification, does word order really matter?</li>
+                    <li>What types of meaning depend on word order? (Negation? Causation? Narrative?)</li>
+                    <li>If we successfully classify without order, does that mean order was never important?</li>
+                    <li>How do humans process word order vs. word presence?</li>
+                </ul>
+                <p class="activity-note">Try: Create sentence pairs that differ only in order but have opposite
+                    meanings.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Systems Thinking / Speculation</span>
+                <h3>5. Transfer Learning: Standing on Whose Shoulders?</h3>
+                <p>
+                    Pre-trained embeddings encode knowledge from massive corpora. We inherit that
+                    knowledge—but also its blind spots. What comes along for the ride?
+                </p>
+                <ul class="probing-questions">
+                    <li>What gets included in training corpora (Wikipedia, books, web)? What's excluded?</li>
+                    <li>If models are trained on English, what happens to other languages and cultures?</li>
+                    <li>Does transfer learning democratize AI (anyone can use) or centralize it (few create
+                        foundations)?</li>
+                    <li>How do we audit what a pre-trained model "knows" and "believes"?</li>
+                </ul>
+                <p class="activity-note">Try: Probe pre-trained models for cultural knowledge gaps.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Ethics</span>
+                <h3>6. The Limits of Distributional Semantics</h3>
+                <p>
+                    "You shall know a word by the company it keeps." But is co-occurrence sufficient
+                    for meaning? What's missing from the distributional hypothesis?
+                </p>
+                <ul class="probing-questions">
+                    <li>A model can use "pain" correctly without ever feeling pain. Does it understand pain?</li>
+                    <li>Embeddings know "fire is hot" from text. Do they know what hot feels like?</li>
+                    <li>The Chinese Room argument: Can statistical patterns constitute understanding?</li>
+                    <li>What would it take to say a model truly understands language?</li>
+                </ul>
+                <p class="activity-note">Try: Debate—"Models trained only on text can never truly understand language."
+                </p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 9</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

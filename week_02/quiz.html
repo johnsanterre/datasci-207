@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 2 Knowledge Check Quiz - DATASCI 207">
+    <title>Quiz: Module 2 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 2</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 2: Knowledge Check</h1>
+            <p>Test your understanding of linear regression and gradient descent.</p>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <!-- Question 1 -->
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Squaring is unnecessary—what matters is why we square. This answer does not address the actual purpose.",
+                    "b": "Correct. Squaring accomplishes two things: it ensures all errors are positive (so they do not cancel out), and it penalizes large errors more heavily than small ones.",
+                    "c": "MSE does not involve taking square roots. You may be thinking of RMSE (Root Mean Squared Error), which is the square root of MSE.",
+                    "d": "Squaring actually amplifies large errors. An error of 10 becomes 100 when squared, while an error of 2 becomes only 4."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>In Mean Squared Error (MSE), why do we square the errors?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> To make computation faster</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> To ensure all errors are positive and to
+                                penalize large errors more</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> To take the square root later</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> To reduce the impact of large errors</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Moving in the direction of the gradient would INCREASE the loss, not decrease it. The gradient points uphill.",
+                    "b": "Random direction updates would not systematically decrease loss. Gradient descent is strategic, not random.",
+                    "c": "Correct. The gradient points in the direction of steepest INCREASE. To minimize loss, we move in the opposite direction—against the gradient, or downhill.",
+                    "d": "Gradient descent does not ignore the gradient; the gradient is central to the algorithm."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>In gradient descent, why do we update parameters in the negative gradient direction?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Because the gradient points toward the
+                                minimum</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> To add randomness to the
+                                optimization</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Because the gradient points toward
+                                increasing loss, and we want to decrease it</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> To ignore the gradient information</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. If the learning rate is too high, the parameter updates overshoot the minimum, causing the loss to increase (possibly to infinity). This is called divergence.",
+                    "b": "A learning rate that is too HIGH causes divergence, not one that is too low. A low learning rate causes slow convergence instead.",
+                    "c": "Too few iterations might cause early stopping before convergence, but loss would plateau, not explode.",
+                    "d": "Randomness in SGD causes noisy updates, but the loss would fluctuate, not consistently increase to infinity."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What typically causes the loss to explode to infinity during training?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Learning rate is too high</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Learning rate is too low</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Too few training iterations</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Using stochastic gradient descent</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Batch gradient descent is actually SLOWER than the alternatives because it processes all data before each update.",
+                    "b": "Batch gradient descent produces LESS noisy updates because it uses all data, averaging out individual sample variance.",
+                    "c": "Mini-batch (not batch) is the most common in modern deep learning due to its balance of speed and stability.",
+                    "d": "Correct. By using all data points to compute each gradient, batch gradient descent gets a precise estimate of the true gradient, leading to stable, consistent updates."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>What is the main advantage of batch gradient descent over stochastic gradient descent?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> It is faster</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> It produces more random updates</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> It is used in all modern deep
+                                learning</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> It produces more stable and accurate
+                                gradient estimates</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Parameters (weights and biases) are learned from data through training. They are not set by the user beforehand.",
+                    "b": "Correct. Hyperparameters like learning rate are choices made before training begins. They control how training proceeds but are not learned from the data itself.",
+                    "c": "The learning rate affects how quickly we approach the minimum, not what the minimum value of the loss is.",
+                    "d": "The learning rate is not fixed by the loss function. It is a choice made by the practitioner and can significantly impact training outcomes."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>The learning rate is an example of what?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> A parameter learned from data</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> A hyperparameter set before training</label>
+                        </li>
+                        <li><label><input type="radio" name="q5" value="c"> The minimum value of the loss
+                                function</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> A value determined by the loss
+                                function</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 2</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

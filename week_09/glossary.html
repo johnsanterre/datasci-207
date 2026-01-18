@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 9 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 9</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 9 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Bag-of-Words (BoW)</dt>
+                    <dd>
+                        Bag-of-words is a text representation that converts documents into fixed-length vectors
+                        by counting word occurrences, ignoring word order and grammar. Each position in the
+                        vector corresponds to a vocabulary word, and the value is the word's count or binary
+                        presence. While simple and fast, BoW produces sparse high-dimensional vectors and cannot
+                        capture semantic similarity (synonyms are completely different features).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>TF-IDF (Term Frequency-Inverse Document Frequency)</dt>
+                    <dd>
+                        TF-IDF is a numerical statistic that reflects how important a word is to a document
+                        in a collection. It combines term frequency (how often a word appears in the document)
+                        with inverse document frequency (logarithmic measure of how rare the word is across
+                        all documents). Words that are frequent in a specific document but rare overall receive
+                        high scores, making TF-IDF effective for identifying distinctive terms.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>N-gram</dt>
+                    <dd>
+                        An n-gram is a contiguous sequence of n items (typically words or characters) from a
+                        text. Unigrams are single words, bigrams are pairs, trigrams are triplets, and so on.
+                        N-grams capture some word order information that bag-of-words loses, making them useful
+                        for distinguishing phrases like "not good" from "good." The tradeoff is exponentially
+                        larger vocabulary and increased sparsity.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Word Embedding</dt>
+                    <dd>
+                        A word embedding is a dense, low-dimensional vector representation of a word (typically
+                        100-300 dimensions) learned from large text corpora. Unlike one-hot or bag-of-words
+                        representations, embeddings place semantically similar words close together in vector
+                        space. This enables arithmetic-like operations: vector("king") - vector("man") +
+                        vector("woman") ≈ vector("queen"). Pre-trained embeddings can be transferred to new tasks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Word2Vec</dt>
+                    <dd>
+                        Word2Vec is a family of neural network models that learn word embeddings from text.
+                        The Skip-gram variant predicts context words given a center word, while CBOW predicts
+                        the center word from context. Training on large corpora, Word2Vec learns that words
+                        appearing in similar contexts should have similar vectors. It was a breakthrough that
+                        demonstrated embeddings could capture semantic relationships like analogies.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>GloVe (Global Vectors)</dt>
+                    <dd>
+                        GloVe is a word embedding method that combines global co-occurrence statistics with
+                        local context learning. It constructs a word-word co-occurrence matrix from the corpus,
+                        then learns embeddings that predict these co-occurrence counts. GloVe embeddings often
+                        perform comparably to Word2Vec and are widely available pre-trained on various corpora
+                        including Wikipedia and Common Crawl.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Cosine Similarity</dt>
+                    <dd>
+                        Cosine similarity measures the cosine of the angle between two vectors, computed as
+                        their dot product divided by the product of their magnitudes. Values range from -1
+                        (opposite directions) to 1 (same direction), with 0 indicating orthogonality. Cosine
+                        similarity is preferred for comparing embeddings because it focuses on direction rather
+                        than magnitude, making it robust to vector length differences.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Document Embedding</dt>
+                    <dd>
+                        A document embedding is a fixed-length vector representation of an entire document
+                        (sentence, paragraph, or longer). Simple approaches average the word embeddings of
+                        constituent words, optionally weighted by TF-IDF. Advanced methods like Doc2Vec and
+                        Sentence-BERT learn document representations directly. Document embeddings enable
+                        semantic similarity comparison between documents of different lengths.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Tokenization</dt>
+                    <dd>
+                        Tokenization is the process of splitting text into individual units (tokens), typically
+                        words or subwords. Simple tokenization splits on whitespace and punctuation. Subword
+                        tokenization (BPE, WordPiece) breaks rare words into common pieces, handling
+                        out-of-vocabulary issues. Tokenization is the first step in most NLP pipelines and
+                        significantly affects downstream model performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Vocabulary</dt>
+                    <dd>
+                        The vocabulary is the set of unique tokens known to the model, mapping each token to
+                        an integer index. In bag-of-words, vocabulary size determines vector dimensionality.
+                        For embeddings, each vocabulary word has a corresponding vector. Words not in the
+                        vocabulary (out-of-vocabulary or OOV) must be handled specially—either ignored, mapped
+                        to an unknown token, or processed with subword methods.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Transfer Learning (for NLP)</dt>
+                    <dd>
+                        Transfer learning in NLP uses representations learned from a large corpus on a new task
+                        with limited data. Pre-trained word embeddings (Word2Vec, GloVe) provide general language
+                        understanding. Modern transformers (BERT, GPT) are pre-trained on massive text and
+                        fine-tuned for specific tasks. Transfer learning dramatically reduces the data needed
+                        for many NLP tasks while achieving state-of-the-art performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Sentence Transformers</dt>
+                    <dd>
+                        Sentence transformers are neural models that produce dense embeddings for sentences
+                        or short paragraphs. Unlike word-level embeddings that require averaging, sentence
+                        transformers consider the entire context at once. Models like Sentence-BERT are trained
+                        specifically to produce embeddings where semantically similar sentences are close in
+                        vector space, making them excellent for semantic search and clustering.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 9</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

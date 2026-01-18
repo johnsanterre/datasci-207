@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 5 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 5</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 5 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Multiclass Classification</dt>
+                    <dd>
+                        Multiclass classification is a supervised learning task where each example is assigned to
+                        one of k classes, where k is greater than two. Examples include digit recognition (10 classes)
+                        and image categorization (potentially thousands of classes). The model outputs a probability
+                        distribution over all classes, and the class with highest probability is the prediction.
+                        Multiclass is distinct from multi-label classification, where examples can belong to multiple
+                        classes simultaneously.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Softmax Function</dt>
+                    <dd>
+                        The softmax function converts a vector of arbitrary real numbers (logits) into a valid
+                        probability distribution. The formula is softmax(z)_i = exp(z_i) / Σ_j exp(z_j), which
+                        ensures all outputs are positive and sum to 1. Softmax amplifies differences between
+                        values—a small increase in one logit can significantly increase its probability while
+                        decreasing others. It generalizes the sigmoid function to multiple classes and is the
+                        standard output layer for multiclass neural networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Categorical Cross-Entropy</dt>
+                    <dd>
+                        Categorical cross-entropy is the loss function for multiclass classification, measuring
+                        the difference between predicted and true probability distributions. For a true class c,
+                        the loss is simply -log(p_c), where p_c is the predicted probability of class c. Low
+                        predicted probability for the true class results in high loss, penalizing confident
+                        wrong predictions severely. This loss is convex and has well-behaved gradients that
+                        point toward increasing the probability of the correct class.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Confusion Matrix</dt>
+                    <dd>
+                        A confusion matrix is a table that visualizes classification performance by showing
+                        counts of predictions versus actual labels for each class. For k classes, it is a k×k
+                        matrix where entry (i,j) counts examples of true class i predicted as class j. The
+                        diagonal contains correct predictions; off-diagonal elements reveal systematic errors.
+                        Confusion matrices enable calculation of per-class metrics and identification of which
+                        classes are commonly confused with each other.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Precision</dt>
+                    <dd>
+                        Precision measures the accuracy of positive predictions, calculated as TP / (TP + FP),
+                        where TP is true positives and FP is false positives. High precision means that when
+                        the model predicts positive, it is usually correct—there are few false alarms. Precision
+                        is important when the cost of false positives is high, such as in spam filtering where
+                        false positives mean losing important emails. Improving precision typically requires
+                        raising the classification threshold, which may decrease recall.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Recall (Sensitivity)</dt>
+                    <dd>
+                        Recall measures the completeness of positive predictions, calculated as TP / (TP + FN),
+                        where TP is true positives and FN is false negatives. High recall means the model finds
+                        most of the actual positive cases—few are missed. Recall is critical when missing positives
+                        is costly, such as in disease screening where false negatives mean undetected illness.
+                        Improving recall typically requires lowering the classification threshold, which may
+                        decrease precision.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>F1 Score</dt>
+                    <dd>
+                        The F1 score is the harmonic mean of precision and recall: F1 = 2 × (P × R) / (P + R).
+                        The harmonic mean has the property that it is low if either precision or recall is low,
+                        making it a balanced single metric. F1 is especially useful for imbalanced datasets
+                        where accuracy is misleading. When precision equals recall, F1 equals both; when they
+                        differ significantly, F1 is closer to the smaller value.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>True Positive (TP)</dt>
+                    <dd>
+                        A true positive is a correct positive prediction—the model predicts positive and the
+                        actual class is positive. True positives are what we want to maximize in classification.
+                        They form the numerator in both precision (TP / predicted positives) and recall
+                        (TP / actual positives) calculations. In a confusion matrix, true positives appear
+                        on the diagonal in the row and column corresponding to the positive class.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>False Positive (FP / Type I Error)</dt>
+                    <dd>
+                        A false positive is an incorrect positive prediction—the model predicts positive but
+                        the actual class is negative. Also called a Type I error or "false alarm." False positives
+                        decrease precision and can have real-world costs like unnecessary medical procedures or
+                        marking legitimate emails as spam. The false positive rate (FP / actual negatives) is
+                        used in ROC curves and measures how often the model incorrectly triggers on negative cases.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>False Negative (FN / Type II Error)</dt>
+                    <dd>
+                        A false negative is a missed positive—the model predicts negative but the actual class
+                        is positive. Also called a Type II error or "miss." False negatives decrease recall and
+                        can have serious consequences like undiagnosed diseases or undetected fraud. The false
+                        negative rate (FN / actual positives) measures how often the model fails to detect true
+                        positive cases. Reducing false negatives typically requires lowering the classification
+                        threshold.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>ROC Curve</dt>
+                    <dd>
+                        The Receiver Operating Characteristic (ROC) curve plots True Positive Rate (Recall) on
+                        the Y-axis against False Positive Rate on the X-axis for various classification thresholds.
+                        Each point on the curve represents a different threshold setting. The curve shows the
+                        tradeoff between catching more positives versus generating more false alarms. A perfect
+                        classifier reaches the top-left corner (TPR=1, FPR=0); a random classifier follows the
+                        diagonal. ROC curves are threshold-independent evaluation tools.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>AUC (Area Under the ROC Curve)</dt>
+                    <dd>
+                        AUC summarizes the ROC curve as a single number between 0 and 1, representing the
+                        probability that the model ranks a random positive example higher than a random negative
+                        example. AUC = 1.0 indicates perfect discrimination; AUC = 0.5 indicates no better than
+                        random guessing. AUC is useful for comparing classifiers without choosing a specific
+                        threshold. However, it can be misleading for highly imbalanced datasets where
+                        precision-recall curves may be more informative.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>One-vs-All (OvA)</dt>
+                    <dd>
+                        One-vs-All is a strategy for extending binary classifiers to multiclass problems by
+                        training k separate binary classifiers, one for each class. Each classifier learns to
+                        distinguish "this class" from "all other classes." At prediction time, all k classifiers
+                        are run and the class with highest confidence wins. OvA is simple to implement but
+                        requires training multiple models and can suffer from imbalanced training when one
+                        class is compared against all others combined.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 5</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

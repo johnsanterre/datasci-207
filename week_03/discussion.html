@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 3 - DATASCI 207">
+    <title>Discussion Topics: Module 3 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 3</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 3: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> feature engineering matters and what choices reveal about our assumptions.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Epistemology</span>
+                <h3>1. Features as World Models</h3>
+                <p>
+                    When we engineer features, we're encoding our beliefs about what matters.
+                    Features are hypotheses, not facts. What are the implications?
+                </p>
+                <ul class="probing-questions">
+                    <li>If features encode assumptions, whose assumptions are we encoding?</li>
+                    <li>A feature like "years of experience" embeds beliefs about what predicts job performance. What's
+                        being assumed?</li>
+                    <li>Can you have "neutral" features, or is every feature political?</li>
+                    <li>What features would an alien engineer for predicting human behavior?</li>
+                </ul>
+                <p class="activity-note">Try: Give the same prediction task to groups with different backgrounds.
+                    Compare the features they propose.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Ethics</span>
+                <h3>2. The Feature Engineering vs. Deep Learning Debate</h3>
+                <p>
+                    Deep learning promised to end feature engineering by learning features automatically.
+                    Has it succeeded? At what cost?
+                </p>
+                <ul class="probing-questions">
+                    <li>If neural networks learn features, do we understand what they learned?</li>
+                    <li>Is interpretable feature engineering worth worse performance?</li>
+                    <li>Who benefits from black-box systems where features are opaque?</li>
+                    <li>In domains like medicine or law, should we require human-understandable features?</li>
+                </ul>
+                <p class="activity-note">Try: Debate—"Companies should be required to use interpretable features in
+                    high-stakes decisions."</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Critical Thinking</span>
+                <h3>3. The Danger of Data Leakage</h3>
+                <p>
+                    Leakage is when information from the future sneaks into training.
+                    It's a technical bug, but it reveals deeper problems about how we think about time and causality.
+                </p>
+                <ul class="probing-questions">
+                    <li>Why is temporal leakage so hard to detect? What does this say about our mental models?</li>
+                    <li>In finance, "knowing the future" is obviously cheating. In other domains, why is it less
+                        obvious?</li>
+                    <li>What's the relationship between leakage and causality?</li>
+                    <li>If a feature is highly predictive, should you be suspicious?</li>
+                </ul>
+                <p class="activity-note">Try: Present a suspiciously accurate model. Have students find the leakage.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Ethics</span>
+                <h3>4. Scaling and Normalization as Power</h3>
+                <p>
+                    When we normalize features, we decide what's "normal." This is a quiet exercise of power.
+                    On whose terms are we normalizing?
+                </p>
+                <ul class="probing-questions">
+                    <li>Standard scaling centers on the mean. Whose "average" becomes the reference point?</li>
+                    <li>If we scale income, outliers (billionaires) become extreme. Is that appropriate?</li>
+                    <li>Normalization treats 2 standard deviations as equivalent across features. When does this fail?
+                    </li>
+                    <li>"Normal" in statistics vs. "normal" in society—what's the relationship?</li>
+                </ul>
+                <p class="activity-note">Try: Discuss how "normal" BMI was historically defined. Who was in the sample?
+                </p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Application</span>
+                <h3>5. Domain Knowledge vs. Data-Driven Features</h3>
+                <p>
+                    Should features come from expert knowledge or statistical analysis?
+                    This tension between theory and empiricism is ancient.
+                </p>
+                <ul class="probing-questions">
+                    <li>When should you trust a domain expert over what the data suggests?</li>
+                    <li>PCA creates features that maximize variance. But is variance what matters?</li>
+                    <li>Can automated feature selection ever replace domain expertise?</li>
+                    <li>What's lost when we automate feature engineering?</li>
+                </ul>
+                <p class="activity-note">Try: Have a domain expert and a data scientist propose features for the same
+                    problem. Compare.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Evaluation</span>
+                <h3>6. Missing Data as Information</h3>
+                <p>
+                    We often impute missing values to "fill the gaps." But missingness itself
+                    might be informative. What are we erasing?
+                </p>
+                <ul class="probing-questions">
+                    <li>If rich patients have more complete medical records, what does imputation assume?</li>
+                    <li>Is creating a "missing indicator" feature acknowledging or hiding the problem?</li>
+                    <li>When is data missing at random vs. missing for a reason?</li>
+                    <li>Does imputation create information that doesn't exist?</li>
+                </ul>
+                <p class="activity-note">Try: Present a dataset where income is missing for 30% of people. Discuss what
+                    imputation strategies imply about those people.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 3</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 7 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 7</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 7: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Information gain measures REDUCTION in entropy after a split, not increase.",
+                    "b": "The number of features is fixed and does not change based on splits.",
+                    "c": "Correct. Information gain is the difference between parent entropy and weighted child entropy. A split that creates purer subsets has higher information gain.",
+                    "d": "Information gain relates to classification purity, not training speed."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What does high information gain indicate about a decision tree split?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> The split increases entropy</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> The split uses more features</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> The split effectively separates classes,
+                                reducing entropy</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> The split makes training faster</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "KNN is sensitive to irrelevant features, not robust to them. All features affect distance equally unless weighted.",
+                    "b": "Correct. Features on different scales (e.g., age 0-100 vs. income 0-1M) would cause income to dominate distance calculations. Scaling puts features on equal footing.",
+                    "c": "KNN does not have weights in the traditional sense—it uses direct distance calculations.",
+                    "d": "KNN is actually quite slow for prediction (must compute distances to all training points)."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>Why does KNN require feature scaling?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> To make KNN robust to irrelevant
+                                features</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Because distance calculations are affected
+                                by feature magnitudes</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> To ensure the weight update
+                                converges</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> To speed up the prediction phase</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Each tree is trained on the same bootstrap sample in bagging, but random forests add feature randomization.",
+                    "b": "Boosting trains trees sequentially on residuals, not bagging.",
+                    "c": "Bagging uses classification trees, not logistic regression.",
+                    "d": "Correct. Bagging creates multiple bootstrap samples (random samples with replacement), trains a model on each, and combines predictions by averaging or voting."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is the key idea behind bagging?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Train each tree on a different subset of
+                                features</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Train trees sequentially to correct
+                                errors</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Use logistic regression instead of
+                                trees</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Train models on bootstrap samples and
+                                average predictions</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Random forests add random feature selection at each split (in addition to bootstrap sampling). This decorrelates trees, providing more variance reduction than bagging alone.",
+                    "b": "Both random forests and regular bagging use bootstrap sampling.",
+                    "c": "Random forests combine predictions, the same as bagging.",
+                    "d": "Gradient boosting uses sequential training, not random forests."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>What makes Random Forests different from standard bagging?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> Random subset of features is considered at
+                                each split</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> Trees are trained on the same data without
+                                sampling</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> Predictions are not combined</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> Trees are trained sequentially</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Deep unrestricted trees tend to overfit, having high variance but low bias.",
+                    "b": "Limiting depth typically decreases, not increases, the gap between training and test accuracy.",
+                    "c": "Correct. Limiting max_depth is a form of regularization that prevents the tree from learning overly specific patterns in training data, reducing overfitting.",
+                    "d": "Shallow trees are typically faster to train and use, not slower."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Why might you limit the maximum depth of a decision tree?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> To increase model complexity and capture
+                                more patterns</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> To make the gap between training and test
+                                accuracy larger</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> To prevent overfitting by limiting model
+                                complexity</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> To slow down training</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 7</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

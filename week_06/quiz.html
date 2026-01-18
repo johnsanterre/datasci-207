@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 6 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 6</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 6: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Stacking linear layers gives another linear function: W2(W1x) = (W2×W1)x, which is still linear.",
+                    "b": "Correct. Without non-linear activations, any number of stacked linear transformations can be collapsed into a single linear transformation, providing no additional representational power.",
+                    "c": "Activations are not only for the output layer; they are essential between all layers for non-linearity.",
+                    "d": "Activations are about function representation, not execution speed."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>Why are activation functions necessary in neural networks?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> To make the network faster to train</label>
+                        </li>
+                        <li><label><input type="radio" name="q1" value="b"> Without them, stacking layers would still be
+                                linear</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> They are only needed for the output
+                                layer</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> To parallelize computation</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. ReLU(x) = max(0, x) is computationally simple, has a derivative of 1 for positive values (avoiding vanishing gradients), and works well in practice for most hidden layers.",
+                    "b": "Sigmoid is used for binary output layers but causes vanishing gradients in hidden layers.",
+                    "c": "Softmax is for multiclass output layers, not hidden layers.",
+                    "d": "Linear activation provides no non-linearity and would defeat the purpose of having hidden layers."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>Which activation function is most commonly used in hidden layers of modern neural networks?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> ReLU</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Sigmoid</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Softmax</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> Linear</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Backpropagation is used during training for computing gradients, not during inference.",
+                    "b": "Backpropagation does not initialize weights; it computes how to update them.",
+                    "c": "Correct. Backpropagation applies the chain rule to compute the gradient of the loss with respect to each parameter, enabling gradient descent to update weights effectively.",
+                    "d": "Random prediction would not be useful. Backpropagation is a deterministic algorithm for gradient computation."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is the purpose of backpropagation?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> To compute predictions on new data</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="b"> To initialize the network weights</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="c"> To compute gradients of loss with respect to
+                                all parameters</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> To randomly select which predictions to
+                                make</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Overfitting relates to model complexity and data, not specifically to gradient magnitude during training.",
+                    "b": "When gradients vanish, training becomes TOO SLOW, not too fast.",
+                    "c": "Dropout is a regularization technique unrelated to vanishing gradients.",
+                    "d": "Correct. When gradients become very small in early layers, those layers learn extremely slowly or not at all. Solutions include ReLU activation and skip connections."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>What problem does the vanishing gradient cause during training?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> The model overfits to training data</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="b"> Training becomes too fast</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> Dropout stops working</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> Early layers learn very slowly or not at
+                                all</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Dropout does not increase prediction accuracy by itself; it is a regularization technique.",
+                    "b": "Correct. By randomly zeroing activations during training, dropout prevents neurons from co-adapting and forces the network to learn more robust, generalizable features.",
+                    "c": "Dropout would slightly slow computation due to the random masking operation.",
+                    "d": "Dropout is typically disabled during inference, not used to change predictions."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>What is the primary purpose of dropout?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> To increase prediction accuracy</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> To prevent overfitting by regularizing the
+                                network</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> To speed up computation</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> To change predictions during
+                                inference</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 6</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

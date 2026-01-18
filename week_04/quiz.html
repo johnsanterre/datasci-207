@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 4 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 4</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 4: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "The sigmoid function outputs values in the open interval (0, 1), never exactly reaching 0 or 1.",
+                    "b": "Correct. The sigmoid function σ(z) = 1/(1+e^(-z)) asymptotically approaches 0 and 1 but never reaches them, so outputs are always between 0 and 1 (exclusive).",
+                    "c": "The sigmoid output is bounded and cannot be negative or greater than 1.",
+                    "d": "The sigmoid function produces continuous values in (0,1), not discrete outputs."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What is the range of the sigmoid function?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> [0, 1] (inclusive)</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> (0, 1) (exclusive)</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> (-infinity, +infinity)</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> {0, 1} (only these two values)</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Lowering the threshold makes it EASIER to predict class 1, resulting in MORE positive predictions, not fewer.",
+                    "b": "The threshold affects predictions, so changing it will change predictions (though not for all examples).",
+                    "c": "The model parameters (weights/bias) are fixed after training. Changing threshold only changes how we interpret the output probabilities.",
+                    "d": "Correct. A lower threshold means we require less confidence to predict positive, so more examples cross the threshold and get classified as positive."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>If we lower the classification threshold from 0.5 to 0.3, what happens?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Fewer examples are classified as
+                                positive</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> The predictions stay the same</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> The model must be retrained</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> More examples are classified as
+                                positive</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. When the true label is 1, the loss is -log(p). If p is close to 1, log(p) is close to 0, so loss is low. If p is close to 0, log(p) is very negative, so the negative of it is a large positive loss.",
+                    "b": "The loss behaves the same way for both classes—confident correct predictions have low loss.",
+                    "c": "Logistic loss is always non-negative. It equals 0 only when the prediction is perfect (p=1 for y=1 or p=0 for y=0).",
+                    "d": "Logistic loss considers the predicted probability, not just the thresholded class."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>For a true label of y=1, what happens to the logistic loss as the predicted probability p
+                        approaches 0?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> The loss becomes very large (approaches
+                                infinity)</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> The loss becomes very small (approaches
+                                0)</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> The loss becomes negative</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> The loss stays constant</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "The sigmoid function is the output, not the input. It transforms the linear combination into a probability.",
+                    "b": "The linear combination comes first, then sigmoid is applied. Not the other way around.",
+                    "c": "Correct. First, compute z = w·x + b (the linear combination). Then apply sigmoid to get the probability: p = sigmoid(z).",
+                    "d": "There is a clear order: linear first, then sigmoid. They are not combined arbitrarily."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>In logistic regression, what is the relationship between the linear combination and sigmoid?
+                    </h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> Sigmoid is applied first, then the linear
+                                combination</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> Sigmoid is the input to the linear
+                                combination</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> The linear combination is computed first,
+                                then sigmoid is applied</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> They are applied simultaneously</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "The decision boundary is where the probability equals the threshold (0.5 by default), not where it is maximized.",
+                    "b": "Correct. With a default threshold of 0.5, the decision boundary is where sigmoid(w·x + b) = 0.5, which means w·x + b = 0. This is a linear equation in feature space.",
+                    "c": "Logistic regression can be trained with gradient descent, but the decision boundary itself is where predictions change, not just where training occurs.",
+                    "d": "The decision boundary separates predicted classes, not where data points are located."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Where is the decision boundary in logistic regression (with default threshold)?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> Where the probability is highest</label>
+                        </li>
+                        <li><label><input type="radio" name="q5" value="b"> Where w·x + b = 0</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> Where the gradient is zero</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> Where most data points are located</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 4</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

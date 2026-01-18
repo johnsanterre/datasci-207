@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 1 - DATASCI 207">
+    <title>Discussion Topics: Module 1 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 1</a>
+                <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 1: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> machine learning works the way it does, and what it means for
+                how we build systems.
+            </p>
+
+            <!-- TOPIC 1 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Evaluation</span>
+                <h3>1. The Function Approximation Lens</h3>
+                <p>
+                    We describe ML as "learning a function from data." But is this framing
+                    always appropriate? When does thinking of ML as function approximation
+                    help us, and when does it mislead us?
+                </p>
+                <ul class="probing-questions">
+                    <li>What gets lost when we reduce "intelligence" to "input-output mapping"?</li>
+                    <li>Are there problems where the "function" metaphor breaks down? (Hint: think about tasks like
+                        creativity, conversation, or planning)</li>
+                    <li>How does this framing shape what questions we ask and don't ask about our models?</li>
+                    <li>Is a spam classifier really "understanding" email, or just pattern-matching?</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Have students argue both sides. When is pattern-matching sufficient? When is it dangerous?
+                </p>
+            </div>
+
+            <!-- TOPIC 2 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Synthesis</span>
+                <h3>2. The Train/Test Ritual</h3>
+                <p>
+                    We split data into train and test sets almost religiously. But this practice
+                    embeds deep assumptions about the world. What are those assumptions, and
+                    when do they fail?
+                </p>
+                <ul class="probing-questions">
+                    <li>What does it mean for the test set to be "representative"? Representative of what?</li>
+                    <li>If the future looks different from the past (distribution shift), what good is our test set?
+                    </li>
+                    <li>Why do we trust that performance on 20% of our data predicts performance on data we've never
+                        seen?</li>
+                    <li>When might it be <em>wrong</em> to randomly shuffle data before splitting?</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Present a scenario where the test set gave 95% accuracy but the deployed model failed. What
+                    went wrong?
+                </p>
+            </div>
+
+            <!-- TOPIC 3 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Application</span>
+                <h3>3. Overfitting: Bug or Feature?</h3>
+                <p>
+                    We treat overfitting as something to avoid. But memorization isn't always
+                    bad—sometimes we <em>want</em> our model to remember specific cases.
+                    How do we decide?
+                </p>
+                <ul class="probing-questions">
+                    <li>Is a model that memorizes all training data useless? What about a search engine?</li>
+                    <li>Large language models seem to "memorize" training text—is that overfitting?</li>
+                    <li>At what point does "learning the pattern" become "memorizing the data"?</li>
+                    <li>If we had infinite data, would overfitting still matter?</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Debate—"Modern deep learning has made overfitting obsolete."
+                </p>
+            </div>
+
+            <!-- TOPIC 4 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Evaluation</span>
+                <h3>4. What Makes a Metric "Good"?</h3>
+                <p>
+                    We evaluate models with metrics like accuracy, MSE, or F1. But metrics
+                    are choices, not truths. What makes a metric appropriate, and who decides?
+                </p>
+                <ul class="probing-questions">
+                    <li>If two models have the same accuracy but different error patterns, are they equally good?</li>
+                    <li>Who is harmed by our choice of metric? (Think: false positives vs. false negatives)</li>
+                    <li>Can we have a "perfect" metric, or does every metric encode values?</li>
+                    <li>How might optimizing for a metric lead to unintended consequences? (Goodhart's Law)</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Give a real scenario (cancer screening, loan approval) and have groups argue for different
+                    metrics.
+                </p>
+            </div>
+
+            <!-- TOPIC 5 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Analysis</span>
+                <h3>5. When Should We NOT Use Machine Learning?</h3>
+                <p>
+                    The course teaches you how to apply ML. But the hardest skill is knowing
+                    when <em>not</em> to. What are the signs that ML isn't the right tool?
+                </p>
+                <ul class="probing-questions">
+                    <li>If you don't have enough data, what should you do instead?</li>
+                    <li>When is a simple rule-based system better than a learned model?</li>
+                    <li>What's the cost of being wrong? Does ML hide that uncertainty?</li>
+                    <li>Are there problems that are fundamentally unsuitable for ML? Why?</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Present 5 problem statements. Vote on which ones actually need ML.
+                </p>
+            </div>
+
+            <!-- TOPIC 6 -->
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Evaluation</span>
+                <h3>6. The Baseline Mindset</h3>
+                <p>
+                    We insist on comparing to simple baselines. This seems obvious, but it
+                    reveals something deeper about how we should think about progress.
+                </p>
+                <ul class="probing-questions">
+                    <li>Why do researchers sometimes "forget" to compare to simple baselines?</li>
+                    <li>What does it mean when a complex model barely beats a simple one?</li>
+                    <li>How do you choose the right baseline? Is there always a "fair" one?</li>
+                    <li>"If you can't beat random guessing, you don't have a model." Agree or disagree?</li>
+                </ul>
+                <p class="activity-note">
+                    Try: Show a paper that claims state-of-the-art. Have students find what baseline is missing.
+                </p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 1</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

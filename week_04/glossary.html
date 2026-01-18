@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 4 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 4</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 4 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Logistic Regression</dt>
+                    <dd>
+                        Logistic regression is a classification algorithm that models the probability of a binary
+                        outcome by applying the sigmoid function to a linear combination of features. Despite
+                        its name, logistic regression is used for classification, not regression—the "regression"
+                        refers to regressing the log-odds. The model outputs P(y=1|x) = sigmoid(w·x + b), which
+                        is then thresholded to make class predictions. It is widely used due to its simplicity,
+                        interpretability (weights indicate feature importance), and effectiveness.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Binary Classification</dt>
+                    <dd>
+                        Binary classification is a supervised learning task where the goal is to assign each
+                        example to one of exactly two classes, typically encoded as 0 and 1. Examples include
+                        spam detection (spam/not spam), medical diagnosis (disease/healthy), and sentiment
+                        analysis (positive/negative). The model outputs a probability for one class; the
+                        probability of the other class is simply one minus that value. Many real-world
+                        classification problems are binary or can be decomposed into binary subproblems.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Sigmoid Function</dt>
+                    <dd>
+                        The sigmoid function (also called the logistic function) maps any real number to the
+                        interval (0, 1) using the formula σ(z) = 1 / (1 + e^(-z)). It is monotonically increasing,
+                        with σ(0) = 0.5 and asymptotes at 0 and 1. In logistic regression, the sigmoid converts
+                        the linear combination of features into a valid probability. The smooth, differentiable
+                        nature of sigmoid enables gradient-based optimization, though it can cause vanishing
+                        gradients in deep networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Decision Boundary</dt>
+                    <dd>
+                        The decision boundary is the surface in feature space that separates regions where the
+                        model predicts different classes. For logistic regression with threshold 0.5, this is
+                        where P(y=1) = 0.5, which corresponds to w·x + b = 0. In 2D, the boundary is a line;
+                        in 3D, a plane; in general, a hyperplane. The decision boundary is determined by the
+                        learned weights and bias, and its position visually shows how the model separates classes.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Classification Threshold</dt>
+                    <dd>
+                        The classification threshold is the probability cutoff used to convert predicted
+                        probabilities into class labels. The default threshold of 0.5 assigns class 1 if
+                        P(y=1) ≥ 0.5. Lowering the threshold produces more positive predictions (higher recall
+                        but lower precision); raising it produces fewer positive predictions (higher precision
+                        but lower recall). The optimal threshold depends on the relative costs of false positives
+                        versus false negatives for the specific application.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Logistic Loss (Binary Cross-Entropy)</dt>
+                    <dd>
+                        Logistic loss (also called binary cross-entropy) is the loss function for binary
+                        classification: L = -[y·log(p) + (1-y)·log(1-p)]. When the prediction matches the
+                        label (p close to 1 for y=1, or p close to 0 for y=0), the loss is small. Confident
+                        wrong predictions are penalized heavily—predicting 0.99 when y=0 incurs a very large
+                        loss. This asymmetric penalty encourages the model to output well-calibrated probabilities
+                        rather than extreme values.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Log-Odds (Logit)</dt>
+                    <dd>
+                        The log-odds, or logit, is the logarithm of the odds ratio: logit(p) = log(p / (1-p)).
+                        While probabilities are bounded to [0, 1], log-odds range from -∞ to +∞, making them
+                        suitable as outputs of a linear function. Logistic regression can be understood as
+                        modeling the log-odds as a linear function of features: log(p/(1-p)) = w·x + b. The
+                        logit function is the inverse of the sigmoid: sigmoid(logit(p)) = p.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Probability Output</dt>
+                    <dd>
+                        In logistic regression, the model output represents the probability that an example
+                        belongs to the positive class, given its features: P(y=1|x). This is more informative
+                        than a hard class prediction because it conveys the model's confidence. A prediction
+                        of 0.51 is far less certain than 0.99, even though both would be assigned to class 1
+                        with default thresholding. Probability outputs enable threshold tuning and proper
+                        handling of uncertainty.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Linear Separability</dt>
+                    <dd>
+                        A dataset is linearly separable if a straight line (2D), plane (3D), or hyperplane
+                        (higher dimensions) can perfectly separate the two classes with no misclassifications.
+                        Logistic regression works best when the data is at least approximately linearly separable.
+                        If the true decision boundary is curved or complex, logistic regression will underfit.
+                        Solutions include feature engineering (adding polynomial or crossed features) or using
+                        more powerful models like neural networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Vanishing Gradient</dt>
+                    <dd>
+                        The vanishing gradient problem occurs when gradients become extremely small during
+                        backpropagation, effectively stopping learning. The sigmoid function contributes to
+                        this because its derivative σ'(z) = σ(z)(1-σ(z)) is at most 0.25 and approaches 0
+                        for large |z|. When many sigmoid layers are stacked (deep networks), gradients
+                        multiply together and shrink exponentially. This is why modern deep networks use
+                        ReLU activation instead of sigmoid for hidden layers.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 4</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

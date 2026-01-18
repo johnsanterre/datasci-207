@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 4 - DATASCI 207">
+    <title>Discussion Topics: Module 4 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 4</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 4: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> we transform problems into classification tasks and what that reveals.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Philosophy</span>
+                <h3>1. From Regression to Decision: The Threshold Problem</h3>
+                <p>
+                    Logistic regression outputs probabilities. Then we choose a threshold to make decisions.
+                    Who chooses the threshold, and what values does that choice encode?
+                </p>
+                <ul class="probing-questions">
+                    <li>A 0.5 threshold seems "neutral." Is it? When would you choose differently?</li>
+                    <li>In a cancer screening, who should decide the threshold—doctors, patients, insurers, or society?
+                    </li>
+                    <li>If we set threshold at 0.1 (flag almost everyone), what message does that send?</li>
+                    <li>Is there ever an "objective" threshold, or is it always a value judgment?</li>
+                </ul>
+                <p class="activity-note">Try: Give costs for false positives and false negatives. Have groups derive
+                    optimal thresholds. Compare results.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Ethics</span>
+                <h3>2. Probabilities vs. Decisions</h3>
+                <p>
+                    A probability of 0.7 means something different from a prediction of "yes."
+                    When should systems output probabilities vs. binary decisions?
+                </p>
+                <ul class="probing-questions">
+                    <li>Would you rather a doctor say "70% chance of disease" or "you probably have the disease"?</li>
+                    <li>Do humans reason well about probabilities? Should systems accommodate our weaknesses?</li>
+                    <li>If a loan model says 0.62, should the loan officer see that number or just yes/no?</li>
+                    <li>Does outputting probabilities shift responsibility to the end user?</li>
+                </ul>
+                <p class="activity-note">Try: Present the same probabilities in different framings and see how students
+                    react.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Critical Analysis / Synthesis</span>
+                <h3>3. Calibration: When 70% Should Mean 70%</h3>
+                <p>
+                    A well-calibrated model means its probabilities match reality.
+                    But in practice, models are rarely calibrated. What's at stake?
+                </p>
+                <ul class="probing-questions">
+                    <li>If a weather app says "70% rain" and it rains 90% of such days, is that a problem?</li>
+                    <li>How would you even check if a model is calibrated? What data do you need?</li>
+                    <li>Should miscalibration be considered a form of "lying"?</li>
+                    <li>Can a model be highly accurate but poorly calibrated? What would that mean?</li>
+                </ul>
+                <p class="activity-note">Try: Show reliability diagrams from real systems. Discuss implications.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Ethics</span>
+                <h3>4. The Sigmoid's Soft Violence</h3>
+                <p>
+                    The sigmoid function squashes reality into a 0-1 range. This is mathematical
+                    elegance, but it's also a compression of human complexity. What gets lost?
+                </p>
+                <ul class="probing-questions">
+                    <li>A person becomes a probability. What aspects of personhood does this erase?</li>
+                    <li>Is 0.49 meaningfully different from 0.51? Should it determine different outcomes?</li>
+                    <li>The sigmoid has no concept of "too close to call." Should models admit uncertainty?</li>
+                    <li>When models output 0.001 or 0.999, should we believe them?</li>
+                </ul>
+                <p class="activity-note">Try: Have students describe someone they know. Then ask: "What's their
+                    probability of defaulting on a loan?" Discuss the discomfort.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Systems Thinking</span>
+                <h3>5. Log-Odds and Human Intuition</h3>
+                <p>
+                    Logistic regression works in log-odds space, not probability space.
+                    This is mathematically convenient but cognitively unnatural. Why does it matter?
+                </p>
+                <ul class="probing-questions">
+                    <li>Can you intuitively feel the difference between log-odds of 0 and 1?</li>
+                    <li>Does working in "unnatural" mathematical spaces hide assumptions?</li>
+                    <li>Experts learn to think in log-odds. Is that expertise or distortion?</li>
+                    <li>What happens when model-space and human-space diverge?</li>
+                </ul>
+                <p class="activity-note">Try: Convert coefficients to odds ratios and discuss which is more intuitive.
+                </p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Application</span>
+                <h3>6. Binary Classification in a Non-Binary World</h3>
+                <p>
+                    We treat classification as binary: spam/not spam, sick/healthy, fraud/legitimate.
+                    But reality is rarely so clean. What are the consequences of dichotomization?
+                </p>
+                <ul class="probing-questions">
+                    <li>"Pre-diabetic" didn't exist until we created it. Are disease categories discovered or invented?
+                    </li>
+                    <li>Some emails are sort-of-spam. What should a classifier do with ambiguity?</li>
+                    <li>When we build binary classifiers, do we reinforce dichotomous thinking in society?</li>
+                    <li>Would multi-class or regression approaches better capture reality?</li>
+                </ul>
+                <p class="activity-note">Try: Have students describe cases that don't fit either class. What should the
+                    system do?</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 4</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

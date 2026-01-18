@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 10 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 10</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 10: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Shared weights reduce parameters; they do not increase memory usage.",
+                    "b": "Correct. The same filter is applied at every position, so the filter weights are shared. A 3×3 filter has only 9 weights regardless of image size, dramatically reducing parameters compared to fully connected layers.",
+                    "c": "CNNs with pooling actually produce smaller outputs than inputs.",
+                    "d": "Convolution is designed for images; text typically uses other architectures like transformers."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What is the main benefit of parameter sharing in convolutional layers?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> It increases memory usage</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> It dramatically reduces the number of
+                                learnable parameters</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> It makes output larger than input</label>
+                        </li>
+                        <li><label><input type="radio" name="q1" value="d"> It only works with text data</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Pooling reduces spatial dimensions, not increases them.",
+                    "b": "Pooling actually reduces computation in subsequent layers by downsampling.",
+                    "c": "Correct. Because max pooling takes the maximum value in a region, small shifts in the input (moving the object slightly) often produce the same output, making the model invariant to small translations.",
+                    "d": "Pooling preserves high-level features; fine details are lost by design."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>Why does pooling provide translation invariance?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> It increases the spatial dimensions</label>
+                        </li>
+                        <li><label><input type="radio" name="q2" value="b"> It adds more computation</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Small shifts in input produce the same
+                                pooled output</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> It preserves all fine details</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Early layers see small regions and detect simple patterns like edges and textures. Deeper layers have larger receptive fields and combine simple patterns into complex features like object parts and whole objects.",
+                    "b": "Early layers detect low-level features (edges); complex objects are detected in deeper layers.",
+                    "c": "Feature extraction happens throughout the convolutional layers, not only in dense layers.",
+                    "d": "Deeper layers have LARGER receptive fields due to the stacking of convolutions."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What kind of features do early convolutional layers typically learn?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Low-level features like edges and
+                                textures</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> High-level features like objects and
+                                faces</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> No features; only dense layers extract
+                                features</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Features with the smallest receptive field
+                                come from deep layers</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Transfer learning is especially useful when you have LIMITED data—it leverages pre-trained knowledge.",
+                    "b": "Transfer learning adds parameters (the new head) but trains fewer because the base is frozen.",
+                    "c": "Transfer learning speeds up training since most parameters are frozen and pre-initialized.",
+                    "d": "Correct. Models pre-trained on ImageNet have learned general visual features (edges, textures, shapes) that transfer well to many image tasks, even with limited task-specific data."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>Why is transfer learning effective for image classification?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> It requires more training data</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> It reduces the number of model
+                                parameters</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> It makes training slower</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> Pre-trained models have learned useful
+                                general features</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Augmentation creates variations, making training data more diverse, which reduces overfitting.",
+                    "b": "Correct. By applying random transformations (flips, rotations, zooms), augmentation creates synthetic training examples, effectively increasing dataset size and teaching invariance to transformations.",
+                    "c": "Augmentation is applied during training, not validation/testing.",
+                    "d": "Augmentation is particularly useful when data is LIMITED—it helps maximize learning from available examples."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>What is the purpose of data augmentation?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> To make the model overfit faster</label>
+                        </li>
+                        <li><label><input type="radio" name="q5" value="b"> To artificially increase training data by
+                                creating variations</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> To modify the validation set</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> To reduce the need for any training
+                                data</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 10</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

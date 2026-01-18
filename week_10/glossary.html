@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 10 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 10</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 10 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Convolutional Neural Network (CNN)</dt>
+                    <dd>
+                        A CNN is a neural network architecture designed for processing grid-structured data
+                        like images. It uses convolutional layers that apply learnable filters to detect
+                        local patterns, enabling parameter sharing and translation invariance. CNNs typically
+                        stack convolutional and pooling layers to learn hierarchical features, from edges
+                        in early layers to complex objects in deeper layers. They dramatically outperform
+                        fully connected networks on image tasks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Convolution (in Neural Networks)</dt>
+                    <dd>
+                        Convolution is an operation where a small filter (kernel) slides across the input,
+                        computing the dot product at each position to produce a feature map. This operation
+                        detects local patterns regardless of their position in the input. Unlike fully
+                        connected layers, convolutions share the same filter weights across all positions,
+                        dramatically reducing parameters. Multiple filters can be learned to detect different
+                        patterns simultaneously.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Filter (Kernel)</dt>
+                    <dd>
+                        A filter or kernel is a small matrix of learnable weights (typically 3×3, 5×5, or 7×7)
+                        that defines a pattern to detect in the input. During convolution, the filter slides
+                        across the input computing element-wise products and sums. Classical filters include
+                        edge detectors and blur kernels; in deep learning, filters are learned from data
+                        to detect whatever patterns help the task.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Feature Map</dt>
+                    <dd>
+                        A feature map is the output of applying a filter to an input through convolution.
+                        Each position in the feature map indicates how strongly the corresponding filter
+                        pattern is present at that location. A convolutional layer with 64 filters produces
+                        64 feature maps. Early layers produce feature maps for simple patterns; deeper
+                        layers produce feature maps for complex, abstract features.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Stride</dt>
+                    <dd>
+                        Stride is the number of pixels the filter moves at each step during convolution.
+                        Stride 1 moves one pixel at a time, producing output nearly the same size as input.
+                        Stride 2 moves two pixels, halving the output dimensions and reducing computation.
+                        Larger strides provide more aggressive downsampling but may miss fine details.
+                        Stride is also used in pooling layers.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Padding</dt>
+                    <dd>
+                        Padding adds extra pixels (usually zeros) around the input border before convolution.
+                        "Valid" padding means no padding, causing output to shrink. "Same" padding adds enough
+                        zeros to keep output size equal to input (with stride 1). Padding helps preserve
+                        spatial dimensions and ensures border pixels contribute to as many output positions
+                        as center pixels.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Pooling Layer</dt>
+                    <dd>
+                        A pooling layer reduces the spatial dimensions of feature maps by summarizing
+                        regions with a single value. Max pooling takes the maximum value in each region;
+                        average pooling takes the mean. Typical pooling uses 2×2 regions with stride 2,
+                        halving each dimension. Pooling provides translation invariance (small shifts
+                        don't change output) and reduces computation in subsequent layers.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Receptive Field</dt>
+                    <dd>
+                        The receptive field of a neuron is the region of the original input that affects
+                        its output. In the first convolutional layer with a 3×3 filter, each neuron's
+                        receptive field is 3×3 pixels. Deeper layers have larger effective receptive fields
+                        because they see the outputs of previous layers. This allows deep CNNs to detect
+                        patterns spanning the entire image while keeping individual filters small.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Transfer Learning</dt>
+                    <dd>
+                        Transfer learning reuses a model trained on one task (typically ImageNet classification
+                        with millions of images) for a different but related task. The pre-trained model's
+                        learned features—edges, textures, shapes—transfer well to new image domains. Common
+                        approaches include feature extraction (freeze base model, train new head) and
+                        fine-tuning (update top layers with low learning rate). Transfer learning enables
+                        good results with limited task-specific data.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Data Augmentation</dt>
+                    <dd>
+                        Data augmentation creates synthetic training examples by applying transformations
+                        to existing images—rotations, flips, zooms, color adjustments, and more. This
+                        effectively increases training data size and teaches the model invariance to
+                        transformations that don't change the label. Augmentation is applied randomly
+                        during training; the original image is used during evaluation. It significantly
+                        reduces overfitting, especially with limited data.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Global Average Pooling</dt>
+                    <dd>
+                        Global average pooling computes the average of each feature map across all spatial
+                        positions, producing one value per channel. For a 7×7×512 feature volume, global
+                        average pooling outputs a 512-dimensional vector. This replaces flattening and
+                        dense layers at the end of CNNs, dramatically reducing parameters and providing
+                        regularization. It also enables input images of varying sizes.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Skip Connection (Residual Connection)</dt>
+                    <dd>
+                        A skip connection adds the input of a layer block directly to its output, allowing
+                        gradients to flow through the shortcut during backpropagation. Introduced in ResNet,
+                        skip connections enable training very deep networks (100+ layers) by mitigating
+                        vanishing gradients. The network learns residual functions (what to add to the input)
+                        rather than full transformations, making optimization easier.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 10</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

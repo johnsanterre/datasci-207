@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 8 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 8</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 8 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Unsupervised Learning</dt>
+                    <dd>
+                        Unsupervised learning is a category of machine learning where the algorithm learns
+                        patterns from data without labeled examples—there are no target values to predict.
+                        Instead, the goal is to discover hidden structure, such as groups of similar items
+                        or compact representations. Common tasks include clustering, dimensionality reduction,
+                        and anomaly detection. Unsupervised learning is often used for data exploration before
+                        applying supervised methods.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Clustering</dt>
+                    <dd>
+                        Clustering is an unsupervised learning task that groups data points so that points
+                        within a cluster are more similar to each other than to points in other clusters.
+                        Unlike classification, there are no predefined classes—the algorithm discovers groups
+                        on its own. Applications include customer segmentation, image grouping, and document
+                        organization. Major algorithms include k-means, hierarchical clustering, and DBSCAN.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>K-Means Clustering</dt>
+                    <dd>
+                        K-means is a clustering algorithm that partitions data into exactly k clusters by
+                        iteratively assigning points to the nearest centroid and updating centroids as cluster
+                        means. The algorithm minimizes within-cluster sum of squares (inertia). K-means is
+                        fast and scalable but requires specifying k in advance and assumes clusters are
+                        spherical and equally sized. Initialization matters—k-means++ provides smarter
+                        starting centroids.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Centroid</dt>
+                    <dd>
+                        A centroid is the center point of a cluster, typically computed as the mean of all
+                        points in that cluster. In k-means, centroids are iteratively updated as points are
+                        reassigned. The centroid represents a "typical" or "average" member of the cluster.
+                        Distance from a point to the centroid determines cluster membership, and total
+                        distance to centroids (inertia) measures clustering quality.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Inertia</dt>
+                    <dd>
+                        Inertia is the sum of squared distances from each point to its assigned cluster
+                        centroid, measuring how compact the clusters are. Lower inertia indicates tighter
+                        clusters. Inertia always decreases as the number of clusters (k) increases, so it
+                        cannot be used alone to select k. The elbow method looks for a k where inertia
+                        reduction slows down significantly.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Silhouette Score</dt>
+                    <dd>
+                        The silhouette score measures clustering quality by comparing how close each point
+                        is to its own cluster versus other clusters. For each point, it computes
+                        (b - a) / max(a, b), where a is the average distance within the cluster and b is
+                        the average distance to the nearest other cluster. Scores range from -1 to 1:
+                        positive means the point is well-matched to its cluster; negative means it might
+                        belong elsewhere.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Hierarchical Clustering</dt>
+                    <dd>
+                        Hierarchical clustering creates a tree-like structure (dendrogram) showing how
+                        clusters are nested within each other. Agglomerative (bottom-up) starts with each
+                        point as its own cluster and repeatedly merges the closest pairs. Divisive (top-down)
+                        starts with one cluster and splits. The dendrogram can be cut at any level to obtain
+                        a desired number of clusters, eliminating the need to specify k in advance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Dendrogram</dt>
+                    <dd>
+                        A dendrogram is a tree diagram produced by hierarchical clustering that shows the
+                        sequence of cluster merges and the distances at which they occurred. The y-axis
+                        represents the distance (or dissimilarity) at each merge. Cutting the dendrogram
+                        horizontally at a chosen height produces a specific number of clusters. Dendrograms
+                        help visualize cluster relationships and identify natural groupings.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Principal Component Analysis (PCA)</dt>
+                    <dd>
+                        PCA is a dimensionality reduction technique that finds the directions (principal
+                        components) of maximum variance in the data. Each component is a linear combination
+                        of original features, with the first component capturing the most variance. PCA is
+                        useful for visualization (projecting to 2D/3D), noise reduction, and decorrelating
+                        features. It works by computing eigenvectors of the data covariance matrix.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Eigenvalue and Eigenvector</dt>
+                    <dd>
+                        In PCA, eigenvectors of the covariance matrix are the principal component directions,
+                        while eigenvalues indicate how much variance is captured along each direction. The
+                        eigenvector with the largest eigenvalue is the first principal component. The ratio
+                        of an eigenvalue to the sum of all eigenvalues gives the proportion of variance
+                        explained by that component. Keeping components with large eigenvalues preserves
+                        most of the information.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Explained Variance Ratio</dt>
+                    <dd>
+                        The explained variance ratio indicates the proportion of total variance captured by
+                        each principal component, calculated as eigenvalue divided by the sum of all eigenvalues.
+                        The cumulative explained variance helps decide how many components to keep—commonly
+                        enough for 90-95% of total variance. For example, if two components explain 95% of
+                        variance, reducing from 100 dimensions to 2 loses only 5% of information.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Elbow Method</dt>
+                    <dd>
+                        The elbow method is a heuristic for choosing the number of clusters (k) by plotting
+                        inertia versus k and looking for an "elbow" point where adding more clusters provides
+                        diminishing returns. At the elbow, the curve bends—below this k, clusters are too
+                        coarse; above, the additional granularity may not be meaningful. The elbow is sometimes
+                        ambiguous, so silhouette scores or domain knowledge should supplement this method.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 8</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

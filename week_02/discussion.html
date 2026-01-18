@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 2 - DATASCI 207">
+    <title>Discussion Topics: Module 2 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 2</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 2: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> linear regression and gradient descent work the way they do, and what
+                it means for how we build and train models.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Evaluation</span>
+                <h3>1. Why Start with Linear Regression?</h3>
+                <p>
+                    Every ML course starts with linear regression. Is this historical accident,
+                    pedagogical convenience, or is there something fundamental about linearity?
+                </p>
+                <ul class="probing-questions">
+                    <li>What makes linear models "interpretable"? Is interpretability always valuable?</li>
+                    <li>If neural networks can approximate any function, why teach linear regression at all?</li>
+                    <li>Many real-world relationships aren't linear. Does that make linear models useless or essential?
+                    </li>
+                    <li>What cognitive biases might we develop by starting with linear thinking?</li>
+                </ul>
+                <p class="activity-note">Try: Have students find a problem where a linear model would be preferred over
+                    a neural network, even if the NN is more accurate.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Metacognition</span>
+                <h3>2. Gradient Descent as a Metaphor for Learning</h3>
+                <p>
+                    Gradient descent "learns" by following the slope downhill. How does this
+                    compare to how humans (or organizations) learn? What does the metaphor reveal and hide?
+                </p>
+                <ul class="probing-questions">
+                    <li>Humans don't just follow gradients—we make leaps, get stuck, and sometimes go backwards. Is that
+                        a bug or a feature?</li>
+                    <li>What's the "loss function" of a student learning machine learning? Who defines it?</li>
+                    <li>Local minima trap algorithms. What are the "local minima" in human learning or organizational
+                        change?</li>
+                    <li>If gradient descent only sees the local slope, how can it find globally good solutions?</li>
+                </ul>
+                <p class="activity-note">Try: Draw parallels between hyperparameters (learning rate) and real-world
+                    learning decisions (how fast to adopt new ideas).</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Critical Thinking</span>
+                <h3>3. The Learning Rate Dilemma</h3>
+                <p>
+                    Too high and you overshoot. Too low and you never arrive. This tension
+                    appears everywhere in life. What does the learning rate teach us about trade-offs?
+                </p>
+                <ul class="probing-questions">
+                    <li>In startups, is it better to move fast and break things (high LR) or be careful and methodical
+                        (low LR)?</li>
+                    <li>Why can't we just find the "perfect" learning rate automatically?</li>
+                    <li>Learning rate schedules start high and decrease. What's the analog in human skill acquisition?
+                    </li>
+                    <li>Is there ever a time when "overshooting" (high learning rate) is beneficial?</li>
+                </ul>
+                <p class="activity-note">Try: Have students tune learning rate live and observe the frustration—then
+                    discuss what that teaches about optimization.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Perspective-Taking</span>
+                <h3>4. What Does "Optimal" Mean?</h3>
+                <p>
+                    We minimize loss to find "optimal" weights. But optimal according to what?
+                    The choice of loss function embeds values we rarely examine.
+                </p>
+                <ul class="probing-questions">
+                    <li>MSE treats all errors as equally bad. When is this assumption problematic?</li>
+                    <li>Who decides what gets optimized? What happens to things we don't measure?</li>
+                    <li>If two loss functions give different "optimal" models, which one is really optimal?</li>
+                    <li>"What gets measured gets managed." How does this apply to ML optimization?</li>
+                </ul>
+                <p class="activity-note">Try: Present the same data with different stakeholder objectives (patient,
+                    hospital, insurer) and show how "optimal" changes.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Application</span>
+                <h3>5. Closed-Form vs. Iterative Solutions</h3>
+                <p>
+                    Linear regression has a closed-form solution. Why bother with gradient descent?
+                    This small choice reflects a deep tension in computation.
+                </p>
+                <ul class="probing-questions">
+                    <li>When is an exact answer worse than an approximate one?</li>
+                    <li>What's lost when we can't write down a closed-form solution?</li>
+                    <li>Is iterative refinement a sign of weakness or flexibility?</li>
+                    <li>In your life, when do you prefer "calculate the answer" vs. "iterate toward a solution"?</li>
+                </ul>
+                <p class="activity-note">Try: Compare the time complexity of both methods. When does gradient descent
+                    actually win?</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Critical Analysis</span>
+                <h3>6. The Geometry of Optimization</h3>
+                <p>
+                    We visualize loss as a bowl with a minimum at the bottom. But high-dimensional
+                    loss landscapes look nothing like bowls. What are we missing?
+                </p>
+                <ul class="probing-questions">
+                    <li>Why do we draw 2D pictures for 1000-dimensional problems?</li>
+                    <li>In high dimensions, most directions are "flat" (saddle points). What does that mean for
+                        learning?</li>
+                    <li>How do our visual intuitions fail us in high dimensions?</li>
+                    <li>What would it mean to "see" a million-dimensional space?</li>
+                </ul>
+                <p class="activity-note">Try: The "curse of dimensionality" discussion—have students guess how volume
+                    scales with dimensions.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 2</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

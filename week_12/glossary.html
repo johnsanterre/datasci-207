@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 12 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 12</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 12 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Algorithmic Bias</dt>
+                    <dd>
+                        Algorithmic bias refers to systematic and unfair discrimination in the predictions
+                        or decisions made by machine learning systems. Bias can originate from biased
+                        training data, flawed algorithms, or inappropriate use cases. Unlike random errors,
+                        algorithmic bias consistently disadvantages certain groups. Identifying and mitigating
+                        bias is essential for deploying ML systems ethically, especially in high-stakes
+                        applications like hiring, lending, and criminal justice.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Protected Attribute</dt>
+                    <dd>
+                        A protected attribute (or sensitive attribute) is a characteristic that should not
+                        influence predictions in a discriminatory way, typically because of legal protections
+                        or ethical considerations. Common examples include race, gender, age, religion, and
+                        disability status. Even when protected attributes are not included as features, models
+                        may learn to predict them from proxy variables, leading to indirect discrimination.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Demographic Parity (Statistical Parity)</dt>
+                    <dd>
+                        Demographic parity is a fairness criterion requiring that the probability of a positive
+                        prediction be equal across groups: P(Ŷ=1|A=0) = P(Ŷ=1|A=1). This ensures equal
+                        "selection rates" regardless of group membership. However, demographic parity may
+                        conflict with accuracy if base rates differ between groups, and it does not consider
+                        whether predictions are actually correct.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Equalized Odds</dt>
+                    <dd>
+                        Equalized odds requires equal true positive rates AND equal false positive rates across
+                        groups, conditioning on the true outcome. This means that among qualified individuals,
+                        each group has the same chance of a positive prediction, and among unqualified
+                        individuals, each group has the same chance of a false positive. Equalized odds
+                        is often more appropriate than demographic parity when accuracy matters.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Equal Opportunity</dt>
+                    <dd>
+                        Equal opportunity is a relaxed version of equalized odds that requires only equal true
+                        positive rates across groups: P(Ŷ=1|Y=1,A=0) = P(Ŷ=1|Y=1,A=1). This ensures that
+                        qualified individuals from each group have an equal chance of receiving a positive
+                        prediction. Equal opportunity focuses on the harm of false negatives (missing qualified
+                        candidates) rather than false positives.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Calibration</dt>
+                    <dd>
+                        Calibration in fairness requires that probability estimates are equally accurate across
+                        groups: P(Y=1|Ŷ=p,A=0) = P(Y=1|Ŷ=p,A=1) = p. This means that when a model predicts
+                        70% probability for individuals in either group, approximately 70% should actually
+                        be positive. Calibration is important for decision-making based on predicted
+                        probabilities but can conflict with other fairness criteria.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Disparate Impact</dt>
+                    <dd>
+                        Disparate impact is a legal doctrine originating from US employment law that examines
+                        whether a practice disproportionately affects a protected group, regardless of intent.
+                        The "80% rule" suggests disparate impact exists if the selection rate for a protected
+                        group is less than 80% of the rate for the majority group. Disparate impact focuses
+                        on outcomes rather than intentions.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Proxy Variable</dt>
+                    <dd>
+                        A proxy variable is a feature that correlates with a protected attribute and thus
+                        can allow a model to discriminate even when the protected attribute is not included.
+                        Common proxies include ZIP code (for race/income), name (for gender/ethnicity), and
+                        purchasing patterns. Removing protected attributes without addressing proxies may
+                        not prevent discrimination—models can reconstruct protected information.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Fairness-Accuracy Tradeoff</dt>
+                    <dd>
+                        The fairness-accuracy tradeoff refers to the tension between maximizing overall
+                        predictive accuracy and satisfying fairness constraints. Enforcing fairness may
+                        reduce accuracy (especially if base rates differ between groups), while maximizing
+                        accuracy may lead to disparate outcomes. This tradeoff is fundamental when groups
+                        have different underlying distributions, and practitioners must decide how to balance
+                        competing objectives.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Bias Mitigation</dt>
+                    <dd>
+                        Bias mitigation encompasses techniques to reduce unfairness in ML systems. Pre-processing
+                        methods modify training data (resampling, reweighting). In-processing methods change
+                        the learning algorithm (constraints, adversarial debiasing). Post-processing methods
+                        adjust outputs (threshold calibration, reject option). Each approach has different
+                        tradeoffs regarding when intervention occurs and what aspects of fairness are addressed.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Individual Fairness</dt>
+                    <dd>
+                        Individual fairness requires that similar individuals receive similar predictions:
+                        if two people are similar according to a task-relevant metric, their predicted
+                        outcomes should be similar. Unlike group fairness, individual fairness focuses on
+                        treating each person appropriately. The main challenge is defining an appropriate
+                        similarity metric that captures task-relevant features while ignoring protected
+                        attributes.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Intersectionality</dt>
+                    <dd>
+                        Intersectionality considers how multiple protected attributes combine to create unique
+                        patterns of discrimination. A model might be fair for women overall and for Black
+                        people overall, but still discriminate against Black women specifically. Analyzing
+                        intersections is computationally challenging due to small subgroup sizes but is
+                        essential for comprehensive fairness evaluation. Simply checking individual attributes
+                        may miss important disparities.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 12</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

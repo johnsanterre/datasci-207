@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 12 - DATASCI 207">
+    <title>Discussion Topics: Module 12 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 12</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 12: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> fairness in AI matters and what it means to build responsible systems.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Ethics</span>
+                <h3>1. What Is Fairness?</h3>
+                <p>
+                    There are multiple formal definitions of fairness, and they often conflict.
+                    If experts can't agree on a definition, how can we build "fair" systems?
+                </p>
+                <ul class="probing-questions">
+                    <li>Demographic parity focuses on outcomes. Equalized odds focuses on error rates. Which matters
+                        more?</li>
+                    <li>If two fairness criteria conflict, who decides which to prioritize?</li>
+                    <li>Is fairness objective (can be measured) or subjective (depends on values)?</li>
+                    <li>Can a system be "fair" if the people affected feel it is unfair?</li>
+                </ul>
+                <p class="activity-note">Try: Present a hiring scenario. Have groups argue for different fairness
+                    definitions.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Critical Analysis / Systems Thinking</span>
+                <h3>2. The Impossibility Results</h3>
+                <p>
+                    Mathematical proofs show that certain fairness criteria cannot be satisfied simultaneously
+                    when base rates differ. What does this mean for the project of fair ML?
+                </p>
+                <ul class="probing-questions">
+                    <li>If perfect fairness is impossible, should we give up on fairness?</li>
+                    <li>The impossibility depends on base rate differences. Are those differences "natural" or socially
+                        constructed?</li>
+                    <li>If we must choose, should the affected community choose which fairness criterion?</li>
+                    <li>Does the impossibility result show the limits of technical solutions to social problems?</li>
+                </ul>
+                <p class="activity-note">Try: Calculate fairness metrics that show the tradeoff. Discuss what to
+                    prioritize.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Perspective-Taking</span>
+                <h3>3. Who Is Harmed by Algorithmic Decisions?</h3>
+                <p>
+                    False positives and false negatives harm different people in different ways.
+                    Who bears the cost of algorithmic errors, and who benefits?
+                </p>
+                <ul class="probing-questions">
+                    <li>In criminal justice, a false positive means an innocent person is detained. A false negative
+                        means a potentially dangerous person goes free. Who decides the tradeoff?</li>
+                    <li>In hiring, a false negative means a qualified candidate is rejected. They'll never know. Is
+                        invisible harm still harm?</li>
+                    <li>Those harmed by algorithms often have the least power to change them. How do we address this
+                        asymmetry?</li>
+                    <li>Should affected communities have veto power over algorithmic systems?</li>
+                </ul>
+                <p class="activity-note">Try: Role-play as different stakeholders (defendant, victim, judge, company,
+                    candidate). Discuss perspectives.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Application</span>
+                <h3>4. The Proxy Problem</h3>
+                <p>
+                    Even without protected attributes as features, models can learn to predict them
+                    from proxies. Removing sensitive features doesn't ensure fairness. What does?
+                </p>
+                <ul class="probing-questions">
+                    <li>ZIP code is a proxy for race and income. Should we remove it? What if it's genuinely predictive?
+                    </li>
+                    <li>If everything is a proxy for something, can we ever have "neutral" features?</li>
+                    <li>Some argue we should use sensitive attributes to ensure fairness (fairness through awareness).
+                        Is this ethical?</li>
+                    <li>Is it worse to discriminate directly or through proxies?</li>
+                </ul>
+                <p class="activity-note">Try: Build a model without protected attributes and check for disparate
+                    impact. Discuss findings.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Speculation</span>
+                <h3>5. Beyond Technical Fixes</h3>
+                <p>
+                    Pre-processing, in-processing, and post-processing can mitigate bias. But can
+                    technical interventions solve fundamentally social problems?
+                </p>
+                <ul class="probing-questions">
+                    <li>If historical data reflects discrimination, can any algorithm trained on it be fair?</li>
+                    <li>Bias mitigation might make a system "fairer" while the underlying social reality remains
+                        unequal. Is that progress?</li>
+                    <li>Should we deploy a biased but improving system, or wait for a fair one?</li>
+                    <li>Can algorithms be tools for justice, or do they mainly entrench existing power?</li>
+                </ul>
+                <p class="activity-note">Try: Debate—"Technical fairness interventions do more harm than good by
+                    creating false confidence."</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Evaluation</span>
+                <h3>6. Accountability and Responsibility</h3>
+                <p>
+                    When an algorithm makes an unfair decision, who is responsible? The data scientists?
+                    The company? The algorithm itself?
+                </p>
+                <ul class="probing-questions">
+                    <li>If a model was trained on biased data created by society, can any individual be blamed?</li>
+                    <li>Should there be algorithmic auditors, like financial auditors? Who audits the auditors?</li>
+                    <li>EU's GDPR grants a "right to explanation." Is explanation sufficient for accountability?</li>
+                    <li>If no human reviewed a decision, can anyone be held responsible for it?</li>
+                </ul>
+                <p class="activity-note">Try: Design an accountability framework for a specific domain. Discuss
+                    challenges.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 12</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

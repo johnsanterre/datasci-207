@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 13 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 13</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 13 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Attention Mechanism</dt>
+                    <dd>
+                        Attention is a neural network mechanism that allows a model to focus on relevant
+                        parts of the input when producing each output. It computes a weighted combination
+                        of input representations, where weights indicate importance. Unlike fixed pooling,
+                        attention weights are learned and input-dependent. Attention eliminates the
+                        information bottleneck of recurrent networks by creating direct connections
+                        between any input and output positions.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Self-Attention</dt>
+                    <dd>
+                        Self-attention (or intra-attention) relates different positions within the same
+                        sequence to compute a representation. Each position queries all positions
+                        (including itself) to determine what information to gather. This allows modeling
+                        long-range dependencies with constant path length. Self-attention is the core
+                        building block of transformer models and enables parallel processing of sequences.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Query, Key, Value (Q, K, V)</dt>
+                    <dd>
+                        The attention mechanism frames its computation using three vectors: Query (what
+                        information am I looking for?), Key (what information do I have?), and Value
+                        (what do I return when matched?). Attention scores are computed as Query-Key
+                        dot products, normalized with softmax, then used to weight Values. In
+                        self-attention, Q, K, and V are all derived from the same input sequence
+                        through learned linear projections.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Scaled Dot-Product Attention</dt>
+                    <dd>
+                        Scaled dot-product attention computes attention as: Attention(Q,K,V) = softmax(QK^T/√d_k)V.
+                        The scaling factor √d_k prevents dot products from growing too large for high-dimensional
+                        vectors, which would push softmax into regions with tiny gradients. This formulation
+                        is computationally efficient because it uses matrix multiplication operations that
+                        are highly optimized on modern hardware.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Multi-Head Attention</dt>
+                    <dd>
+                        Multi-head attention runs multiple attention functions in parallel, each with
+                        different learned projections. This allows the model to jointly attend to
+                        information from different representation subspaces at different positions.
+                        The outputs are concatenated and projected. Typical transformers use 8-16 heads,
+                        with each head using a fraction of the total dimension.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Transformer</dt>
+                    <dd>
+                        The transformer is a neural architecture introduced in "Attention Is All You Need"
+                        (2017) that relies entirely on attention mechanisms, eliminating recurrence. It
+                        consists of stacked encoder and/or decoder blocks, each containing multi-head
+                        attention, feed-forward networks, residual connections, and layer normalization.
+                        Transformers enable massive parallelization and have become the dominant
+                        architecture for NLP and increasingly for other modalities.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Positional Encoding</dt>
+                    <dd>
+                        Since self-attention is permutation-invariant (order doesn't affect computation),
+                        transformers add positional encodings to inject sequence order information. The
+                        original transformer uses sinusoidal functions at different frequencies; modern
+                        models often learn positional embeddings. Without positional information, the
+                        model cannot distinguish "dog bites man" from "man bites dog."
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>BERT (Bidirectional Encoder Representations from Transformers)</dt>
+                    <dd>
+                        BERT is an encoder-only transformer pre-trained with masked language modeling
+                        (predicting randomly masked tokens) and next sentence prediction. Its bidirectional
+                        nature—each token attends to all tokens—makes it powerful for understanding tasks
+                        like classification and question answering. BERT pioneered the pre-train then
+                        fine-tune paradigm that now dominates NLP.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>GPT (Generative Pre-trained Transformer)</dt>
+                    <dd>
+                        GPT is a decoder-only transformer trained autoregressively to predict the next
+                        token. Causal masking ensures each position only attends to previous positions.
+                        GPT excels at text generation and, at large scale (GPT-3, GPT-4), demonstrates
+                        emergent capabilities like few-shot learning through prompting. The GPT family
+                        showed that scale dramatically improves model capabilities.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Causal Masking</dt>
+                    <dd>
+                        Causal masking (or look-ahead masking) prevents attention from "seeing" future
+                        positions by setting attention weights to zero for positions ahead in the sequence.
+                        This is essential for autoregressive generation: when generating token t, the
+                        model should only use information from tokens 1 through t-1. Causal masking is
+                        implemented by adding large negative values before softmax.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Fine-Tuning</dt>
+                    <dd>
+                        Fine-tuning adapts a pre-trained model to a specific task by training on
+                        task-specific data, usually with a small learning rate. For transformers, this
+                        typically involves adding a task-specific head (classification layer) and
+                        training the entire model end-to-end. Fine-tuning is far more sample-efficient
+                        than training from scratch because the model starts with general language
+                        understanding.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Layer Normalization</dt>
+                    <dd>
+                        Layer normalization normalizes activations across the feature dimension (rather
+                        than batch dimension like batch norm). For each sample, it computes mean and
+                        variance across features and normalizes. This stabilizes training by reducing
+                        internal covariate shift. Transformers apply layer norm after residual
+                        connections, and this proves essential for training deep transformer stacks.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 13</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

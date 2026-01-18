@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 8 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 8</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 8: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Inertia measures clustering quality (lower is better), not training speed.",
+                    "b": "Correct. Inertia is the sum of squared distances from each point to its cluster centroid. Lower inertia means points are closer to their centroids, indicating more compact clusters.",
+                    "c": "Inertia is computed for all clusters, not just the largest one.",
+                    "d": "Inertia relates to distances within clusters, not between cluster centers."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What does inertia measure in k-means clustering?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> The time required for training</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> The sum of squared distances from points to
+                                their cluster centroids</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> The size of the largest cluster</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> The distance between cluster centers</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "More components always decreases reconstruction error but may include noise.",
+                    "b": "The number of components does not directly speed up training of PCA itself.",
+                    "c": "Correct. The optimal number of components balances retaining most variance (typically 90-95%) while reducing dimensionality. Too few loses information; too many includes noise and defeats the purpose.",
+                    "d": "The number of components can be any value from 1 to the number of original features."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>When choosing the number of PCA components, what is the main consideration?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Always use as many components as
+                                possible</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Choose the number that minimizes training
+                                time</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Balance variance explained vs.
+                                dimensionality reduction</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> The number must equal the number of
+                                clusters</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Hierarchical clustering produces a dendrogram; k-means produces centroids and labels.",
+                    "b": "K-means requires specifying k; hierarchical clustering does not require k upfront.",
+                    "c": "K-means is typically faster than hierarchical for large datasets.",
+                    "d": "Correct. Hierarchical clustering builds a complete tree structure (dendrogram) that can be cut at any level to get any number of clusters, without rerunning the algorithm."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is an advantage of hierarchical clustering over k-means?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> It only works with the same number of
+                                clusters</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> It requires specifying k in advance</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="c"> It is always faster</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> It produces a hierarchy that can be cut at
+                                any level</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Silhouette scores near 1 indicate points are close to their own cluster and far from others. Near 0 means clusters overlap. Negative values suggest points may be in the wrong cluster.",
+                    "b": "High silhouette scores (near 1) indicate good clustering, not poor.",
+                    "c": "Silhouette score is about cluster quality, not training speed.",
+                    "d": "Silhouette score applies to the clustering as a whole, not individual features."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>A silhouette score close to 1 indicates what?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> Points are well-matched to their own cluster
+                                and far from others</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> The clustering is poor and should be
+                                redone</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> The algorithm converged quickly</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> Only one feature was used</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "K-means uses Euclidean distance, which is affected by feature scale. Larger-scale features will dominate.",
+                    "b": "Correct. Both k-means and PCA are sensitive to feature scales. Features on larger scales will dominate distance calculations (k-means) or variance (PCA). Standardization puts all features on equal footing.",
+                    "c": "Algorithms work on both scaled and unscaled data; the issue is whether results are meaningful.",
+                    "d": "Categorical features require encoding, but scaling is about numeric magnitude."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Why should you standardize features before applying k-means or PCA?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> It is not necessary; both methods are
+                                scale-invariant</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> Features with larger scales would otherwise
+                                dominate the results</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> The algorithms cannot process
+                                non-standardized data</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> Standardization is only needed for
+                                categorical features</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 8</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

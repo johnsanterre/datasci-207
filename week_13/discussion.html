@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 13 - DATASCI 207">
+    <title>Discussion Topics: Module 13 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 13</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 13: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> transformers have transformed AI and what that means for the future.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Epistemology</span>
+                <h3>1. Attention as Understanding?</h3>
+                <p>
+                    Attention mechanisms "decide" what to focus on. Does this represent understanding,
+                    or just a clever computational trick?
+                </p>
+                <ul class="probing-questions">
+                    <li>When GPT generates a response, it "attends" to relevant context. Is that similar to how humans
+                        think?</li>
+                    <li>Attention weights are sometimes visualized as "explanations." Are they meaningful or post-hoc
+                        rationalizations?</li>
+                    <li>If a model attends to the right tokens for the wrong reasons, does that matter?</li>
+                    <li>Is "attention" in transformers analogous to human attention, or is the metaphor misleading?</li>
+                </ul>
+                <p class="activity-note">Try: Visualize attention patterns. Discuss whether they match human
+                    intuitions about relevance.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Critical Analysis</span>
+                <h3>2. The Pre-training Power Concentration</h3>
+                <p>
+                    Foundation models like GPT and BERT are trained by a few large organizations.
+                    What are the implications of this concentration of AI power?
+                </p>
+                <ul class="probing-questions">
+                    <li>Training GPT-4 cost an estimated $100M+. What does this mean for AI research outside Big Tech?
+                    </li>
+                    <li>If everyone fine-tunes the same base models, do we end up with AI mono-cultures?</li>
+                    <li>Open-source models like LLaMA democratize access. But is access the same as power?</li>
+                    <li>Who should govern foundation models? Companies? Governments? International bodies?</li>
+                </ul>
+                <p class="activity-note">Try: Map who controls the major foundation models. Discuss power
+                    dynamics.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Speculation</span>
+                <h3>3. Understanding Without Grounding</h3>
+                <p>
+                    Transformers learn language from text alone, without sensory experience of the world.
+                    Can language understanding ever be grounded without embodiment?
+                </p>
+                <ul class="probing-questions">
+                    <li>GPT can explain what "pain" means without ever feeling pain. Is that understanding?</li>
+                    <li>Multimodal models (GPT-4V, CLIP) see images. Does vision provide grounding, or is it just more
+                        symbols?</li>
+                    <li>The Chinese Room argument applied to transformers—are they understanding or simulating
+                        understanding?</li>
+                    <li>If a model consistently behaves as if it understands, does the distinction between understanding
+                        and simulating matter?</li>
+                </ul>
+                <p class="activity-note">Try: Pose questions requiring world knowledge vs. text pattern matching.
+                    Discuss the boundaries.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Systems Thinking / Ethics</span>
+                <h3>4. Emergent Capabilities and Unpredictability</h3>
+                <p>
+                    Large language models exhibit "emergent" abilities that appear suddenly at scale.
+                    If we can't predict what models will learn, can we control them?
+                </p>
+                <ul class="probing-questions">
+                    <li>Emergent capabilities weren't designed—they appeared. Should we deploy systems we don't fully
+                        understand?</li>
+                    <li>If capabilities emerge unexpectedly, could dangerous capabilities also emerge?</li>
+                    <li>Is "scale up and see what happens" responsible science or reckless experimentation?</li>
+                    <li>How should we regulate systems whose capabilities we can't fully specify in advance?</li>
+                </ul>
+                <p class="activity-note">Try: List emergent capabilities. Discuss how we'd have predicted (or not)
+                    each one.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Application / Evaluation</span>
+                <h3>5. The Prompt Engineering Paradox</h3>
+                <p>
+                    Foundation models are "programmed" through prompts rather than code. This democratizes
+                    access but changes what it means to build AI systems.
+                </p>
+                <ul class="probing-questions">
+                    <li>Is prompt engineering programming, or something new?</li>
+                    <li>If the right prompt can unlock capabilities, who is responsible when a prompt elicits harmful
+                        output?</li>
+                    <li>Prompt injection attacks can manipulate models. How do we secure prompt-based systems?</li>
+                    <li>Should prompts be copyrightable? Are they intellectual property?</li>
+                </ul>
+                <p class="activity-note">Try: Experiment with different prompts for the same task. Discuss the
+                    sensitivity.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Philosophy</span>
+                <h3>6. The End of Applied ML as We Know It?</h3>
+                <p>
+                    Foundation models shift ML from training models to prompting them. Does this change
+                    what it means to be an ML practitioner?
+                </p>
+                <ul class="probing-questions">
+                    <li>If many tasks can be solved by prompting GPT, do we still need custom models?</li>
+                    <li>What skills from this course remain relevant in a world of foundation models?</li>
+                    <li>Does the ease of using foundation models risk deskilling the field?</li>
+                    <li>Will there be a divide between those who create foundation models and those who consume them?
+                    </li>
+                </ul>
+                <p class="activity-note">Try: Solve a course problem with prompting vs. custom ML. Discuss
+                    tradeoffs.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 13</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

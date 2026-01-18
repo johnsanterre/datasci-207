@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 11 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 11</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 11: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "L1 encourages sparsity (exactly zero weights); L2 shrinks but rarely to exactly zero.",
+                    "b": "Both L1 and L2 help prevent overfitting by constraining model complexity.",
+                    "c": "Correct. L1 regularization is the technique that pushes weights to exactly zero, effectively removing features from the model. This makes L1/Lasso useful for automatic feature selection.",
+                    "d": "L1 and L2 refer to which norm is used for the penalty, not the number of layers."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What is the key difference between L1 and L2 regularization?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> L1 shrinks weights; L2 creates sparse
+                                solutions</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> L2 prevents overfitting; L1 does not</label>
+                        </li>
+                        <li><label><input type="radio" name="q1" value="c"> L1 can push weights to exactly zero; L2
+                                shrinks but rarely to zero</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> L2 is for networks with 2 layers; L1 for
+                                single-layer</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Dropout is disabled during inference, not training.",
+                    "b": "Correct. During training, dropout randomly sets activations to zero, forcing the network to learn redundant representations and preventing neurons from relying too heavily on specific other neurons.",
+                    "c": "Dropout rates are typically 0.1-0.5, not removing most neurons.",
+                    "d": "Dropout is used solely for regularization, not for making networks deeper."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>How does dropout work during training?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> It removes layers from the network</label>
+                        </li>
+                        <li><label><input type="radio" name="q2" value="b"> It randomly sets some activations to
+                                zero</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> It removes 90% of neurons
+                                permanently</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> It doubles the number of layers</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "CV uses the SAME data multiple times with different splits, not more data.",
+                    "b": "CV is more computationally expensive because it trains k models instead of one.",
+                    "c": "CV provides a more ROBUST estimate, with lower variance, not higher.",
+                    "d": "Correct. By averaging performance across multiple train/validation splits, cross-validation reduces the dependence on any single split being unrepresentative, providing a more reliable performance estimate."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is the main advantage of k-fold cross-validation over a single train/validation split?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> It uses more training data</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> It is faster to compute</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> It always gives higher accuracy</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> It provides a more robust performance
+                                estimate</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Random search samples from continuous distributions and often finds good solutions faster because it explores more of the parameter space with less computation, especially when some parameters matter more than others.",
+                    "b": "Random search does not guarantee the global optimum, but neither does grid search (which only finds the best within its grid).",
+                    "c": "Random search typically uses the SAME number of iterations as specified, not more.",
+                    "d": "Grid search is exhaustive; random search samples randomly."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>Why might random search outperform grid search?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> It explores more of the parameter space with
+                                the same budget</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> It always finds the global optimum</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="c"> It uses more iterations</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> It tries all combinations
+                                exhaustively</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Pipelines ensure preprocessing IS included in cross-validation, not excluded.",
+                    "b": "Pipelines do not increase the number of folds.",
+                    "c": "Correct. Without pipelines, fitting a scaler on all data before CV would leak validation information into training. Pipelines ensure each preprocessing step is fit only on the training fold, maintaining proper separation.",
+                    "d": "Pipelines affect how preprocessing is done, not which hyperparameters are found."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Why should you use a Pipeline when combining preprocessing with cross-validation?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> To exclude preprocessing from
+                                cross-validation</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> To increase the number of folds</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> To prevent data leakage from preprocessing
+                                on test data</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> To automatically select the best
+                                hyperparameters</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 11</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

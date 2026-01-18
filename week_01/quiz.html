@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 1 Knowledge Check Quiz - DATASCI 207">
+    <title>Quiz: Module 1 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 1</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 1: Knowledge Check</h1>
+            <p>Test your understanding of the foundational concepts covered in this module.</p>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <!-- Question 1 -->
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "The training set is used to fit the model, not to evaluate generalization. Performance on training data can be misleading if the model overfits.",
+                    "b": "Correct. The test set is held out specifically to evaluate how well the model generalizes to new, unseen data.",
+                    "c": "A validation set is used for model selection and hyperparameter tuning, not final evaluation of generalization.",
+                    "d": "The full dataset includes training data, so performance on it does not measure generalization to new data."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What is the primary purpose of a test set?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> To train the model</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> To evaluate how well the model generalizes
+                                to unseen data</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> To tune hyperparameters</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> To increase the size of the training
+                                data</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Overfitting means the model has learned the training data too specifically. It would have LOW training error, not high.",
+                    "b": "If the model generalizes well, it would have similar (low) error on both training and test data.",
+                    "c": "Correct. Overfitting is characterized by low training error (the model fits training data well) but high test error (it fails to generalize).",
+                    "d": "Low error on both sets indicates good generalization, not overfitting."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>A model achieves 98% accuracy on training data but only 60% on test data. This is most likely a
+                        case of:</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Underfitting</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Good generalization</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Overfitting</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> Optimal performance</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. A baseline provides a simple reference point. Your model should beat baselines like predicting the mean or most common class, otherwise the added complexity is not justified.",
+                    "b": "The baseline is not the best possible model; it is intentionally simple. It sets a floor, not a ceiling.",
+                    "c": "Baselines are usually very simple (e.g., predict the mean). They are not complex.",
+                    "d": "A baseline is used for comparison, not for hyperparameter tuning."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>Why is it important to establish a baseline model?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> To have a reference point that your model
+                                should outperform</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Because the baseline is always the best
+                                model</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Baselines are complex models that capture
+                                all patterns</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> To determine the optimal
+                                hyperparameters</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "Inputs (or features) are the information given to the model to make predictions. They are not what the model predicts.",
+                    "b": "Loss measures error, not the predicted output. The model minimizes loss during training.",
+                    "c": "An error is the difference between prediction and actual value, not the prediction itself.",
+                    "d": "Correct. The output (also called target, label, or prediction) is the value the model produces given the inputs."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>In the function notation f(x) = y, what does y represent?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> The input features</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> The loss value</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> The error term</label></li>
+                        <li><label><input type="radio" name="q4" value="d"> The output or target value</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Complexity alone does not determine generalization. A complex model that overfits will not generalize well.",
+                    "b": "Correct. Generalization is defined as the ability to perform well on new, unseen data that was not used during training.",
+                    "c": "Perfect training performance often indicates overfitting, which hurts generalization.",
+                    "d": "Memorizing training examples is the opposite of generalization. It leads to overfitting."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>What does it mean for a model to generalize well?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> It uses many parameters</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> It performs well on data it has not seen
+                                during training</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> It achieves 100% accuracy on training
+                                data</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> It memorizes all training examples</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 1</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

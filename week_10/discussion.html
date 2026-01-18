@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 10 - DATASCI 207">
+    <title>Discussion Topics: Module 10 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 10</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 10: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> CNNs revolutionized computer vision and what that means for AI.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Analysis</span>
+                <h3>1. Why Do Convolutions Work for Vision?</h3>
+                <p>
+                    CNNs exploit spatial locality—nearby pixels matter more than distant ones. But why
+                    does this assumption hold, and when might it break down?
+                </p>
+                <ul class="probing-questions">
+                    <li>Humans recognize objects regardless of position. How do CNNs achieve translation invariance?
+                    </li>
+                    <li>Are there visual tasks where local patterns don't matter? (Abstract art? Optical illusions?)
+                    </li>
+                    <li>CNNs were inspired by the visual cortex. Is this biomimicry or coincidence?</li>
+                    <li>Would aliens with different eyes invent different architectures?</li>
+                </ul>
+                <p class="activity-note">Try: Show images where global context matters more than local features.
+                    Discuss whether CNNs would struggle.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Critical Analysis</span>
+                <h3>2. The Transfer Learning Paradox</h3>
+                <p>
+                    Pre-trained models on ImageNet enable powerful vision systems. But ImageNet was built
+                    from a particular worldview. What comes along for the ride?
+                </p>
+                <ul class="probing-questions">
+                    <li>ImageNet categories include dog breeds but not vegetables from non-Western cuisines. What's
+                        included and excluded?</li>
+                    <li>If models learn "chair" from Western furniture, will they recognize chairs from other cultures?
+                    </li>
+                    <li>Transfer learning democratizes AI (anyone can use), but who controls the foundation models?</li>
+                    <li>Should there be different pre-trained models for different cultures or contexts?</li>
+                </ul>
+                <p class="activity-note">Try: Test a pre-trained model on images from different cultural contexts.
+                    Discuss the results.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Epistemology</span>
+                <h3>3. What Do Filters "See"?</h3>
+                <p>
+                    We visualize learned filters and say "this detects edges" or "this detects eyes."
+                    But is that interpretation accurate, or are we projecting human concepts?
+                </p>
+                <ul class="probing-questions">
+                    <li>When we label a filter as an "edge detector," are we discovering or inventing that
+                        interpretation?</li>
+                    <li>Deeper layers have "higher-level" features. What does "higher-level" mean?</li>
+                    <li>Can we trust feature visualizations? Do they show what the network actually uses?</li>
+                    <li>If two filters produce similar outputs for different reasons, does it matter?</li>
+                </ul>
+                <p class="activity-note">Try: Show filter visualizations and have students generate alternative
+                    interpretations.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Systems Thinking / Ethics</span>
+                <h3>4. The Compute Cost of Vision</h3>
+                <p>
+                    Training large vision models requires enormous computational resources. What are
+                    the implications for who can do AI research?
+                </p>
+                <ul class="probing-questions">
+                    <li>If only large companies can train foundation models, what happens to academic research?</li>
+                    <li>Training GPT-4V reportedly cost $100M+. Who benefits from such investments?</li>
+                    <li>Environmental cost: large models have significant carbon footprints. How do we weigh benefits
+                        and costs?</li>
+                    <li>Does efficient research become more valuable as compute costs rise?</li>
+                </ul>
+                <p class="activity-note">Try: Calculate the approximate cost of training a model. Discuss who can
+                    afford it.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Speculation</span>
+                <h3>5. Pooling as Information Loss</h3>
+                <p>
+                    Pooling deliberately throws away information for the sake of invariance and efficiency.
+                    What's lost, and does it matter?
+                </p>
+                <ul class="probing-questions">
+                    <li>Max pooling keeps the strongest signal. What if subtle signals matter?</li>
+                    <li>In medical imaging, could pooling discard diagnostically relevant details?</li>
+                    <li>Strided convolutions are replacing pooling. Does this solve the problem or just hide it?</li>
+                    <li>Is there a philosophical parallel—summarizing always loses something?</li>
+                </ul>
+                <p class="activity-note">Try: Show an image at different resolutions. Discuss what's lost at each
+                    level.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Application</span>
+                <h3>6. When CNNs Fail</h3>
+                <p>
+                    CNNs are brittle in ways humans are not. Small perturbations (adversarial examples)
+                    can completely fool them. What does this reveal about their "understanding"?
+                </p>
+                <ul class="probing-questions">
+                    <li>Adversarial patches can make a stop sign invisible to self-driving cars. How worried should we
+                        be?</li>
+                    <li>Humans and CNNs fail differently. Does this mean they "see" differently?</li>
+                    <li>If we don't understand why CNNs fail, can we trust them in critical applications?</li>
+                    <li>Should adversarial robustness be a requirement for deployment?</li>
+                </ul>
+                <p class="activity-note">Try: Generate simple adversarial examples. Discuss what makes CNNs
+                    vulnerable.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 10</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

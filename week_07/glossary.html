@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 7 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 7</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 7 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>K-Nearest Neighbors (KNN)</dt>
+                    <dd>
+                        K-Nearest Neighbors is a non-parametric algorithm that makes predictions by finding
+                        the k training examples closest to a query point and aggregating their labels. For
+                        classification, it uses majority voting; for regression, it averages neighbor values.
+                        KNN has no training phase (it just stores data) but prediction is slow for large
+                        datasets. The choice of k trades off between noise sensitivity (small k) and
+                        over-smoothing (large k).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Decision Tree</dt>
+                    <dd>
+                        A decision tree is a model that makes predictions by recursively partitioning the
+                        feature space using axis-aligned splits, forming a tree structure of if-then rules.
+                        Each internal node tests a feature against a threshold; leaves contain predictions.
+                        Trees are highly interpretable and can capture non-linear relationships. However,
+                        they are prone to overfitting when grown too deep and can be unstable (small data
+                        changes lead to different trees).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Entropy</dt>
+                    <dd>
+                        Entropy is a measure of impurity or disorder in a set, defined as H(S) = -Σ pᵢ log₂(pᵢ),
+                        where pᵢ is the proportion of class i. For binary classification, entropy is 0 for
+                        pure sets (all one class) and 1 for maximally mixed sets (50-50 split). Decision
+                        trees use entropy to evaluate splits—good splits reduce entropy in the resulting
+                        subsets. Lower entropy means more homogeneous class distribution.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Information Gain</dt>
+                    <dd>
+                        Information gain measures the reduction in entropy achieved by splitting a dataset
+                        on a particular feature. It is computed as the parent entropy minus the weighted
+                        average of child entropies: IG = H(parent) - Σ(|child|/|parent|) × H(child).
+                        Decision tree algorithms greedily select the split with maximum information gain
+                        at each node. Higher information gain indicates a more useful split that better
+                        separates classes.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Gini Impurity</dt>
+                    <dd>
+                        Gini impurity is an alternative to entropy for measuring node purity, defined as
+                        Gini(S) = 1 - Σ pᵢ². It represents the probability of incorrectly classifying
+                        a randomly chosen element if labeled according to the class distribution. Like
+                        entropy, Gini is 0 for pure nodes and reaches maximum for uniform distributions.
+                        The CART algorithm uses Gini impurity, while ID3 and C4.5 use entropy.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Ensemble Method</dt>
+                    <dd>
+                        An ensemble method combines multiple models to produce better predictions than any
+                        single model alone. The key insight is that if individual model errors are
+                        independent, combining them reduces overall error. Ensembles can reduce variance
+                        (bagging, random forests) or bias (boosting). Common combination strategies include
+                        voting (classification), averaging (regression), and weighted combinations.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Bagging (Bootstrap Aggregating)</dt>
+                    <dd>
+                        Bagging is an ensemble technique that trains multiple models on different bootstrap
+                        samples (random samples with replacement) of the training data, then averages their
+                        predictions. By training on different subsets, each model sees different views of
+                        the data, and averaging reduces variance without increasing bias. Bagging is
+                        particularly effective for high-variance models like deep decision trees.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Random Forest</dt>
+                    <dd>
+                        Random Forest is an ensemble of decision trees that combines bagging with random
+                        feature selection. Each tree is trained on a bootstrap sample, and at each split,
+                        only a random subset of features is considered. This additional randomness
+                        decorrelates the trees, further reducing variance compared to simple bagging.
+                        Random forests are widely used because they are accurate, robust to hyperparameters,
+                        and provide feature importance scores.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Gradient Boosting</dt>
+                    <dd>
+                        Gradient boosting is a sequential ensemble method where each model is trained to
+                        correct errors made by the previous models. Specifically, each new tree fits the
+                        negative gradient (residuals) of the loss function. Predictions are accumulated
+                        with a learning rate that controls contribution size. Gradient boosting often
+                        achieves state-of-the-art results on tabular data but requires careful tuning
+                        to avoid overfitting.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Feature Importance</dt>
+                    <dd>
+                        Feature importance quantifies how much each feature contributes to the model's
+                        predictions. For tree-based models, importance is typically computed by summing
+                        the improvement (e.g., information gain) across all splits using that feature,
+                        weighted by the number of samples affected. Random forest importance averages
+                        across trees for stability. Feature importance aids interpretability and feature
+                        selection.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Pruning</dt>
+                    <dd>
+                        Pruning is a technique to reduce decision tree complexity and prevent overfitting
+                        by removing branches. Pre-pruning (early stopping) limits tree growth during
+                        training using criteria like maximum depth or minimum samples per leaf. Post-pruning
+                        grows the full tree then removes nodes that don't improve validation performance.
+                        Pruning trades training accuracy for better generalization.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Bootstrap Sample</dt>
+                    <dd>
+                        A bootstrap sample is a random sample of size n drawn with replacement from a
+                        dataset of size n. On average, each bootstrap sample contains about 63% of the
+                        unique original examples (some appear multiple times, others are out-of-bag).
+                        Bootstrap sampling enables variance estimation and is the foundation of bagging.
+                        The left-out examples (out-of-bag) can be used for validation without a separate
+                        test set.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 7</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

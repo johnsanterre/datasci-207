@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 6 - DATASCI 207">
+    <title>Discussion Topics: Module 6 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 6</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 6: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> neural networks work and what their power means.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Analysis</span>
+                <h3>1. The Brain Metaphor: Inspiration or Distraction?</h3>
+                <p>
+                    We call them "neural" networks, but they bear little resemblance to actual brains.
+                    Is the biological metaphor helpful or harmful?
+                </p>
+                <ul class="probing-questions">
+                    <li>What do artificial neurons actually share with biological neurons? What's different?</li>
+                    <li>Does calling it "neural" make the technology seem more legitimate or trustworthy?</li>
+                    <li>Would the field have developed differently with a different metaphor (e.g., "layered function
+                        approximators")?</li>
+                    <li>When AI systems fail, do we tend to anthropomorphize the failure? Does the neural metaphor
+                        encourage this?</li>
+                </ul>
+                <p class="activity-note">Try: Debate—"The neural metaphor has done more harm than good for public
+                    understanding of AI."</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Epistemology / Evaluation</span>
+                <h3>2. The Black Box Problem</h3>
+                <p>
+                    Neural networks work, but we don't always know why. How much does
+                    understanding matter, and what are we willing to sacrifice for it?
+                </p>
+                <ul class="probing-questions">
+                    <li>Would you take a medicine that works but no one understands why?</li>
+                    <li>Is interpretability a requirement for trust, or can trust come from track record alone?</li>
+                    <li>When regulators demand "explainability," what are they really asking for?</li>
+                    <li>Do humans actually make decisions in an interpretable way? Are we black boxes too?</li>
+                </ul>
+                <p class="activity-note">Try: Present a scenario where a black-box model outperforms all interpretable
+                    ones. What should be deployed?</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Critical Analysis / History</span>
+                <h3>3. The Lottery Ticket Hypothesis and Hidden Structure</h3>
+                <p>
+                    Research suggests large networks contain small "winning" subnetworks.
+                    What does this say about how learning works and what we're actually building?
+                </p>
+                <ul class="probing-questions">
+                    <li>If a small subnetwork can do the job, why train a large one?</li>
+                    <li>Is the large network "wasteful" or does redundancy serve a purpose?</li>
+                    <li>What does it mean that we can't find the winning ticket without training the full network first?
+                    </li>
+                    <li>Are there parallels to how human organizations work? (Many employees, few critical ones?)</li>
+                </ul>
+                <p class="activity-note">Try: Discuss what "essential" means. Is there essential structure that must
+                    exist?</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Systems Thinking</span>
+                <h3>4. Universal Approximation: Power and Peril</h3>
+                <p>
+                    Neural networks can approximate any function—given enough data and capacity.
+                    This universality is a strength, but is it also a danger?
+                </p>
+                <ul class="probing-questions">
+                    <li>If NNs can fit anything, does that include fitting noise, bias, or nonsense?</li>
+                    <li>Universal approximation says nothing about generalization. Why is this distinction crucial?</li>
+                    <li>"With great power comes great responsibility." What responsibilities come with universal
+                        approximators?</li>
+                    <li>Can a tool that fits anything actually be scientific?</li>
+                </ul>
+                <p class="activity-note">Try: Show examples of NNs fitting random labels. Discuss what this means for
+                    validation.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Perspective-Taking</span>
+                <h3>5. Activation Functions as Design Choices</h3>
+                <p>
+                    ReLU, sigmoid, tanh—each shapes how information flows. These feel like
+                    technical details, but they encode assumptions about how the world works.
+                </p>
+                <ul class="probing-questions">
+                    <li>ReLU is "spiky" (hard threshold). Does that match how real neurons work?</li>
+                    <li>Choosing an activation function is choosing how to transform reality. What are we assuming?</li>
+                    <li>If small changes to activation functions change results, how robust is our science?</li>
+                    <li>Could an AI discover activation functions we haven't thought of?</li>
+                </ul>
+                <p class="activity-note">Try: Have students design a new activation function and justify its properties.
+                </p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Speculation</span>
+                <h3>6. Depth vs. Width: The Architecture Question</h3>
+                <p>
+                    Deeper networks learn hierarchical features; wider networks learn more patterns.
+                    Is there a "right" architecture, or is architecture a form of prior knowledge?
+                </p>
+                <ul class="probing-questions">
+                    <li>Why does depth seem to help? What does "hierarchy" mean for different problems?</li>
+                    <li>Is our preference for certain architectures theory-driven or trial-and-error?</li>
+                    <li>Neural architecture search automates design. Does that make the human designer obsolete?</li>
+                    <li>What would it mean for an architecture to be "discovered" vs. "invented"?</li>
+                </ul>
+                <p class="activity-note">Try: Given the same task, have groups propose architectures and defend their
+                    choices.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 6</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

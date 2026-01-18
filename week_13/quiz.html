@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 13 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 13</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 13: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "CNNs are good for local patterns but struggle with long-range dependencies in text.",
+                    "b": "Dense layers cannot efficiently model variable-length sequences.",
+                    "c": "Correct. RNNs must process sequences step-by-step, which prevents parallelization and causes information bottlenecks for long sequences. Attention creates direct paths between any positions, solving these issues.",
+                    "d": "Both RNNs and attention models can handle sequence classification."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>What problem does attention solve that RNNs struggle with?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> RNNs cannot process text data</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> RNNs are too parallel</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> RNNs have difficulty modeling long-range
+                                dependencies</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> RNNs cannot classify sequences</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Queries determine WHAT to look for, not what to retrieve.",
+                    "b": "Correct. In the Q-K-V formulation, Values contain the actual information retrieved. Keys are matched against Queries to determine attention weights, which are then used to create a weighted sum of Values.",
+                    "c": "Keys are matched against Queries; they are not directly retrieved.",
+                    "d": "Attention weights are scalar values indicating importance, not the retrieved content."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>In the Query-Key-Value formulation, what role do Values play?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> They determine what to look for</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> They contain the information to be
+                                retrieved</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> They are matched against Queries</label>
+                        </li>
+                        <li><label><input type="radio" name="q2" value="d"> They store the attention weights</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "BERT is bidirectional; GPT is autoregressive (causal).",
+                    "b": "BERT uses ENCODER architecture; GPT uses DECODER architecture.",
+                    "c": "BERT excels at UNDERSTANDING tasks; GPT excels at GENERATION.",
+                    "d": "Correct. BERT processes bidirectionally (each token sees all tokens) making it ideal for understanding tasks. GPT processes autoregressively (each token sees only prior tokens) making it ideal for generation."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is the key difference between BERT and GPT?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> BERT is autoregressive; GPT is
+                                bidirectional</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> BERT uses decoder; GPT uses encoder</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="c"> BERT generates text; GPT understands
+                                text</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> BERT is bidirectional (understanding); GPT
+                                is autoregressive (generation)</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Self-attention computes attention over all positions in parallel using matrix operations, with no sequential dependencies. This is unlike RNNs where output at position t depends on output at position t-1.",
+                    "b": "Transformers CAN model sequences—they use attention instead of recurrence.",
+                    "c": "Transformers have residual connections, but that is not why they parallelize.",
+                    "d": "Transformers do have position information via positional encodings."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>Why can transformers be parallelized during training while RNNs cannot?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> Self-attention computes all positions
+                                simultaneously</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> Transformers do not model sequences</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="c"> Transformers use skip connections</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="d"> Transformers ignore position
+                                information</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Positional encodings provide position information; they do not enforce causal masking.",
+                    "b": "Multi-head attention enables multiple attention patterns but does not prevent peeking ahead.",
+                    "c": "Correct. Causal masking sets attention weights to zero for future positions by adding large negative values before softmax. This ensures that when generating token t, the model only uses tokens 1 through t-1.",
+                    "d": "Layer normalization stabilizes training but does not control what positions can attend to."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>What mechanism prevents a decoder from seeing future tokens during training?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> Positional encodings</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> Multi-head attention</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> Causal masking (masking future
+                                positions)</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> Layer normalization</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 13</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

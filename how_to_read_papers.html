@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guide to reading machine learning research papers">
+    <title>How to Read ML Papers - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span class="separator">/</span>
+                <span>How to Read ML Papers</span>
+            </nav>
+
+            <h1>How to Read ML Papers</h1>
+
+            <p>
+                Throughout this course, you will encounter links to foundational research papers.
+                Reading academic papers is a skill that improves with practice. This guide offers
+                strategies to help you read efficiently and extract key insights.
+            </p>
+
+            <h2>The Three-Pass Approach</h2>
+
+            <p>
+                Do not try to read a paper linearly from start to finish. Instead, make multiple
+                passes with different goals.
+            </p>
+
+            <h3>First Pass: Survey (5-10 minutes)</h3>
+            <p>Get a high-level understanding of what the paper is about.</p>
+            <ul>
+                <li>Read the title, abstract, and introduction</li>
+                <li>Read all section headings</li>
+                <li>Look at figures and tables (often the most informative part)</li>
+                <li>Read the conclusion</li>
+                <li>Glance at the references to see what work it builds on</li>
+            </ul>
+            <p>
+                After this pass, you should be able to answer: What problem does this paper solve?
+                What is the main contribution? Is this paper relevant to what I need to learn?
+            </p>
+
+            <h3>Second Pass: Comprehension (30-60 minutes)</h3>
+            <p>Understand the main ideas without getting lost in details.</p>
+            <ul>
+                <li>Read the paper more carefully, but skip complex proofs or derivations</li>
+                <li>Annotate key points in the margins</li>
+                <li>Pay attention to figures and understand what each one shows</li>
+                <li>Note terms or concepts you do not understand for later lookup</li>
+                <li>Summarize the main method in your own words</li>
+            </ul>
+
+            <h3>Third Pass: Critical Reading (1-2 hours, if needed)</h3>
+            <p>Deep dive for full understanding.</p>
+            <ul>
+                <li>Work through the math and derivations</li>
+                <li>Question assumptions and identify limitations</li>
+                <li>Think about how you would implement the method</li>
+                <li>Consider how this work connects to other things you know</li>
+            </ul>
+
+            <h2>What to Focus On</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>What to Extract</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Abstract</td>
+                        <td>Problem, method summary, key result (one sentence each)</td>
+                    </tr>
+                    <tr>
+                        <td>Introduction</td>
+                        <td>Motivation, why existing solutions are insufficient</td>
+                    </tr>
+                    <tr>
+                        <td>Related Work</td>
+                        <td>Context and positioning (often skimmable on first read)</td>
+                    </tr>
+                    <tr>
+                        <td>Method</td>
+                        <td>The core contribution; focus here</td>
+                    </tr>
+                    <tr>
+                        <td>Experiments</td>
+                        <td>What datasets, baselines, and metrics were used</td>
+                    </tr>
+                    <tr>
+                        <td>Results</td>
+                        <td>Key numbers and comparisons; look at tables and figures</td>
+                    </tr>
+                    <tr>
+                        <td>Conclusion</td>
+                        <td>Summary and future directions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>What to Skip (Initially)</h2>
+
+            <ul>
+                <li>Detailed proofs (unless you need them)</li>
+                <li>Exhaustive related work sections</li>
+                <li>Appendices and supplementary material</li>
+                <li>Implementation details that are not central to understanding</li>
+            </ul>
+
+            <h2>Taking Notes</h2>
+
+            <p>For each paper you read, try to write down:</p>
+            <ol>
+                <li><strong>Problem:</strong> What problem is being solved?</li>
+                <li><strong>Key Insight:</strong> What is the main idea or contribution?</li>
+                <li><strong>Method:</strong> How does it work (in your own words)?</li>
+                <li><strong>Results:</strong> What are the main findings?</li>
+                <li><strong>Limitations:</strong> What are the weaknesses or open questions?</li>
+                <li><strong>Relevance:</strong> How does this connect to what I am learning?</li>
+            </ol>
+
+            <h2>Dealing with Difficulty</h2>
+
+            <p>It is normal to not understand everything on the first read.</p>
+            <ul>
+                <li>Accept that some parts will be unclear initially</li>
+                <li>Look up unfamiliar terms and notation</li>
+                <li>Read cited papers if you need more background</li>
+                <li>Discuss with classmates or instructors</li>
+                <li>Return to the paper after learning more context</li>
+            </ul>
+
+            <h2>Recommended Resources</h2>
+
+            <ul class="readings-list">
+                <li>
+                    <span class="reading-type">Guide</span>
+                    <span class="reading-title"><a
+                            href="https://web.stanford.edu/class/ee384m/Handouts/HowtoReadPaper.pdf" target="_blank">How
+                            to Read a Paper</a></span>
+                    <span class="reading-source">S. Keshav, University of Waterloo</span>
+                </li>
+                <li>
+                    <span class="reading-type">Video</span>
+                    <span class="reading-title"><a href="https://www.youtube.com/watch?v=SHTOI0KtZnU"
+                            target="_blank">How to Read a Machine Learning Paper</a></span>
+                    <span class="reading-source">Andrew Ng</span>
+                </li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Course Home</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

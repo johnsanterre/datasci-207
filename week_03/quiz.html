@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 3 Knowledge Check Quiz - DATASCI 207">
+    <title>Quiz: Module 3 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 3</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 3: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "While normalization can speed computation, this is not its primary purpose. The main reason is about feature comparability.",
+                    "b": "Normalization does not necessarily improve accuracy. Its purpose is to ensure all features are on comparable scales.",
+                    "c": "Correct. Features on different scales (e.g., age 0-100 vs income 0-1M) can cause gradient descent to converge slowly and may cause some features to dominate simply due to their scale.",
+                    "d": "Normalization does not reduce the number of features; it transforms existing features to a common scale."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>Why is feature scaling important before training?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> It makes the model run faster</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> It always improves model accuracy</label>
+                        </li>
+                        <li><label><input type="radio" name="q1" value="c"> It ensures features on different scales
+                                contribute comparably</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> It reduces the number of features</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Label encoding converts categories to integers (0, 1, 2...) which implies an ordering. For colors, there is no inherent order.",
+                    "b": "Correct. One-hot encoding creates a separate binary column for each category. This avoids implying any ordering between categories like colors.",
+                    "c": "Z-score standardization is for numerical data, not categorical.",
+                    "d": "Log transformation is for numerical data, typically to handle skewed distributions."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>Which encoding method is most appropriate for a color feature with values [red, blue, green]?
+                    </h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Label encoding</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> One-hot encoding</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Z-score standardization</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> Log transformation</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "The curse of dimensionality refers to problems with many features, not limited data.",
+                    "b": "Computation time does increase with dimensions, but this is not the essence of the curse.",
+                    "c": "While complex models can overfit, the curse specifically refers to the geometry of high-dimensional space.",
+                    "d": "Correct. As dimensions increase, points become increasingly spread out. The volume of space grows exponentially, so data points become sparse, distances become less meaningful, and exponentially more data is needed."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>What is the curse of dimensionality?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Having too few training examples</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="b"> Slow computation with many features</label>
+                        </li>
+                        <li><label><input type="radio" name="q3" value="c"> Complex models that overfit</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Data becoming sparse as dimensions increase,
+                                requiring exponentially more data</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. Feature crosses (like city_size) capture interaction effects. A small apartment in NYC is very different from a small house in rural Kansas—the effect of size depends on location.",
+                    "b": "Feature crosses typically increase dimensionality by adding new combined features.",
+                    "c": "Feature crosses are about capturing interactions, not handling missing data.",
+                    "d": "Feature crosses are not for handling outliers; they capture how feature effects interact."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>Why might you create a feature cross between city and property_size?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> To capture that the effect of size may
+                                depend on the city</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> To reduce the number of features</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="c"> To handle missing values in the data</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="d"> To remove outliers from the data</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Z-score standardization centers data around mean=0 with std=1. It does not bound values to [0,1].",
+                    "b": "Log transformation compresses large values but does not scale to [0,1].",
+                    "c": "Correct. Min-max normalization transforms features to a fixed range, typically [0,1], using the formula: (x - min) / (max - min).",
+                    "d": "One-hot encoding creates binary columns for categorical data, not for scaling numerical features."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>Which transformation scales features to the range [0, 1]?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> Z-score standardization</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> Log transformation</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> Min-max normalization</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> One-hot encoding</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 3</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

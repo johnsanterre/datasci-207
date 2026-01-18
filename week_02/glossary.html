@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 2 Glossary - DATASCI 207">
+    <title>Glossary: Module 2 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 2</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 2 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Linear Regression</dt>
+                    <dd>
+                        Linear regression is a model that predicts a continuous output as a weighted sum of inputs
+                        plus a bias term: y = w·x + b. The model assumes a linear relationship between features and
+                        the target variable. Despite its simplicity, linear regression is widely used because it's
+                        fast, interpretable, and often performs surprisingly well. It serves as the foundation for
+                        understanding more complex models like logistic regression and neural networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Loss Function</dt>
+                    <dd>
+                        A loss function quantifies how wrong the model's predictions are compared to the true values,
+                        providing a single number to optimize. Common examples include Mean Squared Error for regression
+                        and cross-entropy for classification. The loss function creates a "landscape" over parameter
+                        space—training seeks the lowest point on this landscape. The choice of loss function determines
+                        what the model prioritizes and must align with the application's goals.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Mean Squared Error (MSE)</dt>
+                    <dd>
+                        Mean Squared Error is a loss function that averages the squared differences between predictions
+                        and actual values: MSE = (1/n) × Σ(y_pred - y_true)². Squaring ensures all errors are positive
+                        and penalizes large errors disproportionately—an error of 10 contributes 100 to MSE, while an
+                        error of 2 contributes only 4. MSE is differentiable, making it suitable for gradient-based
+                        optimization. For linear regression with MSE, the loss surface is convex with a single global
+                        minimum.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Gradient</dt>
+                    <dd>
+                        The gradient is a vector of partial derivatives of the loss function with respect to each
+                        parameter, indicating the direction of steepest increase in loss. Mathematically, for a loss
+                        L and parameters θ, the gradient is ∇L = [∂L/∂θ₁, ∂L/∂θ₂, ...]. The magnitude indicates how
+                        sensitive the loss is to changes in each parameter. To minimize loss, we move in the direction
+                        opposite to the gradient—downhill on the loss surface.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Gradient Descent</dt>
+                    <dd>
+                        Gradient descent is an iterative optimization algorithm that finds parameters minimizing a loss
+                        function by repeatedly moving in the direction opposite to the gradient. The update rule is
+                        θ_new = θ_old - η × ∇L, where η is the learning rate. Each step reduces the loss (if the
+                        learning
+                        rate is appropriate) until the algorithm converges to a minimum. This is the fundamental
+                        algorithm
+                        for training most machine learning models, from linear regression to deep neural networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Batch Gradient Descent</dt>
+                    <dd>
+                        Batch gradient descent computes the gradient using the entire training dataset before making
+                        each parameter update. This produces accurate gradient estimates and smooth convergence toward
+                        the minimum. However, it is computationally expensive for large datasets since every update
+                        requires processing all examples. Batch gradient descent is guaranteed to converge to the
+                        global minimum for convex loss functions.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Stochastic Gradient Descent (SGD)</dt>
+                    <dd>
+                        Stochastic gradient descent updates parameters using the gradient computed from a single
+                        randomly selected training example at each step. This makes updates very fast but introduces
+                        noise—the gradient from one example may not represent the true direction. The noise can help
+                        escape local minima but also causes the loss to fluctuate rather than decrease smoothly.
+                        SGD is particularly useful for very large datasets or online learning scenarios.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Mini-Batch Gradient Descent</dt>
+                    <dd>
+                        Mini-batch gradient descent computes gradients using a small subset of training examples
+                        (typically 32-256) at each step, balancing the stability of batch and speed of stochastic
+                        methods. This approach enables efficient parallelization on GPUs, which can process all
+                        examples in a batch simultaneously. Mini-batch is the most common approach in modern deep
+                        learning due to this favorable tradeoff. The batch size is a hyperparameter that affects
+                        both training dynamics and final model performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Parameters</dt>
+                    <dd>
+                        Parameters are the values that a model learns from data during training, such as the weights
+                        and biases in linear regression. These values define how the model transforms inputs into
+                        predictions. The number of parameters determines a model's capacity—more parameters allow
+                        more complex patterns but require more data to train effectively. After training, parameters
+                        are fixed and used for making predictions on new data.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Hyperparameters</dt>
+                    <dd>
+                        Hyperparameters are configuration settings that are not learned from data but must be specified
+                        before training begins. Examples include learning rate, batch size, number of training
+                        iterations,
+                        and model architecture choices. Hyperparameters control how learning proceeds and can
+                        significantly
+                        impact model performance. Unlike parameters, hyperparameters are typically chosen through
+                        experimentation, grid search, or automated methods like Bayesian optimization.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Learning Rate</dt>
+                    <dd>
+                        The learning rate (often denoted η or α) is a hyperparameter that controls the step size
+                        during gradient descent updates: θ = θ - η × ∇L. A learning rate that is too high causes
+                        overshooting and divergence—the loss increases instead of decreasing. A learning rate that
+                        is too low causes extremely slow convergence, potentially never reaching the minimum. Finding
+                        the right learning rate often requires experimentation; common starting values are 0.01 or
+                        0.001.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Convergence</dt>
+                    <dd>
+                        Convergence occurs when the optimization process reaches a stable solution where further
+                        iterations do not significantly change the parameters or loss. In practice, we often stop
+                        when the loss change falls below a threshold, when a maximum number of iterations is reached,
+                        or when validation performance stops improving. For convex problems like linear regression
+                        with MSE, convergence is guaranteed to reach the global minimum with an appropriate learning
+                        rate.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Epoch</dt>
+                    <dd>
+                        An epoch is one complete pass through the entire training dataset. In batch gradient descent,
+                        one epoch equals one parameter update; in mini-batch, one epoch consists of multiple updates
+                        (dataset size / batch size). Training typically runs for many epochs—often tens to hundreds
+                        for simple models, and potentially thousands for deep learning. Early stopping may terminate
+                        training before a fixed number of epochs if validation performance plateaus.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Update Rule</dt>
+                    <dd>
+                        The update rule is the formula used to adjust parameters during training, determining how
+                        gradient information translates into parameter changes. The basic gradient descent update
+                        rule is θ_new = θ_old - η × ∇L, but many variations exist. Advanced optimizers like Adam,
+                        RMSprop, and momentum modify this rule to improve convergence speed and stability. The
+                        update rule is applied repeatedly until convergence.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 2</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

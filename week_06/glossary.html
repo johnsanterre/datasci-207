@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 6 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 6</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 6 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Neural Network</dt>
+                    <dd>
+                        A neural network is a computational model loosely inspired by biological neurons, consisting
+                        of layers of interconnected units that transform inputs into outputs. Each connection has
+                        a learnable weight, and layers are separated by non-linear activation functions. Neural
+                        networks can approximate any continuous function given sufficient capacity, making them
+                        powerful for complex pattern recognition. The "deep" in deep learning refers to networks
+                        with many layers.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Hidden Layer</dt>
+                    <dd>
+                        A hidden layer is any layer in a neural network between the input and output layers.
+                        Hidden layers transform the input representation into increasingly abstract features that
+                        are useful for the final prediction. Without hidden layers, a network reduces to logistic
+                        or linear regression. Adding hidden layers enables learning non-linear decision boundaries
+                        and solving problems like XOR that linear models cannot handle.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Activation Function</dt>
+                    <dd>
+                        An activation function is a non-linear function applied to the output of each layer,
+                        enabling the network to learn non-linear patterns. Without activations, stacking linear
+                        layers would still be linear. Common activations include ReLU (max(0, x)), sigmoid
+                        (for probability outputs), and softmax (for class probabilities). The choice of
+                        activation affects training dynamics and what patterns the network can represent.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>ReLU (Rectified Linear Unit)</dt>
+                    <dd>
+                        ReLU is an activation function defined as ReLU(x) = max(0, x), outputting the input
+                        if positive and zero otherwise. It is the most commonly used activation for hidden
+                        layers because it is simple, computationally efficient, and reduces the vanishing
+                        gradient problem. However, ReLU neurons can "die" if they receive only negative
+                        inputs, causing their gradients to be permanently zero.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Forward Propagation</dt>
+                    <dd>
+                        Forward propagation is the process of computing the network's output by passing inputs
+                        through each layer sequentially. At each layer, the input is multiplied by weights,
+                        added to biases, and passed through an activation function. The final layer's output
+                        is the prediction. During training, intermediate values are saved for use in
+                        backpropagation to compute gradients.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Backpropagation</dt>
+                    <dd>
+                        Backpropagation is the algorithm for computing gradients of the loss function with
+                        respect to all network parameters by applying the chain rule layer by layer from
+                        output to input. It efficiently computes how each weight contributes to the error,
+                        enabling gradient descent optimization. Modern deep learning frameworks implement
+                        backpropagation automatically through automatic differentiation, so you only need
+                        to define the forward pass.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Vanishing Gradient</dt>
+                    <dd>
+                        The vanishing gradient problem occurs when gradients become exponentially small as
+                        they propagate through many layers, effectively stopping learning in early layers.
+                        This is caused by activation functions like sigmoid and tanh whose derivatives are
+                        less than 1. Solutions include ReLU activation (derivative is 1 for positive inputs),
+                        batch normalization, skip connections (ResNets), and careful weight initialization.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Weight Initialization</dt>
+                    <dd>
+                        Weight initialization is the process of setting initial values for network parameters
+                        before training. Poor initialization can cause vanishing or exploding gradients.
+                        Xavier/Glorot initialization scales weights by 1/√(fan_in) for tanh/sigmoid activations.
+                        He initialization scales by √(2/fan_in) for ReLU. Proper initialization helps
+                        maintain reasonable activation magnitudes throughout the network.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Optimizer</dt>
+                    <dd>
+                        An optimizer is an algorithm that adjusts network weights based on computed gradients
+                        to minimize the loss function. Basic optimizers like SGD update weights proportionally
+                        to gradients. Advanced optimizers like Adam combine momentum (accumulating gradient
+                        direction) with adaptive learning rates (adjusting step size per parameter). Adam
+                        is the most commonly used optimizer due to its robustness across different problems.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Batch Normalization</dt>
+                    <dd>
+                        Batch normalization is a technique that normalizes layer inputs to have zero mean and
+                        unit variance for each mini-batch, then applies learnable scale and shift parameters.
+                        This stabilizes training by reducing internal covariate shift, allows higher learning
+                        rates, and provides some regularization. Batch normalization has become a standard
+                        component in modern deep networks, though layer normalization is preferred for some
+                        applications.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Dropout</dt>
+                    <dd>
+                        Dropout is a regularization technique that randomly sets a fraction of layer activations
+                        to zero during training, with typical rates of 0.1 to 0.5. This prevents neurons from
+                        co-adapting too much and forces the network to learn more robust features. During
+                        inference, dropout is disabled and activations are scaled to maintain expected values.
+                        Dropout can be viewed as training an ensemble of sub-networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Dense Layer (Fully Connected)</dt>
+                    <dd>
+                        A dense or fully connected layer is one where every input is connected to every output
+                        through a learnable weight. The output is computed as y = activation(Wx + b). Dense
+                        layers are the basic building block of feedforward networks and are used in the final
+                        layers of convolutional and recurrent networks for classification. Each connection
+                        has a separate weight, making dense layers parameter-intensive.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Loss Landscape</dt>
+                    <dd>
+                        The loss landscape is the surface defined by the loss function over the space of all
+                        possible parameter values. Training seeks to find low points (minima) on this surface.
+                        For neural networks, the landscape is highly non-convex with many local minima and
+                        saddle points. Modern research suggests that most local minima are actually quite
+                        good, and the main challenge is escaping saddle points rather than finding the
+                        global minimum.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 6</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

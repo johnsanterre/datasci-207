@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 11 - DATASCI 207">
+    <title>Discussion Topics: Module 11 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 11</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 11: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> we regularize and tune, and what choices reveal about our values.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Philosophy / Analysis</span>
+                <h3>1. What Does "Simple" Mean?</h3>
+                <p>
+                    Regularization penalizes "complexity" to prefer "simpler" models. But what makes
+                    a model simple? Small weights? Fewer features? Fewer parameters?
+                </p>
+                <ul class="probing-questions">
+                    <li>L2 prefers small weights. Is a model with many tiny weights simpler than one with few large
+                        weights?</li>
+                    <li>Occam's Razor says simpler explanations are better. Why should this apply to prediction?</li>
+                    <li>A polynomial of degree 3 with complex coefficients vs. degree 10 with simple coefficients—which
+                        is simpler?</li>
+                    <li>Is "simplicity" objective or in the eye of the beholder?</li>
+                </ul>
+                <p class="activity-note">Try: Have students rank models by "simplicity" and compare their rankings.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Ethics / Critical Analysis</span>
+                <h3>2. The Meaning of Regularization Strength</h3>
+                <p>
+                    Lambda (λ) controls how much we penalize complexity. But who chooses λ, and what
+                    does that choice represent?
+                </p>
+                <ul class="probing-questions">
+                    <li>High λ means we trust the prior (simple models) more than the data. When is that appropriate?
+                    </li>
+                    <li>If we tune λ on a validation set, are we letting the data decide? Or is that circular?</li>
+                    <li>In a medical model, should λ be set by data scientists, doctors, or patients?</li>
+                    <li>Is there a "right" λ, or is it always a judgment call?</li>
+                </ul>
+                <p class="activity-note">Try: Show how predictions change with different λ values. Discuss what
+                    stakeholders would prefer.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Epistemology</span>
+                <h3>3. Cross-Validation as Oracle</h3>
+                <p>
+                    We use cross-validation to estimate future performance. But CV assumes the future
+                    looks like the past. When does this assumption fail?
+                </p>
+                <ul class="probing-questions">
+                    <li>If data is non-stationary (changes over time), what does CV even measure?</li>
+                    <li>High CV variance suggests instability. But is instability always bad?</li>
+                    <li>CV gives a number. How much should we trust a single number to summarize model quality?</li>
+                    <li>If we try 100 configurations and select the best CV score, are we overfitting to the validation
+                        data?</li>
+                </ul>
+                <p class="activity-note">Try: Compare CV estimates to true test performance. Discuss the gap.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Systems Thinking / Ethics</span>
+                <h3>4. The Hyperparameter Search Space</h3>
+                <p>
+                    Grid search explores a finite set of hyperparameters. Who decides which values
+                    to try? What's excluded by those choices?
+                </p>
+                <ul class="probing-questions">
+                    <li>If we search learning rates [0.01, 0.1, 1], we'll never find that 0.05 was optimal. How do we
+                        know what to include?</li>
+                    <li>Random search is more efficient, but it still requires defining distributions. Do those encode
+                        assumptions?</li>
+                    <li>AutoML promises to automate hyperparameter search. Does that make the process more or less
+                        transparent?</li>
+                    <li>Is extensive hyperparameter tuning scientific rigor or algorithmic cherry-picking?</li>
+                </ul>
+                <p class="activity-note">Try: Define a grid that would miss the optimal hyperparameters. Discuss
+                    how we'd know.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Application</span>
+                <h3>5. Early Stopping: When to Quit</h3>
+                <p>
+                    Early stopping halts training when validation loss stops improving. But "improvement"
+                    and "patience" are choices. What values do they embed?
+                </p>
+                <ul class="probing-questions">
+                    <li>More patience might find a better model—or waste compute and overfit. How do we balance?</li>
+                    <li>In life, when should we "early stop" and when should we persist?</li>
+                    <li>If early stopping saves money but slightly hurts performance, how should organizations decide?
+                    </li>
+                    <li>Is early stopping regularization, or is it just practical resource management?</li>
+                </ul>
+                <p class="activity-note">Try: Train with different patience values. Discuss the tradeoffs.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Evaluation</span>
+                <h3>6. The Reproducibility Challenge</h3>
+                <p>
+                    Small changes in hyperparameters can dramatically change results. How do we build
+                    science on such sensitive foundations?
+                </p>
+                <ul class="probing-questions">
+                    <li>If a paper's results depend on precise hyperparameters, is the finding robust or fragile?</li>
+                    <li>Should papers report hyperparameter sensitivity, not just best results?</li>
+                    <li>Random seeds affect results. Is a finding "real" if it only appears with certain seeds?</li>
+                    <li>If two reasonable hyperparameter choices give opposite conclusions, what should we believe?</li>
+                </ul>
+                <p class="activity-note">Try: Rerun the same model with different random seeds. Discuss the
+                    variance.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 11</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

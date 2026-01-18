@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Best practices for your capstone project">
+    <title>Capstone Best Practices - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span class="separator">/</span>
+                <span>Capstone Best Practices</span>
+            </nav>
+
+            <h1>Capstone Best Practices</h1>
+
+            <p>
+                Your capstone project is an opportunity to apply the concepts from this course to a
+                real-world problem. This guide provides recommendations for scoping, executing, and
+                presenting your project.
+            </p>
+
+            <h2>Project Scoping</h2>
+
+            <h3>Choose a Focused Problem</h3>
+            <ul>
+                <li>Define a clear, specific question your model will answer</li>
+                <li>Avoid vague goals like "predict stock prices" or "analyze sentiment"</li>
+                <li>Good example: "Predict whether a loan applicant will default within 2 years based on application
+                    data"</li>
+            </ul>
+
+            <h3>Start with Available Data</h3>
+            <ul>
+                <li>Ensure you have data before committing to a project</li>
+                <li>Check that the data is sufficient in size and quality</li>
+                <li>Understand any legal or ethical constraints on data use</li>
+            </ul>
+
+            <h3>Scope Appropriately</h3>
+            <ul>
+                <li>Aim for a project you can complete in the available time</li>
+                <li>It is better to do one thing well than many things poorly</li>
+                <li>Have a minimum viable project and stretch goals</li>
+            </ul>
+
+            <h2>Project Execution</h2>
+
+            <h3>Establish Baselines First</h3>
+            <ul>
+                <li>Always start with a simple baseline (e.g., majority class, mean prediction)</li>
+                <li>Try a basic model (logistic regression, decision tree) before deep learning</li>
+                <li>Document baseline performance to show improvement</li>
+            </ul>
+
+            <h3>Proper Train/Validation/Test Splits</h3>
+            <ul>
+                <li>Never touch test data until final evaluation</li>
+                <li>Use validation set (or cross-validation) for model selection</li>
+                <li>Be aware of data leakage across splits</li>
+            </ul>
+
+            <h3>Feature Engineering</h3>
+            <ul>
+                <li>Spend time understanding your features</li>
+                <li>Handle missing values thoughtfully</li>
+                <li>Consider domain-specific transformations</li>
+                <li>Document your feature engineering decisions</li>
+            </ul>
+
+            <h3>Iterate Systematically</h3>
+            <ul>
+                <li>Change one thing at a time</li>
+                <li>Keep a log of experiments and results</li>
+                <li>Version your code and track experiments</li>
+            </ul>
+
+            <h2>Code Quality</h2>
+
+            <h3>Organization</h3>
+            <ul>
+                <li>Separate data loading, preprocessing, modeling, and evaluation</li>
+                <li>Use functions to avoid code duplication</li>
+                <li>Include a README explaining how to run your code</li>
+            </ul>
+
+            <h3>Reproducibility</h3>
+            <ul>
+                <li>Set random seeds</li>
+                <li>Document package versions (use requirements.txt)</li>
+                <li>Include instructions for obtaining data</li>
+            </ul>
+
+            <h3>Comments and Documentation</h3>
+            <ul>
+                <li>Explain why, not just what</li>
+                <li>Document assumptions and decisions</li>
+                <li>Include docstrings for functions</li>
+            </ul>
+
+            <h2>Evaluation and Analysis</h2>
+
+            <h3>Choose Appropriate Metrics</h3>
+            <ul>
+                <li>Match metrics to your problem (accuracy, precision, recall, RMSE, etc.)</li>
+                <li>Consider business or domain-specific costs</li>
+                <li>Report multiple metrics when relevant</li>
+            </ul>
+
+            <h3>Error Analysis</h3>
+            <ul>
+                <li>Examine where your model fails</li>
+                <li>Look at confusion matrices for classification</li>
+                <li>Analyze residuals for regression</li>
+                <li>Identify patterns in errors</li>
+            </ul>
+
+            <h3>Fairness Considerations</h3>
+            <ul>
+                <li>Check performance across subgroups</li>
+                <li>Consider potential biases in your data</li>
+                <li>Document any fairness concerns</li>
+            </ul>
+
+            <h2>Presentation and Report</h2>
+
+            <h3>Structure</h3>
+            <ol>
+                <li><strong>Problem Statement:</strong> What are you trying to solve and why?</li>
+                <li><strong>Data:</strong> What data did you use? How did you prepare it?</li>
+                <li><strong>Methods:</strong> What approaches did you try?</li>
+                <li><strong>Results:</strong> What did you find? Use tables and figures.</li>
+                <li><strong>Discussion:</strong> What worked? What did not? What would you do next?</li>
+            </ol>
+
+            <h3>Visualizations</h3>
+            <ul>
+                <li>Include clear, labeled figures</li>
+                <li>Show learning curves, confusion matrices, feature importances</li>
+                <li>Avoid chart junk; keep visualizations clean</li>
+            </ul>
+
+            <h3>Be Honest</h3>
+            <ul>
+                <li>Report negative results and failed experiments</li>
+                <li>Acknowledge limitations</li>
+                <li>Do not overstate conclusions</li>
+            </ul>
+
+            <h2>Common Pitfalls to Avoid</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pitfall</th>
+                        <th>How to Avoid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Data leakage</td>
+                        <td>Split data before any preprocessing</td>
+                    </tr>
+                    <tr>
+                        <td>Overfitting to validation set</td>
+                        <td>Limit number of experiments on val set</td>
+                    </tr>
+                    <tr>
+                        <td>Ignoring baselines</td>
+                        <td>Always compare to simple baselines</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity for its own sake</td>
+                        <td>Start simple; add complexity only if needed</td>
+                    </tr>
+                    <tr>
+                        <td>Poor data quality</td>
+                        <td>Explore and clean data thoroughly</td>
+                    </tr>
+                    <tr>
+                        <td>Last-minute scramble</td>
+                        <td>Start early; have working code by midpoint</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <footer>
+                <p><a href="index.html">Back to Course Home</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

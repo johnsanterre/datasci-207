@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 1 Glossary - DATASCI 207">
+    <title>Glossary: Module 1 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 1</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 1 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Function</dt>
+                    <dd>
+                        A function is a mapping from inputs to outputs, written as f(x) = y. In machine learning, we
+                        assume
+                        there exists some true function that relates features to targets, and our goal is to discover
+                        it.
+                        We rarely know this function explicitly—instead, we observe input-output pairs and try to learn
+                        an
+                        approximation. The quality of our learned function determines how well we can make predictions.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Model</dt>
+                    <dd>
+                        A model is a learned approximation of the true function, defined by its structure (architecture)
+                        and parameters (weights). The structure determines what kinds of patterns the model can
+                        represent—for
+                        example, a linear model can only represent straight-line relationships. Parameters are the
+                        specific
+                        values learned from training data that customize the model to the problem. Together, structure
+                        and
+                        parameters define the model's predictions for any input.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Features (Inputs)</dt>
+                    <dd>
+                        Features are the input variables provided to a model for making predictions, also called
+                        predictors
+                        or independent variables. Each example in the dataset is described by a set of features
+                        represented
+                        as a vector x. Good features capture information relevant to predicting the target—for example,
+                        square footage and location are useful features for predicting house prices. Feature engineering
+                        (Module 3) focuses on creating and selecting effective features.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Target (Output)</dt>
+                    <dd>
+                        The target is the value the model is trying to predict, also called the label, response, or
+                        dependent variable. In supervised learning, we have access to target values for training
+                        examples,
+                        which we use to teach the model what to predict. The nature of the target determines the type of
+                        problem: continuous targets indicate regression, while categorical targets indicate
+                        classification.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Generalization</dt>
+                    <dd>
+                        Generalization is a model's ability to perform well on new, unseen data that was not used during
+                        training. This is the central goal of machine learning—we want models that learn the underlying
+                        pattern, not just memorize the training examples. A model that generalizes well captures the
+                        true
+                        relationship between features and targets. Poor generalization indicates the model has learned
+                        spurious patterns specific to the training data.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Overfitting</dt>
+                    <dd>
+                        Overfitting occurs when a model learns the training data too well, capturing noise and random
+                        fluctuations rather than the true underlying pattern. An overfit model has low training error
+                        but high test error—it performs well on seen data but poorly on new data. This typically
+                        happens when the model is too complex relative to the amount of training data. Signs include
+                        a large gap between training and test performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Underfitting</dt>
+                    <dd>
+                        Underfitting occurs when a model is too simple to capture the underlying pattern in the data.
+                        An underfit model has high error on both training and test data because it cannot represent
+                        the true relationship. This typically happens when the model lacks sufficient capacity or
+                        flexibility. The solution is usually to use a more complex model or add more relevant features.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Training Set</dt>
+                    <dd>
+                        The training set is the portion of data used to fit the model by learning its parameters.
+                        During training, the model sees these examples and adjusts its parameters to minimize prediction
+                        error on them. The training set should be representative of the overall data distribution.
+                        Typically, 70-80% of available data is used for training.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Test Set</dt>
+                    <dd>
+                        The test set is data held out from training, used only for final evaluation of the model's
+                        generalization ability. The model never sees test data during training—this ensures the
+                        evaluation reflects true performance on new data. The test set must remain untouched until
+                        the very end of model development; using it earlier compromises the validity of the evaluation.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Train/Test Split</dt>
+                    <dd>
+                        The train/test split is the process of dividing available data into separate training and
+                        test sets, typically 80%/20% or 70%/30%. The split should be random for i.i.d. data to
+                        ensure both sets are representative. For time series data, the split must respect temporal
+                        ordering. Proper splitting is essential—any leakage of test information into training
+                        invalidates performance estimates.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Baseline</dt>
+                    <dd>
+                        A baseline is a simple, often naive model used as a reference point for evaluating more
+                        sophisticated models. Common baselines include predicting the mean (regression) or most
+                        common class (classification). Any useful model should outperform relevant baselines;
+                        otherwise, the added complexity is not justified. Baselines also help detect bugs—if
+                        your complex model performs worse than a mean prediction, something is wrong.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Loss Function</dt>
+                    <dd>
+                        A loss function measures how wrong the model's predictions are compared to the true values.
+                        During training, the model adjusts its parameters to minimize the loss function. Different
+                        problems require different loss functions—Mean Squared Error for regression, cross-entropy
+                        for classification. The choice of loss function affects what the model optimizes for and
+                        must align with the ultimate goal of the application.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Accuracy</dt>
+                    <dd>
+                        Accuracy is a classification metric measuring the fraction of predictions that are correct,
+                        calculated as (correct predictions) / (total predictions). It ranges from 0 to 1 (or 0% to
+                        100%).
+                        While intuitive, accuracy can be misleading for imbalanced classes—predicting the majority class
+                        always can achieve high accuracy but be useless. Additional metrics like precision and recall
+                        (Module 5) provide more nuanced evaluation.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Error</dt>
+                    <dd>
+                        Error refers to the difference between predicted and actual values, either for a single
+                        prediction or aggregated across a dataset. For regression, error is typically the numerical
+                        difference; for classification, it can mean an incorrect prediction. Aggregate error measures
+                        like Mean Absolute Error or Mean Squared Error summarize model performance. Analyzing where
+                        errors occur (error analysis) helps identify model weaknesses.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 1</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

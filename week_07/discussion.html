@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 7 - DATASCI 207">
+    <title>Discussion Topics: Module 7 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 7</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 7: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> trees and ensembles work the way they do.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Epistemology</span>
+                <h3>1. Trees as Decision Processes</h3>
+                <p>
+                    Decision trees mimic how humans make decisions: a series of yes/no questions.
+                    But is this how we actually reason, or a comforting illusion?
+                </p>
+                <ul class="probing-questions">
+                    <li>Do you actually make decisions as a sequence of binary splits?</li>
+                    <li>Criminal sentencing guidelines often look like decision trees. Is that good or bad?</li>
+                    <li>Trees are "interpretable," but interpretable to whom? An expert? A judge? A defendant?</li>
+                    <li>If a tree has 100 splits, is it still interpretable?</li>
+                </ul>
+                <p class="activity-note">Try: Have students draw their intuitive decision process for a real decision.
+                    Compare to what a tree would learn.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Philosophy</span>
+                <h3>2. The Wisdom of Crowds vs. Individual Expertise</h3>
+                <p>
+                    Ensembles aggregate many weak learners into strong predictions. Is there a
+                    parallel to human decision-making? When should we trust crowds vs. experts?
+                </p>
+                <ul class="probing-questions">
+                    <li>Juries are ensembles of people. What makes them work (or fail)?</li>
+                    <li>Random forests succeed with randomness. Why would adding noise help?</li>
+                    <li>When does averaging opinions lead to good outcomes? When does it lead to mediocrity?</li>
+                    <li>Should important decisions be made by committees or individuals?</li>
+                </ul>
+                <p class="activity-note">Try: Have the class vote on uncertain questions. Compare to individual
+                    responses. Discuss.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Critical Analysis / Ethics</span>
+                <h3>3. Feature Importance: Attribution and Its Limits</h3>
+                <p>
+                    Random forests tell us which features are "important." But importance for
+                    prediction isn't the same as causal importance. What's the difference, and why does it matter?
+                </p>
+                <ul class="probing-questions">
+                    <li>If "ZIP code" is the most important predictor of loan default, what should we conclude?</li>
+                    <li>Importance can be measured different ways (Gini, permutation). They often disagree. Now what?
+                    </li>
+                    <li>Could we use feature importance to discover scientific knowledge?</li>
+                    <li>If we remove an "important" feature, does that fix discrimination, or just hide it?</li>
+                </ul>
+                <p class="activity-note">Try: Show feature importance from a real model. Discuss what we can and cannot
+                    conclude.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Systems Thinking</span>
+                <h3>4. Boosting: The Value of Learning from Mistakes</h3>
+                <p>
+                    Boosting focuses on examples we get wrong. Is this a model of good learning,
+                    or does it risk obsessing over edge cases?
+                </p>
+                <ul class="probing-questions">
+                    <li>Students who focus on their mistakes improve. But what if they only study their mistakes?</li>
+                    <li>Boosting can overfit to noise (mislabeled examples). How do we distinguish hard cases from
+                        errors?</li>
+                    <li>In organizational learning, do we learn more from failures or successes?</li>
+                    <li>Is there such a thing as over-indexing on mistakes?</li>
+                </ul>
+                <p class="activity-note">Try: Discuss examples where focusing on failures helped vs. hindered learning.
+                </p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Ethics</span>
+                <h3>5. Greedy Algorithms and Local Optima</h3>
+                <p>
+                    Decision trees are built greedily—each split optimizes for the immediate best outcome.
+                    What does this teach us about short-term vs. long-term thinking?
+                </p>
+                <ul class="probing-questions">
+                    <li>In life, when is being greedy (optimize the next step) a good strategy?</li>
+                    <li>Could a non-greedy tree ever be better? Why don't we use them?</li>
+                    <li>Greedy algorithms are fast but suboptimal. Is there a moral version of this trade-off?</li>
+                    <li>"Don't let perfect be the enemy of good"—is this greedy thinking?</li>
+                </ul>
+                <p class="activity-note">Try: Present a sequential decision problem. Compare greedy vs. planning
+                    approaches.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Speculation</span>
+                <h3>6. Interpretability vs. Performance: A False Dichotomy?</h3>
+                <p>
+                    Trees are interpretable; neural networks perform better. But is this trade-off
+                    fundamental, or a reflection of where we are today?
+                </p>
+                <ul class="probing-questions">
+                    <li>Could we ever have models that are both interpretable AND state-of-the-art?</li>
+                    <li>Is interpretability even well-defined? Interpretable to a machine learning PhD differs from
+                        interpretable to a patient.</li>
+                    <li>In the future, might we develop intuition for "understanding" neural networks directly?</li>
+                    <li>If you could only have one—interpretability or performance—which would you choose?</li>
+                </ul>
+                <p class="activity-note">Try: Have students design a metric for "interpretability." Compare definitions.
+                </p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 7</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

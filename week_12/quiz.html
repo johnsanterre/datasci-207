@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Module 12 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 12</a>
+                <span class="separator">/</span>
+                <span>Knowledge Check</span>
+            </nav>
+
+            <h1>Module 12: Knowledge Check</h1>
+
+            <div class="quiz-score" id="quiz-score">
+                <span class="score-label">Questions</span>
+                <span class="score-value">5</span>
+            </div>
+
+            <div class="quiz-container">
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Bias can also arise from training data, evaluation metrics, and deployment context.",
+                    "b": "Intentional bias is usually obvious; unintentional bias is the greater challenge.",
+                    "c": "Correct. Historical data often reflects past discrimination (e.g., hiring patterns). Models trained on this data perpetuate these patterns even without malicious intent.",
+                    "d": "Small datasets can have other problems, but bias primarily comes from the data content, not size."
+                }'>
+                    <span class="question-number">Question 1</span>
+                    <h4>Which is a common source of algorithmic bias?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q1" value="a"> Using the wrong programming language</label>
+                        </li>
+                        <li><label><input type="radio" name="q1" value="b"> Intentional programmer decisions
+                                only</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> Historical data that reflects past
+                                discrimination</label></li>
+                        <li><label><input type="radio" name="q1" value="d"> Using datasets that are too small</label>
+                        </li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "Demographic parity focuses on prediction rates, not accuracy.",
+                    "b": "Correct. Demographic parity requires that the rate of positive predictions (e.g., loan approvals, hires) be equal across groups, regardless of the true outcome.",
+                    "c": "Demographic parity specifically addresses group-level outcomes, not just individual treatment.",
+                    "d": "Calibration, not demographic parity, concerns probability estimates."
+                }'>
+                    <span class="question-number">Question 2</span>
+                    <h4>What does demographic parity require?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q2" value="a"> Equal accuracy across all groups</label>
+                        </li>
+                        <li><label><input type="radio" name="q2" value="b"> Equal positive prediction rates across
+                                groups</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Each individual treated exactly the
+                                same</label></li>
+                        <li><label><input type="radio" name="q2" value="d"> Probability estimates match true
+                                probabilities</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="d" data-explanations='{
+                    "a": "This describes individual fairness, not equalized odds.",
+                    "b": "Demographic parity, not equalized odds, concerns overall positive rates.",
+                    "c": "Equalized odds requires equality for BOTH true positives and false positives across groups.",
+                    "d": "Correct. Equalized odds requires that both TPR (sensitivity) and FPR are equal across groups, conditioning on the true label. This is more stringent than equal opportunity."
+                }'>
+                    <span class="question-number">Question 3</span>
+                    <h4>Equalized odds requires:</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q3" value="a"> Similar people get similar
+                                predictions</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Equal overall positive rates</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Equal true positive rates only</label></li>
+                        <li><label><input type="radio" name="q3" value="d"> Equal true positive AND false positive rates
+                                across groups</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="a" data-explanations='{
+                    "a": "Correct. A fundamental result in fairness research shows that when base rates differ between groups, calibration, equal FPR, and equal FNR cannot all be satisfied simultaneously. This is a mathematical impossibility, not a technical limitation.",
+                    "b": "The conflict is mathematical, not due to data limitations.",
+                    "c": "More computation cannot resolve this fundamental tradeoff.",
+                    "d": "There is no universal fairness definition—different contexts require different criteria."
+                }'>
+                    <span class="question-number">Question 4</span>
+                    <h4>Why is it impossible to satisfy all fairness criteria simultaneously when base rates differ?
+                    </h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q4" value="a"> It is a mathematical impossibility proven by
+                                fairness researchers</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> We need more data to satisfy all
+                                criteria</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> It requires more computational power</label>
+                        </li>
+                        <li><label><input type="radio" name="q4" value="d"> There is a universal fairness definition
+                                that resolves this</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <div class="quiz-question" data-correct="c" data-explanations='{
+                    "a": "Pre-processing modifies training data, not the trained model.",
+                    "b": "In-processing changes the learning algorithm, not the final predictions.",
+                    "c": "Correct. Post-processing adjusts the model outputs (predictions) after training. Common techniques include applying different classification thresholds for different groups to achieve fairness criteria.",
+                    "d": "Collecting more data is a data strategy, not a post-processing technique."
+                }'>
+                    <span class="question-number">Question 5</span>
+                    <h4>What is an example of post-processing bias mitigation?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q5" value="a"> Reweighting training samples</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> Adding fairness constraints to the loss
+                                function</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> Adjusting classification thresholds
+                                differently for each group</label></li>
+                        <li><label><input type="radio" name="q5" value="d"> Collecting more diverse training
+                                data</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="reset-quiz">Reset Quiz</button>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Module 12</a></p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../assets/quiz.js"></script>
+</body>
+
+</html>

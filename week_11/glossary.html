@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary: Module 11 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 11</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 11 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Regularization</dt>
+                    <dd>
+                        Regularization is any technique that constrains the model to prevent overfitting,
+                        typically by penalizing complexity. Common approaches include adding a penalty term
+                        to the loss function (L1, L2), randomly dropping units during training (dropout),
+                        and stopping training early. Regularization introduces a bias-variance tradeoff:
+                        more regularization reduces variance (overfitting) but may increase bias (underfitting).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>L2 Regularization (Ridge)</dt>
+                    <dd>
+                        L2 regularization adds the sum of squared weights times a penalty factor (λ) to the
+                        loss function: Loss + λ×Σw². This penalizes large weights, causing all weights to
+                        shrink toward zero but rarely reaching exactly zero. L2 regularization is also called
+                        Ridge regression or weight decay. It is computationally efficient because the penalty
+                        is differentiable everywhere.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>L1 Regularization (Lasso)</dt>
+                    <dd>
+                        L1 regularization adds the sum of absolute weights times a penalty factor (λ) to the
+                        loss function: Loss + λ×Σ|w|. Unlike L2, L1 encourages sparse solutions where some
+                        weights become exactly zero, performing automatic feature selection. Lasso stands for
+                        "Least Absolute Shrinkage and Selection Operator." The non-differentiability at zero
+                        requires special optimization techniques.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Elastic Net</dt>
+                    <dd>
+                        Elastic Net combines L1 and L2 regularization: Loss + α×λ×Σ|w| + (1-α)×λ×Σw², where
+                        α controls the balance between L1 and L2. This provides the sparsity benefits of L1
+                        while maintaining the stability of L2 when features are correlated. Elastic Net is
+                        particularly useful when the number of features exceeds the number of samples or
+                        when groups of correlated features should be selected together.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Dropout</dt>
+                    <dd>
+                        Dropout is a regularization technique for neural networks that randomly sets activations
+                        to zero during training with a specified probability (typically 0.1-0.5). This prevents
+                        neurons from co-adapting too strongly and can be viewed as training an ensemble of
+                        sub-networks. During inference, dropout is disabled and activations are scaled
+                        accordingly. Dropout is one of the most effective regularizers for deep networks.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Early Stopping</dt>
+                    <dd>
+                        Early stopping monitors validation performance during training and stops when it stops
+                        improving, preventing overfitting that occurs in later epochs. A patience parameter
+                        specifies how many epochs to wait for improvement before stopping. The best model
+                        (based on validation performance) is typically saved and restored. Early stopping
+                        requires no additional hyperparameter tuning beyond setting patience.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Hyperparameter</dt>
+                    <dd>
+                        A hyperparameter is a configuration value set before training that controls the learning
+                        process or model structure. Unlike parameters (weights) learned during training,
+                        hyperparameters are chosen by the practitioner or through search algorithms. Examples
+                        include learning rate, regularization strength, number of layers, and dropout rate.
+                        Hyperparameter tuning is crucial for achieving good performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Cross-Validation</dt>
+                    <dd>
+                        Cross-validation is a technique for estimating model performance by training and
+                        evaluating on multiple different train/validation splits. In k-fold cross-validation,
+                        data is split into k folds; each fold serves as validation once while training on the
+                        remaining k-1 folds. The k performance scores are averaged for a robust estimate.
+                        Cross-validation uses all data for both training and validation without data leakage.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Grid Search</dt>
+                    <dd>
+                        Grid search is a hyperparameter tuning method that exhaustively evaluates all
+                        combinations of specified parameter values. For each combination, the model is
+                        trained and evaluated using cross-validation. Grid search guarantees finding the
+                        best combination within the specified grid but becomes computationally expensive
+                        as the number of parameters and values grows (curse of dimensionality).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Random Search</dt>
+                    <dd>
+                        Random search samples hyperparameter combinations randomly from specified distributions
+                        rather than trying all combinations. With a fixed computational budget, random search
+                        often finds better solutions than grid search because it can explore the full range of
+                        continuous parameters. Research shows that some hyperparameters matter more than others,
+                        making random exploration more efficient than uniform grid coverage.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Pipeline</dt>
+                    <dd>
+                        A pipeline chains multiple data processing steps and a final estimator into a single
+                        object that can be fit and used for prediction. Pipelines ensure that preprocessing
+                        (scaling, encoding, PCA) is correctly applied during cross-validation—fitting only
+                        on training folds. This prevents data leakage and simplifies code. scikit-learn's
+                        Pipeline and ColumnTransformer are standard tools for building robust ML workflows.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Data Leakage</dt>
+                    <dd>
+                        Data leakage occurs when information from the test or validation set improperly
+                        influences model training or preprocessing. Common examples include fitting a scaler
+                        on all data before splitting, or using future information to predict past events.
+                        Data leakage leads to overly optimistic performance estimates that don't hold in
+                        production. Pipelines and proper train/test separation prevent most forms of leakage.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 11</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Module 3 Glossary - DATASCI 207">
+    <title>Glossary: Module 3 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a>
+                <span class="separator">/</span>
+                <a href="index.html">Module 3</a>
+                <span class="separator">/</span>
+                <span>Glossary</span>
+            </nav>
+
+            <h1>Module 3 Glossary</h1>
+
+            <dl>
+                <div class="glossary-term">
+                    <dt>Feature Engineering</dt>
+                    <dd>
+                        Feature engineering is the process of transforming raw data into features that better
+                        represent the underlying problem to machine learning models. This includes cleaning data,
+                        creating new features from existing ones, encoding categorical variables, and selecting
+                        relevant features. Good feature engineering often has more impact on model performance
+                        than the choice of algorithm. The process requires domain knowledge to create features
+                        that capture meaningful patterns.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Multivariate Regression</dt>
+                    <dd>
+                        Multivariate regression extends simple linear regression to include multiple input features,
+                        with the model learning a weight for each: y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b. In matrix
+                        notation, this is expressed as y = Xw + b, where X is the feature matrix and w is the
+                        weight vector. The gradient computation extends naturally using matrix operations. Most
+                        real-world regression problems involve multiple features, making multivariate regression
+                        the practical default.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Feature Scaling</dt>
+                    <dd>
+                        Feature scaling transforms features to a common scale, preventing features with large
+                        values from dominating the model. Without scaling, a feature like income (0-1,000,000)
+                        would overwhelm a feature like age (0-100). Gradient descent converges faster on scaled
+                        data because the loss surface is more spherical rather than elongated. The two main
+                        approaches are normalization (scaling to a fixed range) and standardization (scaling
+                        to zero mean and unit variance).
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Normalization (Min-Max)</dt>
+                    <dd>
+                        Min-max normalization scales features to a fixed range, typically [0, 1], using the
+                        formula: x_scaled = (x - x_min) / (x_max - x_min). This preserves the shape of the
+                        original distribution while bounding the values. It is useful when you need bounded
+                        outputs or when the algorithm assumes inputs in a specific range. The main drawback
+                        is sensitivity to outliers, which can compress most values into a small portion of
+                        the range.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Standardization (Z-Score)</dt>
+                    <dd>
+                        Standardization transforms features to have zero mean and unit variance using the formula:
+                        x_scaled = (x - μ) / σ. After standardization, most values fall between -3 and +3 (for
+                        roughly normal distributions). This is the most common scaling approach and works well
+                        for algorithms that assume normally distributed data. Unlike min-max normalization,
+                        standardization does not bound the output, so outliers can still have large values.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>One-Hot Encoding</dt>
+                    <dd>
+                        One-hot encoding converts a categorical variable with k categories into k binary columns,
+                        where exactly one column has value 1 and the rest are 0. For example, color ∈ {red, blue,
+                        green} becomes three columns: is_red, is_blue, is_green. This representation does not
+                        impose any ordering on the categories, making it suitable for nominal (unordered)
+                        categorical variables. The main drawback is that high-cardinality categories produce
+                        many sparse columns.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Label Encoding</dt>
+                    <dd>
+                        Label encoding assigns a unique integer to each category (e.g., red=0, blue=1, green=2).
+                        This creates a compact single-column representation instead of multiple columns. However,
+                        the numeric values imply an ordering that may not exist—the model might incorrectly
+                        assume green > blue > red. Label encoding should only be used for ordinal categories
+                        (where order matters, like small < medium < large) or tree-based models that split
+                            categorically. </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Feature Crosses</dt>
+                    <dd>
+                        Feature crosses create new features by combining existing features to capture interaction
+                        effects—situations where the effect of one feature depends on another. For numerical
+                        features, this often means multiplication: x₁ × x₂. For categorical features, it means
+                        creating combinations like "city_size" = "NYC_small". Feature crosses enable linear
+                        models to learn non-linear decision boundaries. They are particularly important when
+                        domain knowledge suggests interactions exist.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Bucketing (Binning)</dt>
+                    <dd>
+                        Bucketing converts continuous numerical features into discrete categories by dividing
+                        the range into bins. For example, age might become buckets: [child, teenager, adult,
+                        senior]. This is useful when the relationship between feature and target is stepwise
+                        rather than continuous. Buckets can then be one-hot encoded, allowing the model to
+                        learn different effects for each range. The number and placement of bin boundaries
+                        requires experimentation or domain knowledge.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Feature Selection</dt>
+                    <dd>
+                        Feature selection is the process of identifying and keeping only the most relevant
+                        features for the model. This reduces overfitting (fewer parameters to fit noise),
+                        improves interpretability (fewer features to understand), and speeds up training.
+                        Methods include filter approaches (correlation, mutual information), wrapper approaches
+                        (evaluate feature subsets using the model), and embedded approaches (regularization
+                        like L1 that drives some weights to zero). The goal is to remove irrelevant or
+                        redundant features.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Curse of Dimensionality</dt>
+                    <dd>
+                        The curse of dimensionality refers to problems that arise when working with many features
+                        (high-dimensional data). As dimensions increase, data becomes sparse—points spread out
+                        and distances between them become meaningless (all points seem equally far apart). This
+                        makes distance-based methods like k-nearest neighbors less effective. Exponentially more
+                        data is needed to maintain coverage of the feature space. Mitigation strategies include
+                        feature selection, dimensionality reduction (PCA), and regularization.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Missing Data</dt>
+                    <dd>
+                        Missing data occurs when some feature values are absent for certain examples, represented
+                        as NaN or null values. Handling strategies include deletion (removing rows or columns
+                        with missing values), imputation (filling with mean, median, or predicted values), and
+                        indicator variables (adding a column flagging which values were missing). The appropriate
+                        strategy depends on why data is missing and how much is affected. Ignoring missing data
+                        or handling it incorrectly can significantly harm model performance.
+                    </dd>
+                </div>
+
+                <div class="glossary-term">
+                    <dt>Log Transformation</dt>
+                    <dd>
+                        Log transformation applies the logarithm function to feature values, typically using
+                        log(1 + x) to handle zeros. This is useful for highly skewed distributions with a long
+                        right tail, such as income or population counts. Log transformation compresses large
+                        values while spreading out small values, often making the distribution more normal.
+                        It is also appropriate when relationships are multiplicative rather than additive—a
+                        10% increase matters more than an absolute increase.
+                    </dd>
+                </div>
+            </dl>
+
+            <footer>
+                <p><a href="index.html">Back to Module 3</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

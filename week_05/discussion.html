@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discussion Topics: Module 5 - DATASCI 207">
+    <title>Discussion Topics: Module 5 - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        .discussion-topic {
+            background: #f8f9fa;
+            border-left: 4px solid #495057;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .discussion-topic h3 {
+            margin-top: 0;
+            color: #212529;
+        }
+
+        .probing-questions {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .probing-questions li {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .thinking-level {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #dee2e6;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="../index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">Home</a> <span class="separator">/</span>
+                <a href="index.html">Module 5</a> <span class="separator">/</span>
+                <span>Discussion Topics</span>
+            </nav>
+
+            <h1>Module 5: Discussion Topics</h1>
+            <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
+
+            <p>
+                These discussion prompts are designed to move beyond technical definitions toward
+                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
+                about <em>why</em> metrics matter and what they hide.
+            </p>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Analysis / Ethics</span>
+                <h3>1. The Politics of Precision and Recall</h3>
+                <p>
+                    Precision favors caution; recall favors vigilance. This trade-off is not just
+                    mathematical—it's political. Who wins and loses in this trade-off?
+                </p>
+                <ul class="probing-questions">
+                    <li>In fraud detection, banks prefer precision (don't annoy good customers). Merchants prefer recall
+                        (catch all fraud). Who decides?</li>
+                    <li>If a cancer screen has high recall but low precision, patients face unnecessary anxiety and
+                        procedures. Is that acceptable?</li>
+                    <li>Is "presumption of innocence" (legal standard) essentially a precision argument?</li>
+                    <li>Can you think of a system that should maximize recall even at the cost of many false alarms?
+                    </li>
+                </ul>
+                <p class="activity-note">Try: Have students negotiate precision-recall trade-offs as different
+                    stakeholders.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Critical Thinking</span>
+                <h3>2. Class Imbalance as a Social Phenomenon</h3>
+                <p>
+                    "Imbalanced classes" is a technical term, but imbalance reflects real-world rarity.
+                    Why are some things rare, and what happens when we oversample or undersample?
+                </p>
+                <ul class="probing-questions">
+                    <li>Fraud is rare because most people are honest. If we oversample fraud, what assumptions are we
+                        making about human nature?</li>
+                    <li>SMOTE creates synthetic minority examples. What does it mean to create synthetic fraudsters or
+                        cancer patients?</li>
+                    <li>If we balance classes artificially, does the model learn about the real world or a fantasy?</li>
+                    <li>Is class imbalance a problem to be solved, or information to be respected?</li>
+                </ul>
+                <p class="activity-note">Try: Calculate base rates for rare events (plane crashes, lottery wins).
+                    Discuss why accurate prediction is so hard.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Evaluation / Philosophy</span>
+                <h3>3. Aggregating Metrics: What Gets Hidden?</h3>
+                <p>
+                    F1-score, macro-average, micro-average—we combine metrics into single numbers.
+                    What simplicity gives us, it takes away in understanding. What's hidden in aggregation?
+                </p>
+                <ul class="probing-questions">
+                    <li>If overall accuracy is 90%, but one group has 60% accuracy, is the model "90% good"?</li>
+                    <li>Macro-averaging treats all classes equally. When is that fair? When is it unfair?</li>
+                    <li>An F1 of 0.8 could come from many different precision-recall combinations. Does that matter?
+                    </li>
+                    <li>When executives ask "how good is this model?" what should you actually tell them?</li>
+                </ul>
+                <p class="activity-note">Try: Show the same model evaluated by multiple metrics. Discuss how each tells
+                    a different story.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Perspective-Taking / Ethics</span>
+                <h3>4. The Confusion Matrix as Moral Inventory</h3>
+                <p>
+                    Each cell of the confusion matrix represents a different kind of error.
+                    Behind each number is a person with a different experience. What are their stories?
+                </p>
+                <ul class="probing-questions">
+                    <li>What's it like to be a false positive in a criminal prediction system? A false negative?</li>
+                    <li>In medicine, a false positive leads to needless treatment; a false negative means missed
+                        disease. Which is worse?</li>
+                    <li>The matrix makes errors look equivalent within cells. Are all false positives equally bad?</li>
+                    <li>If you could only minimize one cell, which would you choose? Why?</li>
+                </ul>
+                <p class="activity-note">Try: Have students role-play being in different cells of the confusion matrix
+                    from a real system.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Metacognition / Systems Thinking</span>
+                <h3>5. Multiclass: When Reality Escapes Categories</h3>
+                <p>
+                    Multiclass classification assumes examples belong to exactly one category.
+                    But the world resists neat categorization. How do we handle multiplicity?
+                </p>
+                <ul class="probing-questions">
+                    <li>A song is both "rock" and "pop." A patient has two diseases. How does classification handle
+                        this?</li>
+                    <li>Multi-label vs. multiclass: when should a system allow multiple labels?</li>
+                    <li>Classification systems reify categories. Does Netflix's "genre" system change how we understand
+                        film?</li>
+                    <li>What happens when cultural categories don't translate? (e.g., emotion classification across
+                        cultures)</li>
+                </ul>
+                <p class="activity-note">Try: Have students categorize ambiguous examples and notice where they
+                    disagree.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Application</span>
+                <h3>6. ROC Curves and the Illusion of Choice</h3>
+                <p>
+                    ROC curves show all possible trade-offs. But having options doesn't mean we
+                    know how to choose. What guidance do we actually have?
+                </p>
+                <ul class="probing-questions">
+                    <li>The ROC curve shows what's possible. Who decides what's desirable?</li>
+                    <li>AUC of 0.95 vs. 0.90: Is one model "better"? Does it depend on where on the curve you operate?
+                    </li>
+                    <li>If two stakeholders want different points on the ROC curve, how do you resolve the conflict?
+                    </li>
+                    <li>Could you explain an ROC curve to a non-technical decision-maker? Should you have to?</li>
+                </ul>
+                <p class="activity-note">Try: Give an ROC curve with marked points. Have groups choose a point and
+                    justify it to stakeholders.</p>
+            </div>
+
+            <h2>Discussion Facilitation Tips</h2>
+            <ul>
+                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
+                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
+                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
+                    self-driving cars).</li>
+                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
+                    answer.</li>
+                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
+                    discussion—"How does this change how you'd build a model?"</li>
+            </ul>
+
+            <footer>
+                <p><a href="index.html">Back to Module 5</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>

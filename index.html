@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DATASCI 207: Applied Machine Learning - Course Materials">
+    <title>DATASCI 207: Applied Machine Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        /* Password Gate Styles */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .password-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-box h2 {
+            margin: 0 0 0.5rem 0;
+            color: #1a1a2e;
+            font-size: 1.75rem;
+        }
+
+        .password-box .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .password-box input[type="password"] {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .password-box input[type="password"]:focus {
+            outline: none;
+            border-color: #0f3460;
+            box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.15);
+        }
+
+        .password-box button {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .password-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);
+        }
+
+        .password-box button:active {
+            transform: translateY(0);
+        }
+
+        .password-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .password-error.show {
+            display: block;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .content-hidden {
+            display: none;
+        }
+
+        .lock-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Password Overlay -->
+    <div id="passwordOverlay" class="password-overlay">
+        <div class="password-box">
+            <div class="lock-icon">🔒</div>
+            <h2>Course Portal</h2>
+            <p class="subtitle">DATASCI 207: Applied Machine Learning</p>
+            <form id="passwordForm">
+                <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off" autofocus>
+                <button type="submit">Access Course</button>
+            </form>
+            <p id="errorMessage" class="password-error">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- Main Content (hidden until authenticated) -->
+    <div id="mainContent" class="content-hidden">
+        <header class="nav-header">
+            <div class="container">
+                <span class="site-title">DATASCI 207: Applied Machine Learning</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <h1>Course Materials</h1>
+
+                <p>
+                    Welcome to DATASCI 207. This course covers the foundations of machine learning,
+                    from linear models through deep learning architectures. Each module includes
+                    lecture code, a glossary of key terms, self-check quizzes, and additional readings.
+                </p>
+
+                <h2>Modules</h2>
+
+                <div class="week-grid">
+                    <div class="week-card">
+                        <a href="week_01/index.html">
+                            <span class="week-number">Module 1</span>
+                            <h3>Introduction and Framing</h3>
+                            <p>Functions, models, generalization, overfitting, train/test split, baselines</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_02/index.html">
+                            <span class="week-number">Module 2</span>
+                            <h3>Linear Regression and Gradient Descent</h3>
+                            <p>Loss functions, optimization, batch/stochastic/mini-batch gradient descent</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_03/index.html">
+                            <span class="week-number">Module 3</span>
+                            <h3>Feature Engineering</h3>
+                            <p>Scaling, encoding, feature crosses, feature selection, curse of dimensionality</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_04/index.html">
+                            <span class="week-number">Module 4</span>
+                            <h3>Logistic Regression</h3>
+                            <p>Sigmoid function, decision boundaries, classification thresholds, logistic loss</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_05/index.html">
+                            <span class="week-number">Module 5</span>
+                            <h3>Multiclass Classification and Metrics</h3>
+                            <p>Softmax, cross-entropy, precision, recall, confusion matrices</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_06/index.html">
+                            <span class="week-number">Module 6</span>
+                            <h3>Feedforward Neural Networks</h3>
+                            <p>XOR problem, hidden layers, activation functions, backpropagation, optimizers</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_07/index.html">
+                            <span class="week-number">Module 7</span>
+                            <h3>KNN, Decision Trees, and Ensembles</h3>
+                            <p>Non-parametric models, entropy, information gain, random forests, boosting</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_08/index.html">
+                            <span class="week-number">Module 8</span>
+                            <h3>Unsupervised Learning: k-Means and PCA</h3>
+                            <p>Clustering, hierarchical methods, GMM, dimensionality reduction, SVD, t-SNE</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_09/index.html">
+                            <span class="week-number">Module 9</span>
+                            <h3>Embeddings For Text</h3>
+                            <p>Tokenization, one-hot, bag-of-words, word embeddings, transfer learning</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_10/index.html">
+                            <span class="week-number">Module 10</span>
+                            <h3>Convolutional Neural Networks</h3>
+                            <p>Convolutional filters, pooling, stride, padding, ImageNet, transfer learning</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_11/index.html">
+                            <span class="week-number">Module 11</span>
+                            <h3>Network Architecture Design</h3>
+                            <p>Keras Functional API, multi-input/output models, embedding layers, pipelines</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_12/index.html">
+                            <span class="week-number">Module 12</span>
+                            <h3>Fairness</h3>
+                            <p>Bias, subgroup metrics, COMPAS case study, adversarial training, ethical AI</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="week_13/index.html">
+                            <span class="week-number">Module 13</span>
+                            <h3>Advanced Topics</h3>
+                            <p>RNNs, seq2seq, attention mechanisms, Transformers, BERT, GPT, LLMs</p>
+                        </a>
+                    </div>
+                </div>
+
+                <h2>Resources</h2>
+
+                <div class="week-grid">
+                    <div class="week-card">
+                        <a href="setup.html">
+                            <span class="week-number">Getting Started</span>
+                            <h3>Environment Setup</h3>
+                            <p>Python installation, required libraries, running code files</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="how_to_read_papers.html">
+                            <span class="week-number">Guide</span>
+                            <h3>How to Read ML Papers</h3>
+                            <p>Strategies for reading and understanding research papers</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="debugging_tips.html">
+                            <span class="week-number">Reference</span>
+                            <h3>Debugging Tips</h3>
+                            <p>Common errors and how to fix them</p>
+                        </a>
+                    </div>
+
+                    <div class="week-card">
+                        <a href="capstone_best_practices.html">
+                            <span class="week-number">Final Project</span>
+                            <h3>Capstone Best Practices</h3>
+                            <p>Recommendations for your final project</p>
+                        </a>
+                    </div>
+                </div>
+
+                <footer>
+                    <p>DATASCI 207: Applied Machine Learning</p>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple password protection
+        // NOTE: This is NOT cryptographically secure - the password is visible in source code
+        // It provides a simple barrier for casual access only
+        const CORRECT_PASSWORD = 'GoBears';
+        const STORAGE_KEY = 'datasci207_authenticated';
+
+        // Check if already authenticated
+        function checkAuth() {
+            if (localStorage.getItem(STORAGE_KEY) === 'true') {
+                showContent();
+            }
+        }
+
+        function showContent() {
+            document.getElementById('passwordOverlay').style.display = 'none';
+            document.getElementById('mainContent').classList.remove('content-hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('passwordForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('errorMessage');
+
+            if (input.value === CORRECT_PASSWORD) {
+                localStorage.setItem(STORAGE_KEY, 'true');
+                showContent();
+            } else {
+                error.classList.add('show');
+                input.value = '';
+                input.focus();
+
+                // Remove error after 3 seconds
+                setTimeout(() => {
+                    error.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // Check authentication on page load
+        checkAuth();
+    </script>
+</body>
+
+</html>
