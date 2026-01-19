@@ -12,24 +12,26 @@
     --color-text: #2c2c2c;
     --color-text-muted: #666666;
     --color-text-light: #888888;
-    --color-primary: #1a365d;       /* Deep navy */
+    --color-primary: #1a365d;
+    /* Deep navy */
     --color-primary-light: #2c5282;
-    --color-accent: #2b6cb0;        /* Professional blue */
+    --color-accent: #2b6cb0;
+    /* Professional blue */
     --color-border: #e2e2e2;
     --color-border-light: #eeeeee;
-    
+
     /* Quiz colors */
     --color-correct: #276749;
     --color-correct-bg: #f0fff4;
     --color-incorrect: #9b2c2c;
     --color-incorrect-bg: #fff5f5;
-    
+
     /* Typography */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     --font-size-base: 16px;
     --line-height: 1.7;
-    
+
     /* Spacing */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
@@ -37,14 +39,16 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
-    
+
     /* Layout */
-    --max-width: 900px;
+    --max-width: 100%;
     --border-radius: 4px;
 }
 
 /* ===== Reset & Base ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -71,13 +75,32 @@ body {
     padding: var(--spacing-xl);
 }
 
+@media (min-width: 1200px) {
+    .container {
+        padding-left: 4rem;
+        padding-right: 4rem;
+    }
+}
+
+@media (min-width: 1600px) {
+    .container {
+        padding-left: 8rem;
+        padding-right: 8rem;
+    }
+}
+
 main {
     background-color: var(--color-bg-alt);
     min-height: 100vh;
 }
 
 /* ===== Typography ===== */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     color: var(--color-primary);
     margin-top: var(--spacing-xl);
@@ -90,6 +113,13 @@ h1 {
     margin-top: 0;
     padding-bottom: var(--spacing-md);
     border-bottom: 2px solid var(--color-primary);
+}
+
+/* Password overlay title - white text */
+h1.overlay-title {
+    color: white;
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 h2 {
@@ -123,7 +153,8 @@ a:hover {
 }
 
 /* ===== Lists ===== */
-ul, ol {
+ul,
+ol {
     margin-bottom: var(--spacing-md);
     padding-left: var(--spacing-xl);
 }
@@ -171,7 +202,8 @@ table {
     font-size: 0.95rem;
 }
 
-th, td {
+th,
+td {
     padding: var(--spacing-sm) var(--spacing-md);
     text-align: left;
     border-bottom: 1px solid var(--color-border);
@@ -202,6 +234,7 @@ tr:hover {
     font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: 0.02em;
+    color: white;
 }
 
 .breadcrumb {
@@ -539,15 +572,37 @@ tr:hover {
     font-size: 0.875rem;
 }
 
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: var(--spacing-md); }
-.mt-2 { margin-top: var(--spacing-lg); }
-.mt-3 { margin-top: var(--spacing-xl); }
+.mt-0 {
+    margin-top: 0;
+}
 
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: var(--spacing-md); }
-.mb-2 { margin-bottom: var(--spacing-lg); }
-.mb-3 { margin-bottom: var(--spacing-xl); }
+.mt-1 {
+    margin-top: var(--spacing-md);
+}
+
+.mt-2 {
+    margin-top: var(--spacing-lg);
+}
+
+.mt-3 {
+    margin-top: var(--spacing-xl);
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-1 {
+    margin-bottom: var(--spacing-md);
+}
+
+.mb-2 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.mb-3 {
+    margin-bottom: var(--spacing-xl);
+}
 
 /* ===== Footer ===== */
 footer {
@@ -563,15 +618,15 @@ footer {
     .container {
         padding: var(--spacing-md);
     }
-    
+
     h1 {
         font-size: 1.5rem;
     }
-    
+
     h2 {
         font-size: 1.25rem;
     }
-    
+
     .week-grid {
         grid-template-columns: 1fr;
     }
@@ -579,20 +634,21 @@ footer {
 
 /* ===== Print Styles ===== */
 @media print {
+
     .nav-header,
     .quiz-actions,
     .btn {
         display: none;
     }
-    
+
     body {
         font-size: 12pt;
     }
-    
+
     a {
         color: var(--color-text);
     }
-    
+
     a[href]::after {
         content: " (" attr(href) ")";
         font-size: 0.8em;
