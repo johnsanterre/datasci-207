@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Curated Resources - DATASCI 207: Applied Machine Learning">
+    <title>Curated Resources - DATASCI 207</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .resource-section {
+            margin-bottom: 3rem;
+        }
+
+        .resource-section h2 {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .resource-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .resource-list li:last-child {
+            border-bottom: none;
+        }
+
+        .resource-list a {
+            color: #0066cc;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .resource-list a:hover {
+            text-decoration: underline;
+        }
+
+        .resource-category {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .resource-category h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .toc {
+            background: #f0f7ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            columns: 2;
+            -webkit-columns: 2;
+            -moz-columns: 2;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .toc ul {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-header">
+        <div class="container">
+            <a href="index.html" class="site-title">DATASCI 207: Applied Machine Learning</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span class="separator">/</span>
+                <span>Curated Resources</span>
+            </nav>
+
+            <h1>Curated Resources</h1>
+            <p>
+                A comprehensive collection of external resources for machine learning, mathematics,
+                and data science. These links cover tutorials, papers, videos, tools, and thought-provoking
+                articles to deepen your understanding.
+            </p>
+
+            <div class="toc">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#ml-courses">ML Courses & Tutorials</a></li>
+                    <li><a href="#linear-algebra">Linear Algebra</a></li>
+                    <li><a href="#deep-learning">Deep Learning</a></li>
+                    <li><a href="#rl">Reinforcement Learning</a></li>
+                    <li><a href="#nlp">NLP & Transformers</a></li>
+                    <li><a href="#fairness">AI Ethics & Fairness</a></li>
+                    <li><a href="#math">Mathematics</a></li>
+                    <li><a href="#papers">Research Papers</a></li>
+                    <li><a href="#tools">Tools & Libraries</a></li>
+                    <li><a href="#books">Books</a></li>
+                    <li><a href="#videos">Video Resources</a></li>
+                    <li><a href="#articles">Articles & Essays</a></li>
+                </ul>
+            </div>
+
+            <!-- ML Courses & Tutorials -->
+            <div class="resource-section" id="ml-courses">
+                <h2>Machine Learning Courses & Tutorials</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://www.r-bloggers.com/in-depth-introduction-to-machine-learning-in-15-hours-of-expert-videos/">In-Depth
+                                Introduction to ML in 15 Hours of Expert Videos</a></li>
+                        <li><a href="http://chicagoboothml.github.io/MachineLearning_Fall2015/">Chicago Booth Machine
+                                Learning Course</a></li>
+                        <li><a href="http://mlsp.cs.cmu.edu/courses/fall2011/">CMU Machine Learning for Signal
+                                Processing</a></li>
+                        <li><a href="https://madewithml.com/">Made With ML</a></li>
+                        <li><a href="https://github.com/eriklindernoren/ML-From-Scratch">ML From Scratch (GitHub)</a>
+                        </li>
+                        <li><a href="https://github.com/eugeneyan/applied-ml">Applied ML (GitHub)</a></li>
+                        <li><a href="http://joschu.net/blog/opinionated-guide-ml-research.html">An Opinionated Guide to
+                                ML Research</a></li>
+                        <li><a href="https://atcold.github.io/pytorch-Deep-Learning/en/week01/01/">NYU Deep Learning
+                                Course</a></li>
+                        <li><a href="https://missing.csail.mit.edu/">The Missing Semester of Your CS Education (MIT)</a>
+                        </li>
+                        <li><a href="https://www.omscs.gatech.edu/">Georgia Tech OMSCS Program</a></li>
+                        <li><a href="https://www.coursera.org/learn/game-theory-1">Game Theory (Coursera)</a></li>
+                        <li><a href="https://www.aeaweb.org/conference/cont-ed/2018-webcasts">AEA Continuing Education
+                                Webcasts</a></li>
+                        <li><a href="https://exercism.io/">Exercism - Code Practice</a></li>
+                        <li><a href="https://classroom.github.com/">GitHub Classroom</a></li>
+                        <li><a href="https://montrealartificialintelligence.com/ai4all.pdf">AI4ALL Curriculum</a></li>
+                        <li><a href="https://github.com/catalyst-team/dl-course">Deep Learning Course (Catalyst)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Linear Algebra -->
+            <div class="resource-section" id="linear-algebra">
+                <h2>Linear Algebra</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://www.math.brown.edu/~treil/papers/LADW/LADW_2017-09-04.pdf">Linear Algebra
+                                Done Wrong (Brown)</a></li>
+                        <li><a href="http://linear.axler.net/LADRvideos.html">Linear Algebra Done Right Videos</a></li>
+                        <li><a href="https://betterexplained.com/articles/linear-algebra-guide/">Better Explained:
+                                Linear Algebra Guide</a></li>
+                        <li><a href="https://textbooks.math.gatech.edu/ila/index.html">Interactive Linear Algebra
+                                (Georgia Tech)</a></li>
+                        <li><a href="http://math.mit.edu/~gs/learningfromdata/dsla1-1.pdf">Data Science & Linear Algebra
+                                (MIT)</a></li>
+                        <li><a
+                                href="https://jeremykun.com/2016/04/18/singular-value-decomposition-part-1-perspectives-on-linear-algebra/">SVD
+                                Part 1: Perspectives on Linear Algebra</a></li>
+                        <li><a href="http://vmls-book.stanford.edu/vmls-julia-companion.pdf">VMLS Julia Companion
+                                (Stanford)</a></li>
+                        <li><a href="https://www.fast.ai/2017/07/17/num-lin-alg/">Computational Linear Algebra
+                                (fast.ai)</a></li>
+                        <li><a href="https://klkuttler.com/book/Linear-Algebra,-Theory-And-Applications/5">Linear
+                                Algebra: Theory and Applications</a></li>
+                        <li><a
+                                href="https://pub.towardsai.net/basic-linear-algebra-for-deep-learning-and-machine-learning-ml-python-tutorial-444e23db3e9e">Basic
+                                Linear Algebra for Deep Learning</a></li>
+                        <li><a
+                                href="http://datahacker.rs/009-the-singular-value-decompositionsvd-illustrated-in-python/">SVD
+                                Illustrated in Python</a></li>
+                        <li><a href="https://davetang.org/file/Singular_Value_Decomposition_Tutorial.pdf">SVD
+                                Tutorial</a></li>
+                        <li><a href="https://www.mathworks.com/company/newsletters/articles/professor-svd.html">Professor
+                                SVD (MathWorks)</a></li>
+                        <li><a href="https://jeremykun.com/2011/07/27/eigenfaces/">Eigenfaces</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Deep Learning -->
+            <div class="resource-section" id="deep-learning">
+                <h2>Deep Learning & Neural Networks</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://pytorch.org/assets/deep-learning/Deep-Learning-with-PyTorch.pdf">Deep
+                                Learning with PyTorch (Official Book)</a></li>
+                        <li><a href="http://neuralnetworksanddeeplearning.com/chap2.html">Neural Networks and Deep
+                                Learning</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/lets-code-a-neural-network-in-plain-numpy-ae7e74410795">Code
+                                a Neural Network in Plain NumPy</a></li>
+                        <li><a
+                                href="https://github.com/mnielsen/neural-networks-and-deep-learning/blob/master/src/network.py">Neural
+                                Network from Scratch (Python)</a></li>
+                        <li><a href="http://www.wildml.com/deep-learning-glossary">WildML Deep Learning Glossary</a>
+                        </li>
+                        <li><a href="https://distill.pub/">Distill.pub - Visual ML Explanations</a></li>
+                        <li><a href="https://distill.pub/2020/bayesian-optimization/">A Visual Exploration of Bayesian
+                                Optimization</a></li>
+                        <li><a href="https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html">DCGAN Tutorial
+                                (PyTorch)</a></li>
+                        <li><a href="https://d2l.ai/chapter_generative-adversarial-networks/gan.html">Dive into Deep
+                                Learning: GANs</a></li>
+                        <li><a
+                                href="https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/gan/gan.py">PyTorch
+                                GAN Implementation</a></li>
+                        <li><a href="https://blog.paperspace.com/implementing-gans-in-tensorflow/">Implementing GANs in
+                                TensorFlow</a></li>
+                        <li><a
+                                href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_Generative_Adversarial_CVPR_2018_paper.pdf">CartoonGAN
+                                Paper</a></li>
+                        <li><a
+                                href="http://kaiminghe.com/iccv15tutorial/iccv2015_tutorial_convolutional_feature_maps_kaiminghe.pdf">Convolutional
+                                Feature Maps (He)</a></li>
+                        <li><a href="http://szeliski.org/Book/2ndEdition.htm">Computer Vision: Algorithms and
+                                Applications</a></li>
+                        <li><a href="https://keras.io/examples/mnist_transfer_cnn/">Transfer Learning with CNNs
+                                (Keras)</a></li>
+                        <li><a
+                                href="https://www.marktechpost.com/2019/06/09/getting-started-with-pytorch-in-google-collab-with-free-gpu/">PyTorch
+                                in Google Colab</a></li>
+                        <li><a href="https://github.com/jdb78/pytorch-forecasting">PyTorch Forecasting</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Reinforcement Learning -->
+            <div class="resource-section" id="rl">
+                <h2>Reinforcement Learning</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html">David Silver's RL Course
+                                (UCL/DeepMind)</a></li>
+                        <li><a href="https://www.alexirpan.com/2018/02/14/rl-hard.html">Deep Reinforcement Learning
+                                Doesn't Work Yet</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/real-world-applications-of-markov-decision-process-mdp-a39685546026">Real-World
+                                Applications of MDPs</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/introduction-to-various-reinforcement-learning-algorithms-part-ii-trpo-ppo-87f2c5919bb9">TRPO
+                                and PPO Explained</a></li>
+                        <li><a
+                                href="https://lilianweng.github.io/lil-log/2020/01/29/curriculum-for-reinforcement-learning.html">Curriculum
+                                for Reinforcement Learning</a></li>
+                        <li><a href="https://github.com/RL-Research-Cohiba/Reinforcement_Learning">Reinforcement
+                                Learning Resources</a></li>
+                        <li><a
+                                href="https://venturebeat.com/2020/04/29/salesforces-ai-economist-taps-reinforcement-learning-to-generate-optimal-tax-policies/">AI
+                                Economist: RL for Tax Policies</a></li>
+                        <li><a
+                                href="https://jeremykun.com/2013/10/28/optimism-in-the-face-of-uncertainty-the-ucb1-algorithm/">UCB1
+                                Algorithm Explained</a></li>
+                        <li><a href="https://jamesrledoux.com/algorithms/bandit-algorithms-epsilon-ucb-exp-python/">Bandit
+                                Algorithms in Python</a></li>
+                        <li><a href="http://setosa.io/ev/markov-chains/">Visual Explanation of Markov Chains</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/markov-models-and-markov-chains-explained-in-real-life-probabilistic-workout-routine-65e47b5c9a73">Markov
+                                Models Explained</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- NLP & Transformers -->
+            <div class="resource-section" id="nlp">
+                <h2>NLP & Transformers</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://arxiv.org/pdf/1706.03762.pdf">Attention Is All You Need (Original
+                                Paper)</a></li>
+                        <li><a href="https://towardsdatascience.com/attention-in-neural-networks-e66920838742">Attention
+                                in Neural Networks</a></li>
+                        <li><a href="https://wsstriving.github.io/2016/04/20/FeedForward-Attention-Model/">Feedforward
+                                Attention Model</a></li>
+                        <li><a href="https://ai.googleblog.com/2020/06/pegasus-state-of-art-model-for.html">PEGASUS:
+                                Summarization Model</a></li>
+                        <li><a
+                                href="https://www.quantamagazine.org/symbolic-mathematics-finally-yields-to-neural-networks-20200520/">Symbolic
+                                Math Yields to Neural Networks</a></li>
+                        <li><a
+                                href="https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html">Seq2Seq
+                                in Keras</a></li>
+                        <li><a href="https://peterroelants.github.io/posts/rnn-implementation-part02/">RNN
+                                Implementation</a></li>
+                        <li><a href="https://towardsdatascience.com/lstm-by-example-using-tensorflow-feb0c1968537">LSTM
+                                by Example (TensorFlow)</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/multi-state-lstms-for-categorical-features-66cc974df1dc">Multi-State
+                                LSTMs</a></li>
+                        <li><a href="https://www.nabla.com/blog/gpt-3/">Nabla GPT-3 Analysis</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/nlp-python-pipeline-tutorial-for-text-classification-modeling-6eb1000f909c">NLP
+                                Python Pipeline Tutorial</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- AI Ethics & Fairness -->
+            <div class="resource-section" id="fairness">
+                <h2>AI Ethics & Fairness</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://www.propublica.org/article/bias-in-criminal-risk-scores-is-mathematically-inevitable-researchers-say">Bias
+                                in Criminal Risk Scores</a></li>
+                        <li><a
+                                href="https://psmag.com/social-justice/justice-by-the-numbers-meet-the-statistician-trying-to-fix-bias-in-criminal-justice-algorithms">Justice
+                                by the Numbers</a></li>
+                        <li><a
+                                href="https://github.com/IBM/AIF360/blob/master/aif360/algorithms/inprocessing/adversarial_debiasing.py">AIF360
+                                Adversarial Debiasing</a></li>
+                        <li><a
+                                href="https://colab.research.google.com/notebooks/ml_fairness/adversarial_debiasing.ipynb">Adversarial
+                                Debiasing Notebook</a></li>
+                        <li><a href="https://dl.acm.org/doi/abs/10.1145/3351095.3372843">Fairness Research (ACM)</a>
+                        </li>
+                        <li><a
+                                href="https://www.journals.elsevier.com/information-processing-and-management/call-for-papers/special-issue-on-algorithmic-bias-and-fairness-in-search">Algorithmic
+                                Bias and Fairness</a></li>
+                        <li><a href="https://www.nytimes.com/2020/06/24/technology/facial-recognition-arrest.html">Facial
+                                Recognition and Wrongful Arrest</a></li>
+                        <li><a
+                                href="https://www.theatlantic.com/magazine/archive/2020/09/china-ai-surveillance/614197/">China's
+                                AI Surveillance</a></li>
+                        <li><a
+                                href="https://www.technologyreview.com/2020/08/25/1007589/participation-washing-ai-trends-opinion-machine-learning/">Participation
+                                Washing in AI</a></li>
+                        <li><a href="https://www.newyorker.com/tech/annals-of-technology/who-should-stop-unethical-ai">Who
+                                Should Stop Unethical AI?</a></li>
+                        <li><a href="https://github.com/daviddao/awful-ai">Awful AI (GitHub)</a></li>
+                        <li><a href="https://www.nscai.gov/wp-content/uploads/2021/03/Full-Report-Digital-1.pdf">NSCAI
+                                Final Report</a></li>
+                        <li><a href="http://positivelysemidefinite.com/2020/06/160k-students.html">160K Students and ML
+                                Grading</a></li>
+                        <li><a
+                                href="https://fivethirtyeight.com/features/police-misconduct-costs-cities-millions-every-year-but-thats-where-the-accountability-ends/">Police
+                                Misconduct and Accountability</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Mathematics -->
+            <div class="resource-section" id="math">
+                <h2>Mathematics</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="http://www.people.vcu.edu/~rhammack/BookOfProof/Main.pdf">Book of Proof</a></li>
+                        <li><a href="http://people.cs.uchicago.edu/~laci/06dm/lecturenotes.pdf">Discrete Math Lecture
+                                Notes (UChicago)</a></li>
+                        <li><a href="https://arxiv.org/pdf/1404.1100.pdf">A Tutorial on PCA</a></li>
+                        <li><a href="http://cs229.stanford.edu/section/cs229-prob.pdf">Probability Review (Stanford
+                                CS229)</a></li>
+                        <li><a href="https://gregorygundersen.com/blog/2020/04/11/moments/">Understanding Moments</a>
+                        </li>
+                        <li><a href="https://www.quantamagazine.org/">Quanta Magazine</a></li>
+                        <li><a
+                                href="https://www.quantamagazine.org/the-useless-perspective-that-transformed-mathematics-20200609/">The
+                                Useless Perspective That Transformed Mathematics</a></li>
+                        <li><a
+                                href="https://www.quantamagazine.org/topology-101-how-mathematicians-study-holes-20210126/">Topology
+                                101</a></li>
+                        <li><a href="https://www.math3ma.com/">Math3ma Blog</a></li>
+                        <li><a href="https://www.scottaaronson.com/democritus/">Quantum Computing Since Democritus</a>
+                        </li>
+                        <li><a href="https://www.maa.org/sites/default/files/pdf/upload_library/22/Ford/MarkKac.pdf">Can
+                                One Hear the Shape of a Drum?</a></li>
+                        <li><a
+                                href="https://web.ma.utexas.edu/users/gordanz/notes/introduction_to_stochastic_processes.pdf">Intro
+                                to Stochastic Processes</a></li>
+                        <li><a href="http://www.randomservices.org/random/">Virtual Laboratories in Probability</a></li>
+                        <li><a href="https://kpknudson.com/my-favorite-theorem/2021/1/15/episode-62-tai-danae-bradley">My
+                                Favorite Theorem Podcast</a></li>
+                        <li><a
+                                href="https://xenaproject.wordpress.com/2021/01/21/formalising-mathematics-an-introduction/">Formalising
+                                Mathematics</a></li>
+                        <li><a href="https://jackschaedler.github.io/circles-sines-signals/aliasing.html">Circles,
+                                Sines, and Signals</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Research Papers -->
+            <div class="resource-section" id="papers">
+                <h2>Research Papers & Reports</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="http://reports-archive.adm.cs.cmu.edu/anon/2016/CMU-CS-16-105.pdf">CMU Technical
+                                Report</a></li>
+                        <li><a href="https://arxiv.org/abs/1712.09913">arXiv: ML Research</a></li>
+                        <li><a href="https://arxiv.org/abs/2001.11279">Understanding Deep Learning</a></li>
+                        <li><a href="https://arxiv.org/pdf/2005.04301.pdf">Deep Learning Optimization</a></li>
+                        <li><a href="https://arxiv.org/abs/2005.01643">ML Research Paper</a></li>
+                        <li><a href="https://arxiv.org/abs/1710.02298">Fairness in ML</a></li>
+                        <li><a href="https://arxiv.org/abs/2004.13649">Recent ML Research</a></li>
+                        <li><a href="https://arxiv.org/pdf/2009.00169.pdf">ML Methods</a></li>
+                        <li><a href="https://arxiv.org/pdf/2002.03206.pdf">Deep Learning Theory</a></li>
+                        <li><a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3562025">SSRN Paper</a></li>
+                        <li><a href="https://www.pnas.org/content/pnas/113/27/7345.full.pdf">PNAS Research</a></li>
+                        <li><a href="https://openreview.net/pdf?id=B1l6y0VFPr">OpenReview Paper</a></li>
+                        <li><a
+                                href="https://sinews.siam.org/Details-Page/deep-learning-in-scientific-computing-understanding-the-instability-mystery">Deep
+                                Learning Instability Mystery</a></li>
+                        <li><a href="https://www.ams.org/publicoutreach/feature-column/fc-2012-12">AMS Feature
+                                Column</a></li>
+                        <li><a href="https://www.ams.org/notices/200902/rtx090200212p.pdf">AMS Notices</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tools & Libraries -->
+            <div class="resource-section" id="tools">
+                <h2>Tools & Libraries</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://datasetsearch.research.google.com/">Google Dataset Search</a></li>
+                        <li><a href="https://aws.amazon.com/education/awseducate/">AWS Educate</a></li>
+                        <li><a href="https://github.com/ypeleg/HungaBunga">HungaBunga: Auto-ML</a></li>
+                        <li><a href="https://github.com/benedekrozemberczki/LittleBallOfFur">LittleBallOfFur: Graph
+                                Sampling</a></li>
+                        <li><a href="https://github.com/googlecodelabs/tools/">Google Codelabs Tools</a></li>
+                        <li><a href="http://archieml.org/">ArchieML</a></li>
+                        <li><a href="https://asciinema.org/about">Asciinema - Terminal Recording</a></li>
+                        <li><a href="http://www.onelinerizer.com/">Python Onelinerizer</a></li>
+                        <li><a href="https://www.vim.so/">Vim.so - Learn Vim</a></li>
+                        <li><a href="https://coiled.io/blog/history-dask.html">History of Dask</a></li>
+                        <li><a
+                                href="https://medium.com/coiled-hq/distributed-computing-for-data-scientists-bfabc72d39da">Distributed
+                                Computing for Data Scientists</a></li>
+                        <li><a href="https://discourse.mc-stan.org/">Stan Forums</a></li>
+                        <li><a href="http://people.duke.edu/~ccc14/sta-663-2016/16C_PyMC3.html">PyMC3 Tutorial
+                                (Duke)</a></li>
+                        <li><a href="https://github.com/poteto/hiring-without-whiteboards">Hiring Without
+                                Whiteboards</a></li>
+                        <li><a href="http://they.whiteboarded.me/">They Whiteboarded Me</a></li>
+                        <li><a href="https://github.com/danistefanovic/build-your-own-x">Build Your Own X</a></li>
+                        <li><a href="https://github.com/ahgroup/DSAIDE">DSAIDE: Disease Modeling</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Books -->
+            <div class="resource-section" id="books">
+                <h2>Books & Textbooks</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://www.oreilly.com/library/view/data-science-from/9781492041122/ch04.html">Data
+                                Science from Scratch (O'Reilly)</a></li>
+                        <li><a
+                                href="https://www.amazon.com/Superforecasting-Science-Prediction-Philip-Tetlock/dp/0804136718">Superforecasting</a>
+                        </li>
+                        <li><a
+                                href="https://www.amazon.com/Bayesian-Analysis-Python-Introduction-probabilistic-ebook/dp/B07HHBCR9G">Bayesian
+                                Analysis with Python</a></li>
+                        <li><a href="https://en.wikipedia.org/wiki/When_Genius_Failed">When Genius Failed</a></li>
+                        <li><a
+                                href="https://www.audible.com/pd/The-Pragmatic-Programmer-20th-Anniversary-Edition-2nd-Edition-Audiobook/B0833FMYH9">The
+                                Pragmatic Programmer</a></li>
+                        <li><a href="http://elevanth.org/blog/2018/07/14/statistical-rethinking-edition-2-eta-2020/">Statistical
+                                Rethinking</a></li>
+                        <li><a href="http://numerical.recipes/book/book.html">Numerical Recipes</a></li>
+                        <li><a href="http://www.algorithmsilluminated.org/">Algorithms Illuminated</a></li>
+                        <li><a href="https://nostarch.com/beyond-basic-stuff-python">Beyond the Basic Stuff with
+                                Python</a></li>
+                        <li><a href="https://d2l.ai/chapter_recommender-systems/mf.html">Dive into Deep Learning</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Video Resources -->
+            <div class="resource-section" id="videos">
+                <h2>Video Resources</h2>
+                <div class="resource-category">
+                    <ul class="resource-list">
+                        <li><a href="https://www.youtube.com/c/AlfredoCanziani">Alfredo Canziani (YouTube)</a></li>
+                        <li><a href="https://www.youtube.com/user/tracydick/playlists">Tracy Dick (YouTube)</a></li>
+                        <li><a href="https://www.youtube.com/channel/UCR1-GEpyOPzT2AO4D_eifdw">Mutual Information
+                                (YouTube)</a></li>
+                        <li><a
+                                href="https://www.youtube.com/watch?v=8iGzBMboA0I&list=PLtmWHNX-gukIc92m1K0P6bIOnZb-mg0hY">ML
+                                Lecture Series</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=a_HPaPd34jk">ML Tutorial</a></li>
+                        <li><a href="https://vimeo.com/363900704">Data Science Talk</a></li>
+                        <li><a href="https://www.youtube.com/playlist?list=PLUZjIBGiCHFfRJwflq6NqU3CuiPhAhSfi">ML
+                                Playlist</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=2pWv7GOvuf0">ML Fundamentals</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=SaJL4SLfrcY">Deep Learning Talk</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=HZGCoVF3YvM">Neural Networks Explained</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=6BMwisTZFr4">ML Workshop</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=EYIKy_FM9x0">Recommender Systems</a></li>
+                        <li><a href="https://www.stitcher.com/podcast/the-joy-of-x">The Joy of X Podcast</a></li>
+                        <li><a
+                                href="https://www.quantamagazine.org/steven-strogatz-talks-science-and-math-on-the-joy-of-x-podcast-20200115/">Steven
+                                Strogatz on Joy of X</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Articles & Essays -->
+            <div class="resource-section" id="articles">
+                <h2>Articles & Essays</h2>
+                <div class="resource-category">
+                    <h3>AI & Technology</h3>
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://www.nytimes.com/interactive/2020/11/21/science/artificial-intelligence-fake-people-faces.html">NYT:
+                                AI Fake Faces</a></li>
+                        <li><a
+                                href="https://medium.com/@mijordan3/artificial-intelligence-the-revolution-hasnt-happened-yet-5e1d5812e1e7">Michael
+                                Jordan: AI Revolution Hasn't Happened Yet</a></li>
+                        <li><a
+                                href="https://cacm.acm.org/magazines/2018/10/231373-human-level-intelligence-or-animal-like-abilities/fulltext">Human-Level
+                                Intelligence or Animal-Like Abilities?</a></li>
+                        <li><a
+                                href="https://www.sciencemag.org/news/2020/05/eye-catching-advances-some-ai-fields-are-not-real">Eye-Catching
+                                AI Advances Not Real</a></li>
+                        <li><a href="https://blog.cerebralab.com/When_to_assume_neural_networks_can_solve_a_problem">When
+                                to Assume NNs Can Solve a Problem</a></li>
+                        <li><a href="https://www.zdnet.com/article/keras-creator-chollets-new-direction-for-ai-a-q-a/">Chollet's
+                                New Direction for AI</a></li>
+                        <li><a href="https://bdtechtalks.com/2020/03/23/yann-lecun-self-supervised-learning/">Yann LeCun
+                                on Self-Supervised Learning</a></li>
+                        <li><a
+                                href="https://thenextweb.com/neural/2020/04/05/self-supervised-learning-is-the-future-of-ai-syndication/">Self-Supervised
+                                Learning is the Future</a></li>
+                        <li><a href="https://infoproc.blogspot.com/2021/02/gradient-descent-models-are-kernel.html">Gradient
+                                Descent Models are Kernel Machines</a></li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Career & Learning</h3>
+                    <ul class="resource-list">
+                        <li><a href="https://daedtech.com/how-developers-stop-learning-rise-of-the-expert-beginner/">Rise
+                                of the Expert Beginner</a></li>
+                        <li><a
+                                href="https://letterstoanewdeveloper.com/2020/04/27/it-never-gets-easier-you-just-go-faster/">It
+                                Never Gets Easier, You Just Go Faster</a></li>
+                        <li><a
+                                href="https://www.nytimes.com/2020/04/07/smarter-living/how-to-edit-your-own-writing.html">How
+                                to Edit Your Own Writing</a></li>
+                        <li><a
+                                href="https://www.sciencemag.org/careers/2018/07/its-never-too-late-stretch-your-wings-why-i-got-phd-age-66">PhD
+                                at Age 66</a></li>
+                        <li><a href="https://lethain.com/eng-brand/">Engineering Brand</a></li>
+                        <li><a href="https://www.debugmind.com/2020/01/04/paths-to-the-future-a-year-at-google-brain/">A
+                                Year at Google Brain</a></li>
+                        <li><a
+                                href="https://www.forbes.com/sites/cognitiveworld/2019/12/01/why-data-scientists-arent-data-engineers/">Why
+                                Data Scientists Aren't Data Engineers</a></li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Science & Society</h3>
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://americanaffairsjournal.org/2020/05/science-without-validation-in-a-world-without-meaning/">Science
+                                Without Validation</a></li>
+                        <li><a href="https://www.discovermagazine.com/mind/fmri-gets-slap-in-the-face-with-a-dead-fish">fMRI
+                                Gets a Slap with a Dead Fish</a></li>
+                        <li><a href="https://constancecrozier.com/2020/04/16/forecasting-s-curves-is-hard">Forecasting
+                                S-Curves is Hard</a></li>
+                        <li><a
+                                href="https://arstechnica.com/science/2020/04/no-senator-science-cant-do-away-with-models/">No
+                                Senator, Science Can't Do Away With Models</a></li>
+                        <li><a href="https://www.wired.com/story/citizens-should-be-allowed-to-kick-robots/">Citizens
+                                Should Be Allowed to Kick Robots</a></li>
+                        <li><a
+                                href="https://www.mcsweeneys.net/articles/just-because-theyve-turned-against-humanity-doesnt-mean-we-should-defund-the-terminator-program">McSweeney's:
+                                Terminator Program</a></li>
+                        <li><a href="https://www.quantamagazine.org/how-swarming-insects-act-like-fluids-20190710/">How
+                                Swarming Insects Act Like Fluids</a></li>
+                        <li><a href="https://ciechanow.ski/cameras-and-lenses/">Cameras and Lenses (Interactive)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Special Topics -->
+            <div class="resource-section" id="special">
+                <h2>Special Topics</h2>
+                <div class="resource-category">
+                    <h3>Recommender Systems</h3>
+                    <ul class="resource-list">
+                        <li><a href="https://sifter.org/~simon/journal/20061211.html">Netflix Prize and SVD</a></li>
+                        <li><a href="https://beckernick.github.io/matrix-factorization-recommender/">Matrix
+                                Factorization Recommender</a></li>
+                        <li><a
+                                href="https://github.com/beckernick/matrix_factorization_recommenders/blob/master/matrix_factorization_recommender.ipynb">Matrix
+                                Factorization Notebook</a></li>
+                        <li><a href="https://alyssaq.github.io/2015/20150426-simple-movie-recommender-using-svd/">Simple
+                                Movie Recommender Using SVD</a></li>
+                        <li><a
+                                href="https://towardsdatascience.com/beginners-guide-to-creating-an-svd-recommender-system-1fd7326d1f65">Beginner's
+                                Guide to SVD Recommenders</a></li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Causal Inference</h3>
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://towardsdatascience.com/causal-inference-using-synthetic-control-the-ultimate-guide-a622ad5cf827">Synthetic
+                                Control: Ultimate Guide</a></li>
+                        <li><a
+                                href="https://github.com/OscarEngelbrektson/SyntheticControlMethods/blob/master/examples/german_reunification.ipynb">German
+                                Reunification Example</a></li>
+                        <li><a href="https://betanalpha.github.io/assets/case_studies/modeling_and_inference.html">Modeling
+                                and Inference</a></li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Disease Modeling & Networks</h3>
+                    <ul class="resource-list">
+                        <li><a
+                                href="https://github.com/joelmiller/DynamicProcessesOnNetworks/blob/master/5%20Disease%20Modeling/SIR%20analysis/SIR%20-%20Mathematical%20Analysis.ipynb">SIR
+                                Mathematical Analysis</a></li>
+                        <li><a href="https://www.nature.com/articles/s41598-020-67949-9">Network Science Research</a>
+                        </li>
+                        <li><a href="http://realitycommons.media.mit.edu/pdfs/eigenbehaviors.pdf">Eigenbehaviors
+                                (MIT)</a></li>
+                        <li><a
+                                href="https://www.earthlymission.com/gps-tracking-shows-how-much-wolf-packs-avoid-each-others-range/">Wolf
+                                Pack Territory (GPS Data)</a></li>
+                    </ul>
+                </div>
+                <div class="resource-category">
+                    <h3>Anomaly Detection</h3>
+                    <ul class="resource-list">
+                        <li><a href="https://medium.com/@jetnew/anomaly-detection-of-time-series-data-e0cb6b382e33">Anomaly
+                                Detection of Time Series</a></li>
+                        <li><a href="http://www.cs.cmu.edu/~neill/papers/eventdetection.pdf">Event Detection (CMU)</a>
+                        </li>
+                        <li><a href="http://www.cs.cmu.edu/~abeutel/kdd2015_tutorial/">KDD 2015 Anomaly Detection
+                                Tutorial</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <footer>
+                <p><a href="index.html">Back to Course Home</a></p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>
