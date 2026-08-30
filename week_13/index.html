@@ -30,15 +30,10 @@
 
             <h1>Module 13: Transformers and Attention</h1>
 
-            <p>
-                This final module introduces the transformer architecture that powers modern AI systems
-                like BERT and GPT. You will understand how attention mechanisms work, why they enable
-                processing of long-range dependencies, and how to use pre-trained transformers for
-                text classification and other NLP tasks.
-            </p>
+            <p>This final module introduces the transformer architecture that powers modern AI systems like BERT and GPT. You will understand how attention mechanisms work, why they enable processing of long-range dependencies, and how to use pre-trained transformers for text classification and other NLP tasks.</p>
 
             <div class="learning-objectives">
-                <h3>Learning Objectives</h3>
+<h3>Learning Objectives</h3>
                 <ul>
                     <li>Explain the limitations of recurrent networks that attention addresses.</li>
                     <li>Describe the intuition behind attention mechanisms.</li>
@@ -49,21 +44,57 @@
                 </ul>
             </div>
 
-            <h2>Materials</h2>
+            <div class="progresswrap">
+              <div class="progressbar"><div id="pbar"></div></div>
+              <div class="plabel"><span id="pdone">0</span> of 8 stages complete</div>
+            </div>
 
-            <nav class="module-nav">
-                <a href="README.pdf">Module Summary</a>
-                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_13/lecture.ipynb">Open Lecture in Colab</a>
-                <a href="https://github.com/johnsanterre/datasci-207/blob/main/week_13/lecture.py">View Code on GitHub</a>
-                <a href="glossary.html">Glossary</a>
-                <a href="quiz.html">Knowledge Check</a>
-                <a href="readings.html">Additional Readings</a>
-                <a href="exercises/index.html">Exercises</a>
-                <a href="discussion.html">Discussion Topics</a>
-            </nav>
+            <section class="seg" data-seg="watch">
+              <div class="stype">1 &middot; Watch</div>
+              <h2>The module in two minutes</h2>
+              <video controls preload="metadata" src="../video/week_13.mp4"></video>
+              <p class="medianote">An animated overview of the module&rsquo;s through-line.
+              Watch it before the lecture &mdash; it is the map, not the territory.</p>
+              <button class="mark" data-for="watch">Mark complete</button>
+            </section>
 
-            <h2>Key Concepts</h2>
-            <ul>
+            <section class="seg" data-seg="listen">
+              <div class="stype">2 &middot; Listen</div>
+              <h2>Orientation audio</h2>
+              <p>Attention, step by step — the mechanism under modern AI, built small enough to read.</p>
+              <audio controls preload="none" src="../audio/week_13.m4a"></audio>
+              <button class="mark" data-for="listen">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="read">
+              <div class="stype">3 &middot; Read</div>
+              <h2>The through-line</h2>
+              <div class="through">
+<p>Module 9 left text as averaged word vectors — order ignored, context lost. The
+transformer is the architecture that fixed this, and it runs essentially every
+system currently called AI. This module builds its core mechanism small enough
+to read.</p>
+<p>Attention is weighted looking. For each position, compute a query; against
+every position, compute keys and values; score query against keys, softmax the
+scores into weights, and take the weighted sum of values. Each word assembles its
+representation by attending to the words that matter for it — "it" can look at
+whatever "it" refers to, forty tokens back, in one step. The scaling by the
+square root of the key dimension is the small detail that keeps softmax gradients
+alive, and you will see why in code.</p>
+<p>Three refinements complete the block. Causal masking zeroes attention to future
+positions, which is what makes next-token generation honest at training time —
+and connects directly to the prediction machine you may have met elsewhere:
+this is how those models are trained. Multi-head attention runs several attention
+patterns in parallel — one head tracking syntax, another coreference. Positional
+encodings inject order, because attention alone treats a sentence as a bag.</p>
+<p>Assembled — attention, residuals, layer norm, feedforward — these form the
+encoder block, and stacking such blocks is, to a first approximation, the whole
+architecture. The course ends on a deliberate note: the exotic frontier of AI is
+matrix multiplies, softmax, and gradient descent — every piece of which you have
+now implemented from scratch.</p>
+              </div>
+              <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
+              <ul>
                 <li><strong>Attention:</strong> Learn which parts of input to focus on</li>
                 <li><strong>Self-Attention:</strong> Relate different positions within a sequence</li>
                 <li><strong>Query-Key-Value:</strong> The attention computation framework</li>
@@ -71,8 +102,66 @@
                 <li><strong>Pre-training:</strong> BERT, GPT, and transfer learning</li>
             </ul>
 
+              <button class="mark" data-for="read">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="code">
+              <div class="stype">4 &middot; Code</div>
+              <h2>The lecture notebook</h2>
+              <p>Six parts, from scratch before any framework. Run every cell; change
+              things and rerun &mdash; the notebook is the lecture.</p>
+              <nav class="module-nav">
+                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_13/lecture.ipynb">Open Lecture in Colab</a>
+                <a href="https://github.com/johnsanterre/datasci-207/blob/main/week_13/lecture.py">View Code on GitHub</a>
+                <a href="README.pdf">Module Summary (PDF)</a>
+              </nav>
+              <p class="medianote">In Colab: File &rarr; Save a copy in Drive keeps your work.</p>
+              <button class="mark" data-for="code">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="practice">
+              <div class="stype">5 &middot; Practice</div>
+              <h2>Exercise</h2>
+              <p>Attempt the exercise before opening the solution &mdash; the attempt is
+              where the learning happens.</p>
+              <nav class="module-nav">
+                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_13/exercises/exercise_01.ipynb">Open Exercise in Colab</a>
+                <a href="exercises/index.html">Exercise page (with solution link)</a>
+              </nav>
+              <button class="mark" data-for="practice">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="check">
+              <div class="stype">6 &middot; Check</div>
+              <h2>Knowledge check</h2>
+              <p>The quiz is self-graded and open-book. If a question surprises you,
+              the corresponding lecture part is the fastest fix.</p>
+              <nav class="module-nav">
+                <a href="quiz.html">Take the Knowledge Check</a>
+              </nav>
+              <button class="mark" data-for="check">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="deeper">
+              <div class="stype">7 &middot; Go deeper</div>
+              <h2>Reference and discussion</h2>
+              <nav class="module-nav">
+                <a href="glossary.html">Glossary</a>
+                <a href="readings.html">Additional Readings</a>
+                <a href="discussion.html">Discussion Topics</a>
+              </nav>
+              <button class="mark" data-for="deeper">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="done">
+              <div class="stype">8 &middot; Done</div>
+              <h2 id="doneHead">Finish the module</h2>
+              <p id="doneMsg">Complete the stages above, then claim the finish here.</p>
+              <button class="mark" id="finishBtn" data-for="done" disabled>Complete Module 13</button>
+            </section>
+
             <footer>
-                <p>
+<p>
                     <a href="../week_12/index.html">Previous: Module 12</a>
                     <span class="separator">|</span>
                     <a href="../index.html">Course Home</a>
@@ -82,6 +171,42 @@
             </footer>
         </div>
     </main>
+
+<script>
+(function(){
+  const KEY='datasci207-week_13';
+  const SEGS=['watch','listen','read','code','practice','check','deeper','done'];
+  let state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){state={}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  function segEl(id){return document.querySelector('.seg[data-seg="'+id+'"]')}
+  function render(){
+    let n=0;
+    for(const s of SEGS){
+      const done=!!state[s]; if(done)n++;
+      const el=segEl(s); el.classList.toggle('done',done);
+      const b=el.querySelector('button.mark[data-for="'+s+'"]');
+      if(b&&s!=='done'){b.disabled=done;b.textContent=done?'\u2713 Complete':'Mark complete'}
+    }
+    document.getElementById('pbar').style.width=(n/SEGS.length*100)+'%';
+    document.getElementById('pdone').textContent=n;
+    const others=SEGS.slice(0,-1).every(s=>state[s]);
+    const fin=document.getElementById('finishBtn');
+    if(state.done){fin.disabled=true;fin.textContent='\u2713 Module 13 complete';
+      document.getElementById('doneHead').textContent='Module 13 complete';
+      document.getElementById('doneMsg').textContent='Done. The next module is linked in the footer.';}
+    else{fin.disabled=!others;
+      document.getElementById('doneMsg').textContent=others?
+        'Every stage above is done \u2014 claim it.':'Complete the stages above, then claim the finish here.'}
+  }
+  document.querySelectorAll('button.mark').forEach(b=>{
+    b.addEventListener('click',()=>{state[b.dataset.for]=true;save();render();
+      if(b.dataset.for==='done'&&window.goatcounter&&window.goatcounter.count){
+        window.goatcounter.count({path:'complete/'+KEY,event:true});}})
+  });
+  render();
+})();
+</script>
 </body>
 
 </html>
