@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Flatten a 200×200 image into a vector and a dense network needs forty thousand
@@ -93,6 +93,91 @@ the data. Augmentation: flip, crop, and shift your training images so the model
 sees more variety than you collected. Between them, serious vision work gets done
 on small datasets.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Slide the filter</div>
+  <p class="figintro">An 8&times;8 image containing a vertical bar and a horizontal bar. Pick a 3&times;3 filter, then step the window across: at each stop, the output is one dot product — the same nine weights, every location.</p>
+  <div class="figrow">
+    <button class="chip w10k on" data-k="v">vertical edge</button>
+    <button class="chip w10k" data-k="h">horizontal edge</button>
+    <button class="chip w10k" data-k="b">blur</button>
+    <button class="figbtn" id="w10step">Step</button>
+    <button class="figbtn" id="w10run">Run all</button>
+    <button class="figbtn alt" id="w10rst">Reset</button>
+  </div>
+  <canvas id="w10cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w10out"></span></div>
+  <p class="fignote">The vertical-edge filter lights up only where columns change; the horizontal one only where rows change; blur smears everything — handmade filters detecting patterns before any learning happens. A CNN learns the nine numbers instead of taking them from you, but the sliding dot product is identical. Same weights everywhere is why a pattern learned once is found anywhere, with dozens of parameters instead of millions.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var IMG=[],r,c;
+for(r=0;r<8;r++){IMG.push([]);for(c=0;c<8;c++){IMG[r].push((c===2||c===3||r===5||r===6)?1:0);}}
+var KER={v:[[1,0,-1],[1,0,-1],[1,0,-1]],h:[[1,1,1],[0,0,0],[-1,-1,-1]],b:[[0.11,0.11,0.11],[0.11,0.11,0.11],[0.11,0.11,0.11]]};
+var kname="v",pos=-1,OUT=[];
+function conv(orow,ocol){
+  var s=0,K=KER[kname];
+  for(var i=0;i<3;i++)for(var j=0;j<3;j++)s+=IMG[orow+i][ocol+j]*K[i][j];
+  return s;
+}
+function reset(){pos=-1;OUT=[];for(r=0;r<6;r++){OUT.push([]);for(c=0;c<6;c++)OUT[r].push(null);}draw();}
+function step(){
+  if(pos>=35)return;
+  pos++;
+  var orow=Math.floor(pos/6),ocol=pos%6;
+  OUT[orow][ocol]=conv(orow,ocol);
+  draw();
+}
+var cc=cv("w10cv",660,270),ctx=cc[1],clr=cc[2];
+var CS=28,IX=20,IY=30,KX=280,KY=68,OX=430,OY=44;
+function cellColor(v,binary){
+  if(binary)return v>0?"#1a365d":"#f7fafc";
+  if(v===null)return "#f7fafc";
+  if(v>0)return "rgba(43,108,176,"+Math.min(1,0.15+v/3*0.85).toFixed(2)+")";
+  if(v<0)return "rgba(197,48,48,"+Math.min(1,0.15-v/3*0.85).toFixed(2)+")";
+  return "#edf2f7";
+}
+function grid(x0,y0,cells,size,binary){
+  for(var i=0;i<cells.length;i++)for(var j=0;j<cells[i].length;j++){
+    ctx.fillStyle=cellColor(cells[i][j],binary);
+    ctx.fillRect(x0+j*size,y0+i*size,size-2,size-2);
+    if(!binary&&cells[i][j]!==null&&size>24){
+      ctx.fillStyle=Math.abs(cells[i][j])>1.4?"#fff":"#1a365d";
+      ctx.font="10px Menlo,monospace";
+      var t=(Math.round(cells[i][j]*100)/100).toString();
+      ctx.fillText(t,x0+j*size+3,y0+i*size+size/2+3);
+    }
+  }
+}
+function draw(){
+  clr();
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";
+  ctx.fillText("input 8x8",IX,IY-8);ctx.fillText("filter 3x3",KX,KY-8);ctx.fillText("output 6x6",OX,OY-8);
+  grid(IX,IY,IMG,CS,true);
+  var K=KER[kname];
+  grid(KX,KY,K,30,false);
+  grid(OX,OY,OUT,30,false);
+  if(pos>=0&&pos<=35){
+    var orow=Math.floor(pos/6),ocol=pos%6;
+    ctx.strokeStyle="#c05621";ctx.lineWidth=2.6;
+    ctx.strokeRect(IX+ocol*CS-1,IY+orow*CS-1,3*CS-1,3*CS-1);
+    ctx.strokeRect(OX+ocol*30-1,OY+orow*30-1,29,29);
+    document.getElementById("w10out").textContent="window at row "+orow+", col "+ocol+"   patch · filter = "+(Math.round(conv(orow,ocol)*100)/100);
+  }else{
+    document.getElementById("w10out").textContent="press Step to place the window";
+  }
+}
+document.getElementById("w10step").addEventListener("click",step);
+document.getElementById("w10run").addEventListener("click",function(){while(pos<35)step();});
+document.getElementById("w10rst").addEventListener("click",reset);
+var chips=document.querySelectorAll(".w10k");
+for(var i=0;i<chips.length;i++)chips[i].addEventListener("click",function(){
+  for(var j=0;j<chips.length;j++)chips[j].classList.remove("on");
+  this.classList.add("on");kname=this.dataset.k;reset();
+});
+reset();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Convolution:</strong> Slide filters to detect local patterns</li>

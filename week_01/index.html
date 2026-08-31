@@ -70,7 +70,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Machine learning starts with a claim modest enough to miss: a prediction is just a
@@ -91,6 +91,60 @@ has a name — overfitting — and you will watch it happen on purpose in the no
 <p>Hold on to the vocabulary this week installs: model, parameters, loss,
 generalization. Every module after this one is a variation on those four words.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Fit vs. memorize</div>
+  <p class="figintro">Ten training points, one dial: polynomial degree. The fit is least squares — loss-minimization, exactly as in lecture. Raise the degree, watch training error fall. Then reveal the held-out points.</p>
+  <div class="figrow">
+    <label>Degree <input type="range" id="w1deg" min="0" max="9" step="1" value="1"> <span class="readout" id="w1degv">1</span></label>
+    <button class="figbtn" id="w1rev">Reveal held-out points</button>
+  </div>
+  <canvas id="w1cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w1tr"></span> <span class="readout" id="w1te" hidden></span></div>
+  <p class="fignote">Training error falls monotonically with degree — evaluating on the data you fit to rewards memorization. The held-out error falls, bottoms out, then climbs as the wiggles start chasing noise. That U-shape is the entire reason the train/test split exists.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+function solveSys(A,b){var n=b.length,i,j,r,c2;for(c2=0;c2<n;c2++){var mx=c2;for(r=c2+1;r<n;r++)if(Math.abs(A[r][c2])>Math.abs(A[mx][c2]))mx=r;var t=A[c2];A[c2]=A[mx];A[mx]=t;var tb=b[c2];b[c2]=b[mx];b[mx]=tb;var pv=A[c2][c2]||1e-12;for(r=0;r<n;r++){if(r===c2)continue;var f=A[r][c2]/pv;for(j=c2;j<n;j++)A[r][j]-=f*A[c2][j];b[r]-=f*b[c2];}}var w=[];for(i=0;i<n;i++)w.push(b[i]/(A[i][i]||1e-12));return w;}
+function fitCols(cols,ys,lam){var n=cols.length,m=ys.length,A=[],b=[],i,j,k;for(i=0;i<n;i++){A.push([]);b.push(0);for(j=0;j<n;j++)A[i].push(0);}for(k=0;k<m;k++){for(i=0;i<n;i++){b[i]+=cols[i][k]*ys[k];for(j=0;j<n;j++)A[i][j]+=cols[i][k]*cols[j][k];}}for(i=0;i<n;i++)A[i][i]+=lam;return solveSys(A,b);}
+var TX=[-1,-0.78,-0.56,-0.33,-0.11,0.11,0.33,0.56,0.78,1],
+    TN=[0.12,-0.18,0.25,-0.1,0.22,-0.24,0.15,-0.12,0.2,-0.16],
+    EX=[-0.93,-0.55,-0.18,0.02,0.36,0.55,0.72,0.91],
+    EN=[-0.14,0.16,-0.2,0.12,-0.1,0.18,-0.15,0.11];
+function truth(x){return 0.8*Math.sin(2.2*x);}
+var TY=TX.map(function(x,i){return truth(x)+TN[i];}),
+    EY=EX.map(function(x,i){return truth(x)+EN[i];});
+function powCols(xs,deg){var cols=[],i,k;for(i=0;i<=deg;i++){var col=[];for(k=0;k<xs.length;k++)col.push(Math.pow(xs[k],i));cols.push(col);}return cols;}
+function pred(w,x){var s=0,p=1,i;for(i=0;i<w.length;i++){s+=w[i]*p;p*=x;}return s;}
+function mse(w,xs,ys){var s=0,i;for(i=0;i<xs.length;i++){var d=pred(w,xs[i])-ys[i];s+=d*d;}return s/xs.length;}
+var cc=cv("w1cv",660,320),ctx=cc[1],clr=cc[2],W=660,H=320,rev=false;
+function px(x){return 40+(x+1.15)/2.3*(W-60);}
+function py(y){return H-30-(y+1.45)/2.9*(H-55);}
+function draw(){
+  var deg=+document.getElementById("w1deg").value;
+  document.getElementById("w1degv").textContent=deg;
+  var w=fitCols(powCols(TX,deg),TY.slice(),1e-8);
+  clr();
+  ctx.strokeStyle="#e2e8f0";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(px(-1.15),py(0));ctx.lineTo(px(1.15),py(0));ctx.stroke();
+  ctx.strokeStyle="#2b6cb0";ctx.lineWidth=2;ctx.beginPath();
+  var i,xx,started=false;
+  for(i=0;i<=200;i++){xx=-1.1+2.2*i/200;var yy=pred(w,xx);if(yy<-1.45||yy>1.45){started=false;continue;}
+    if(!started){ctx.moveTo(px(xx),py(yy));started=true;}else ctx.lineTo(px(xx),py(yy));}
+  ctx.stroke();
+  for(i=0;i<TX.length;i++){ctx.fillStyle="#1a365d";ctx.beginPath();ctx.arc(px(TX[i]),py(TY[i]),4.5,0,7);ctx.fill();}
+  if(rev)for(i=0;i<EX.length;i++){ctx.strokeStyle="#c05621";ctx.lineWidth=2;ctx.beginPath();ctx.arc(px(EX[i]),py(EY[i]),4.5,0,7);ctx.stroke();}
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";
+  ctx.fillText("filled = training points"+(rev?"   rings = held-out points":""),44,18);
+  document.getElementById("w1tr").textContent="train MSE "+mse(w,TX,TY).toFixed(3);
+  var te=document.getElementById("w1te");
+  if(rev){te.hidden=false;var m=mse(w,EX,EY);te.textContent="held-out MSE "+(m>99?">99":m.toFixed(3));te.className="readout"+(m>0.2?" bad":" good");}
+}
+document.getElementById("w1deg").addEventListener("input",draw);
+document.getElementById("w1rev").addEventListener("click",function(){rev=true;this.disabled=true;draw();});
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Function:</strong> A mapping from inputs to outputs</li>

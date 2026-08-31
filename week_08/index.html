@@ -66,7 +66,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Every module so far had labels. This one takes them away and asks what structure
@@ -92,6 +92,101 @@ whatever depth serves the question.</p>
 "the algorithm found four segments" means four was a defensible reading of the
 evidence — not a fact about the world. Unsupervised results are hypotheses.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; K-means, by hand</div>
+  <p class="figintro">Thirty-six unlabeled points. Place k centroids, then run the two-beat loop yourself: assign each point to its nearest centroid, move each centroid to the mean of its points. Repeat until nothing moves.</p>
+  <div class="figrow">
+    <button class="chip w8k on" data-k="2">k = 2</button>
+    <button class="chip w8k" data-k="3">k = 3</button>
+    <button class="chip w8k" data-k="4">k = 4</button>
+    <button class="figbtn" id="w8step">Step</button>
+    <button class="figbtn alt" id="w8rst">Reset (new init)</button>
+  </div>
+  <div class="figrow">
+    <span class="readout" id="w8ph"></span>
+    <span class="readout" id="w8in"></span>
+    <span class="readout good" id="w8done" hidden>converged - nothing moved</span>
+  </div>
+  <canvas id="w8cv" class="figcv"></canvas>
+  <p class="fignote">Convergence takes a handful of iterations, exactly as in the notebook — and the answer depends on where the centroids started, which is why real implementations run several inits and keep the best inertia. Note what the algorithm never tells you: whether k was right. You chose it; the elbow and silhouette are evidence for that choice, not proofs.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var PTS=[[0.15,0.25],[0.2,0.33],[0.25,0.22],[0.28,0.35],[0.18,0.4],[0.3,0.28],[0.22,0.18],[0.12,0.33],[0.26,0.42],[0.33,0.2],[0.16,0.16],[0.29,0.12],
+[0.45,0.7],[0.5,0.78],[0.55,0.68],[0.48,0.85],[0.58,0.8],[0.42,0.78],[0.52,0.62],[0.6,0.72],[0.44,0.62],[0.56,0.88],[0.38,0.7],[0.5,0.7],
+[0.75,0.3],[0.8,0.38],[0.85,0.28],[0.78,0.22],[0.88,0.4],[0.72,0.42],[0.82,0.18],[0.9,0.32],[0.76,0.35],[0.86,0.22],[0.7,0.25],[0.83,0.45]];
+var SEEDS={2:[[[0.4,0.5],[0.6,0.5]],[[0.1,0.1],[0.15,0.2]],[[0.5,0.9],[0.9,0.1]]],
+           3:[[[0.3,0.5],[0.5,0.5],[0.7,0.5]],[[0.1,0.8],[0.2,0.9],[0.9,0.9]],[[0.5,0.1],[0.5,0.5],[0.5,0.9]]],
+           4:[[[0.2,0.5],[0.4,0.5],[0.6,0.5],[0.8,0.5]],[[0.1,0.1],[0.9,0.1],[0.1,0.9],[0.9,0.9]],[[0.45,0.6],[0.5,0.7],[0.55,0.8],[0.8,0.3]]]};
+var COLS=["#2b6cb0","#c05621","#2f855a","#805ad5"];
+var K=2,seedIdx=0,cent=[],assign=[],phase=0,iter=0,trails=[],conv=false;
+function reset(){
+  cent=SEEDS[K][seedIdx%3].map(function(c){return [c[0],c[1]];});
+  assign=PTS.map(function(){return -1;});
+  phase=0;iter=0;trails=cent.map(function(c){return [[c[0],c[1]]];});conv=false;
+  draw();
+}
+function nearest(p){
+  var bi=0,bd=1e9;
+  for(var j=0;j<cent.length;j++){var dx=p[0]-cent[j][0],dy=p[1]-cent[j][1],d=dx*dx+dy*dy;if(d<bd){bd=d;bi=j;}}
+  return bi;
+}
+function step(){
+  if(conv)return;
+  var j,i2;
+  if(phase===0){
+    for(i2=0;i2<PTS.length;i2++)assign[i2]=nearest(PTS[i2]);
+    phase=1;
+  }else{
+    var moved=0;
+    for(j=0;j<cent.length;j++){
+      var sx=0,sy=0,n=0;
+      for(i2=0;i2<PTS.length;i2++)if(assign[i2]===j){sx+=PTS[i2][0];sy+=PTS[i2][1];n++;}
+      if(n>0){var nx=sx/n,ny=sy/n;moved+=Math.abs(nx-cent[j][0])+Math.abs(ny-cent[j][1]);cent[j]=[nx,ny];trails[j].push([nx,ny]);}
+    }
+    phase=0;iter++;
+    if(moved<1e-9)conv=true;
+  }
+  draw();
+}
+var cc=cv("w8cv",660,340),ctx=cc[1],clr=cc[2],W=660,H=340;
+function px(x){return 14+x*(W-28);}
+function py(y){return H-14-y*(H-28);}
+function draw(){
+  clr();
+  var i2,j;
+  for(j=0;j<trails.length;j++){
+    ctx.strokeStyle=COLS[j];ctx.globalAlpha=0.35;ctx.lineWidth=1.4;ctx.beginPath();
+    for(i2=0;i2<trails[j].length;i2++){if(i2===0)ctx.moveTo(px(trails[j][i2][0]),py(trails[j][i2][1]));else ctx.lineTo(px(trails[j][i2][0]),py(trails[j][i2][1]));}
+    ctx.stroke();ctx.globalAlpha=1;
+  }
+  var inertia=0;
+  for(i2=0;i2<PTS.length;i2++){
+    var a=assign[i2];
+    ctx.fillStyle=a<0?"#a0aec0":COLS[a];
+    ctx.beginPath();ctx.arc(px(PTS[i2][0]),py(PTS[i2][1]),5,0,7);ctx.fill();
+    if(a>=0){var dx=PTS[i2][0]-cent[a][0],dy=PTS[i2][1]-cent[a][1];inertia+=dx*dx+dy*dy;}
+  }
+  for(j=0;j<cent.length;j++){
+    ctx.strokeStyle=COLS[j];ctx.lineWidth=3.4;
+    var cx=px(cent[j][0]),cy=py(cent[j][1]);
+    ctx.beginPath();ctx.moveTo(cx-8,cy-8);ctx.lineTo(cx+8,cy+8);ctx.moveTo(cx+8,cy-8);ctx.lineTo(cx-8,cy+8);ctx.stroke();
+  }
+  document.getElementById("w8ph").textContent="iteration "+iter+"   next: "+(conv?"-":phase===0?"assign points":"move centroids");
+  document.getElementById("w8in").textContent=assign[0]<0?"inertia -":"inertia "+inertia.toFixed(3);
+  document.getElementById("w8done").hidden=!conv;
+}
+document.getElementById("w8step").addEventListener("click",step);
+document.getElementById("w8rst").addEventListener("click",function(){seedIdx++;reset();});
+var chips=document.querySelectorAll(".w8k");
+for(var i=0;i<chips.length;i++)chips[i].addEventListener("click",function(){
+  for(var j=0;j<chips.length;j++)chips[j].classList.remove("on");
+  this.classList.add("on");K=+this.dataset.k;seedIdx=0;reset();
+});
+reset();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Clustering:</strong> Group similar data points</li>

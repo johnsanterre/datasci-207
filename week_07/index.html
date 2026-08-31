@@ -66,7 +66,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>This module breaks the pattern on purpose. Not every model is a parametric
@@ -93,6 +93,60 @@ the strongest baseline you can field, and it should be the first serious model
 you reach for there — neural networks earn their keep on images, text, and audio,
 which the coming modules turn to.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; The k dial</div>
+  <p class="figintro">Thirty stored examples, two classes, a few noise points on the wrong side. The colored field is the decision boundary: every location answers with the majority vote of its k nearest stored examples. Turn k.</p>
+  <div class="figrow">
+    <label>k <input type="range" id="w7k" min="1" max="15" step="2" value="1"> <span class="readout" id="w7kv">1</span></label>
+    <span class="readout" id="w7acc"></span>
+  </div>
+  <canvas id="w7cv" class="figcv"></canvas>
+  <p class="fignote">At k = 1 training accuracy is 100% by construction — each point is its own nearest neighbor — and the boundary carves an island around every noise point: memorization, drawn. Raising k smooths the vote, sacrifices the noise points, and generalizes better. No parameters were trained at any k; the data is the model, and k is the smoothness dial.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var P0=[[0.13,0.72],[0.2,0.58],[0.24,0.77],[0.3,0.65],[0.33,0.5],[0.36,0.74],[0.4,0.6],[0.44,0.68],[0.28,0.44],[0.5,0.55],[0.55,0.7],[0.46,0.8],[0.18,0.5],[0.62,0.62],[0.58,0.3]],
+    P1=[[0.5,0.3],[0.56,0.42],[0.6,0.25],[0.65,0.45],[0.68,0.3],[0.72,0.5],[0.75,0.35],[0.8,0.42],[0.84,0.28],[0.88,0.45],[0.64,0.16],[0.77,0.2],[0.9,0.33],[0.42,0.38],[0.35,0.85]];
+var PTS=[],i;
+for(i=0;i<P0.length;i++)PTS.push([P0[i][0],P0[i][1],0]);
+for(i=0;i<P1.length;i++)PTS.push([P1[i][0],P1[i][1],1]);
+var cc=cv("w7cv",660,340),ctx=cc[1],clr=cc[2],W=660,H=340;
+function px(x){return 14+x*(W-28);}
+function py(y){return H-14-y*(H-28);}
+function vote(x,y,k){
+  var ds=[];
+  for(var j=0;j<PTS.length;j++){var dx=x-PTS[j][0],dy=y-PTS[j][1];ds.push([dx*dx+dy*dy,PTS[j][2]]);}
+  ds.sort(function(a,b){return a[0]-b[0];});
+  var s=0;for(var m=0;m<k;m++)s+=ds[m][1];
+  return s>k/2?1:0;
+}
+function draw(){
+  var k=+document.getElementById("w7k").value;
+  document.getElementById("w7kv").textContent=k;
+  clr();
+  var GX=64,GY=34,gx,gy;
+  for(gx=0;gx<GX;gx++)for(gy=0;gy<GY;gy++){
+    var x=(gx+0.5)/GX,y=(gy+0.5)/GY;
+    ctx.fillStyle=vote(x,y,k)===1?"rgba(192,86,33,0.16)":"rgba(26,54,93,0.14)";
+    ctx.fillRect(14+gx*(W-28)/GX,H-14-(gy+1)*(H-28)/GY,(W-28)/GX+0.5,(H-28)/GY+0.5);
+  }
+  var correct=0;
+  for(i=0;i<PTS.length;i++){
+    if(vote(PTS[i][0],PTS[i][1],k)===PTS[i][2])correct++;
+    ctx.fillStyle=PTS[i][2]===1?"#c05621":"#1a365d";
+    ctx.beginPath();ctx.arc(px(PTS[i][0]),py(PTS[i][1]),5,0,7);ctx.fill();
+    ctx.strokeStyle="#fff";ctx.lineWidth=1.4;ctx.stroke();
+  }
+  var acc=correct/PTS.length;
+  var el=document.getElementById("w7acc");
+  el.textContent="training accuracy "+(acc*100).toFixed(0)+"%"+(k===1?" - every noise point memorized":"");
+  el.className="readout"+(k===1?" bad":"");
+}
+document.getElementById("w7k").addEventListener("input",draw);
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>KNN:</strong> Predict based on similar examples</li>

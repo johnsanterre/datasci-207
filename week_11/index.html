@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Module 1 named the enemy — overfitting — and every module since has walked past
@@ -92,6 +92,73 @@ inflates scores silently, and pipelines make it structurally impossible.</p>
 <p>This module is the difference between a model that demos well and one you can
 defend. It is also, not coincidentally, the module interviews draw on most.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Pay for complexity</div>
+  <p class="figintro">A degree-9 polynomial on ten noisy points — module 1&rsquo;s memorizer. Now add the L2 penalty: loss + &lambda;&middot;&Sigma;w&sup2;. Slide &lambda; and watch the weights get taxed into line.</p>
+  <div class="figrow">
+    <label>&lambda; <input type="range" id="w11l" min="0" max="100" step="1" value="0"> <span class="readout" id="w11lv">0</span></label>
+    <span class="readout" id="w11tr"></span>
+    <span class="readout" id="w11va"></span>
+  </div>
+  <canvas id="w11cv" class="figcv"></canvas>
+  <p class="fignote">At &lambda; = 0 the curve threads every training point and the coefficient bars are enormous — training error near zero, validation error terrible. As &lambda; grows the weights shrink smoothly (L2&rsquo;s signature; L1 would zero some outright), the curve calms, and validation error dips before rising again when the penalty starves the fit. Choosing &lambda; is a hyperparameter search — done on validation folds, never on the test set, which stays untouched until the end.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+function solveSys(A,b){var n=b.length,i,j,r,c2;for(c2=0;c2<n;c2++){var mx=c2;for(r=c2+1;r<n;r++)if(Math.abs(A[r][c2])>Math.abs(A[mx][c2]))mx=r;var t=A[c2];A[c2]=A[mx];A[mx]=t;var tb=b[c2];b[c2]=b[mx];b[mx]=tb;var pv=A[c2][c2]||1e-12;for(r=0;r<n;r++){if(r===c2)continue;var f=A[r][c2]/pv;for(j=c2;j<n;j++)A[r][j]-=f*A[c2][j];b[r]-=f*b[c2];}}var w=[];for(i=0;i<n;i++)w.push(b[i]/(A[i][i]||1e-12));return w;}
+function fitCols(cols,ys,lam){var n=cols.length,m=ys.length,A=[],b=[],i,j,k;for(i=0;i<n;i++){A.push([]);b.push(0);for(j=0;j<n;j++)A[i].push(0);}for(k=0;k<m;k++){for(i=0;i<n;i++){b[i]+=cols[i][k]*ys[k];for(j=0;j<n;j++)A[i][j]+=cols[i][k]*cols[j][k];}}for(i=0;i<n;i++)A[i][i]+=lam;return solveSys(A,b);}
+var TX=[-1,-0.78,-0.56,-0.33,-0.11,0.11,0.33,0.56,0.78,1],
+    TN=[0.12,-0.18,0.25,-0.1,0.22,-0.24,0.15,-0.12,0.2,-0.16],
+    VX=[-0.93,-0.55,-0.18,0.02,0.36,0.55,0.72,0.91],
+    VN=[-0.14,0.16,-0.2,0.12,-0.1,0.18,-0.15,0.11];
+function truth(x){return 0.8*Math.sin(2.2*x);}
+var TY=TX.map(function(x,i){return truth(x)+TN[i];}),
+    VY=VX.map(function(x,i){return truth(x)+VN[i];});
+var DEG=9;
+function powCols(xs){var cols=[],i,k;for(i=0;i<=DEG;i++){var col=[];for(k=0;k<xs.length;k++)col.push(Math.pow(xs[k],i));cols.push(col);}return cols;}
+function pred(w,x){var s=0,p=1,i;for(i=0;i<w.length;i++){s+=w[i]*p;p*=x;}return s;}
+function mse(w,xs,ys){var s=0,i;for(i=0;i<xs.length;i++){var d=pred(w,xs[i])-ys[i];s+=d*d;}return s/xs.length;}
+var cc=cv("w11cv",660,330),ctx=cc[1],clr=cc[2],W=660,H=330;
+var PW=400;
+function px(x){return 36+(x+1.15)/2.3*(PW-46);}
+function py(y){return H-56-(y+1.45)/2.9*(H-84);}
+function draw(){
+  var s=+document.getElementById("w11l").value;
+  var lam=s===0?1e-10:Math.pow(10,-6+7*s/100);
+  document.getElementById("w11lv").textContent=s===0?"0":lam.toExponential(1);
+  var w=fitCols(powCols(TX),TY.slice(),lam);
+  clr();
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.moveTo(px(-1.15),py(0));ctx.lineTo(px(1.15),py(0));ctx.stroke();
+  ctx.strokeStyle="#2b6cb0";ctx.lineWidth=2;ctx.beginPath();
+  var i,started=false;
+  for(i=0;i<=220;i++){var xx=-1.1+2.2*i/220,yy=pred(w,xx);
+    if(yy<-1.45||yy>1.45){started=false;continue;}
+    if(!started){ctx.moveTo(px(xx),py(yy));started=true;}else ctx.lineTo(px(xx),py(yy));}
+  ctx.stroke();
+  for(i=0;i<TX.length;i++){ctx.fillStyle="#1a365d";ctx.beginPath();ctx.arc(px(TX[i]),py(TY[i]),4,0,7);ctx.fill();}
+  for(i=0;i<VX.length;i++){ctx.strokeStyle="#c05621";ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(px(VX[i]),py(VY[i]),4,0,7);ctx.stroke();}
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";
+  ctx.fillText("filled = train   rings = validation",40,16);
+  ctx.fillText("|coefficient| (log scale)",PW+30,16);
+  var bx=PW+30,bw=(W-bx-20)/10;
+  for(i=0;i<10;i++){
+    var mag=Math.abs(w[i]),hgt=Math.min(1,Math.log10(1+mag)/2.2)*(H-90);
+    ctx.fillStyle="#2b6cb0";
+    ctx.fillRect(bx+i*bw,H-56-hgt,bw-4,hgt);
+    ctx.fillStyle="#718096";ctx.font="10px Menlo,monospace";
+    ctx.fillText("w"+i,bx+i*bw+1,H-42);
+  }
+  var tr=mse(w,TX,TY),va=mse(w,VX,VY);
+  document.getElementById("w11tr").textContent="train MSE "+tr.toFixed(3);
+  var vel=document.getElementById("w11va");
+  vel.textContent="validation MSE "+(va>99?">99":va.toFixed(3));
+  vel.className="readout"+(va<0.03?" good":va>0.3?" bad":"");
+}
+document.getElementById("w11l").addEventListener("input",draw);
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Regularization:</strong> Penalize model complexity</li>

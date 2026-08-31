@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Module 1 said a model is a function with free parameters. This module answers the
@@ -91,6 +91,65 @@ will watch all three walk the same loss surface in the notebook.</p>
 regression, neural networks, transformers — trains by exactly this loop. Different
 model, different loss, same descent.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Walk the loss surface</div>
+  <p class="figintro">One parameter, one loss curve, one update rule: w &larr; w &minus; lr &middot; dL/dw. Set the learning rate and step. Find the rate that crawls, the one that converges, the one that oscillates, and the one that diverges.</p>
+  <div class="figrow">
+    <label>Learning rate <input type="range" id="w2lr" min="0.02" max="1.3" step="0.01" value="0.4"> <span class="readout" id="w2lrv">0.40</span></label>
+    <label><input type="checkbox" id="w2sto"> stochastic (noisy gradient)</label>
+  </div>
+  <div class="figrow">
+    <button class="figbtn" id="w2step">Step</button>
+    <button class="figbtn" id="w2run">Run 20</button>
+    <button class="figbtn alt" id="w2rst">Reset</button>
+    <span class="readout" id="w2out"></span>
+    <span class="readout bad" id="w2div" hidden>DIVERGED</span>
+  </div>
+  <canvas id="w2cv" class="figcv"></canvas>
+  <p class="fignote">Below lr &asymp; 1.0 the gap to the minimum shrinks every step; above it, each step overshoots by more than it gained and the iterate explodes — the same arithmetic the lecture derives. The stochastic toggle adds noise to the gradient: the path rattles but still finds the valley, which is why mini-batches are what everyone actually uses.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var NS=[0.9,-1.3,0.5,-0.7,1.1,-0.4,0.8,-1.0,0.3,-0.6,1.2,-0.8,0.4,-1.1,0.7,-0.3,1.0,-0.9,0.6,-0.5];
+var w0=-3.2,w=w0,path=[w0],ni=0;
+function loss(v){return (v-2)*(v-2);}
+function grad(v){return 2*(v-2);}
+var cc=cv("w2cv",660,300),ctx=cc[1],clr=cc[2],W=660,H=300;
+function px(v){return 30+(v+5)/14*(W-50);}
+function py(l){return H-26-Math.min(l,46)/46*(H-50);}
+function draw(){
+  clr();
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.moveTo(30,H-26);ctx.lineTo(W-20,H-26);ctx.stroke();
+  ctx.strokeStyle="#1a365d";ctx.lineWidth=2;ctx.beginPath();
+  var i,v;for(i=0;i<=240;i++){v=-5+14*i/240;var l=loss(v);if(i===0)ctx.moveTo(px(v),py(l));else ctx.lineTo(px(v),py(l));}
+  ctx.stroke();
+  for(i=0;i<path.length;i++){
+    var a=0.15+0.85*i/Math.max(1,path.length-1),pv=Math.max(-5,Math.min(9,path[i]));
+    ctx.fillStyle="rgba(192,86,33,"+a.toFixed(2)+")";
+    ctx.beginPath();ctx.arc(px(pv),py(loss(path[i])),4,0,7);ctx.fill();
+    if(i>0){var pu=Math.max(-5,Math.min(9,path[i-1]));
+      ctx.strokeStyle="rgba(192,86,33,"+(a*0.5).toFixed(2)+")";ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(px(pu),py(loss(path[i-1])));ctx.lineTo(px(pv),py(loss(path[i])));ctx.stroke();}
+  }
+  ctx.fillStyle="#2f855a";ctx.beginPath();ctx.arc(px(2),py(0),5,0,7);ctx.fill();
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";ctx.fillText("minimum at w = 2",px(2)-46,py(0)-12);
+  document.getElementById("w2out").textContent="step "+(path.length-1)+"   w = "+(Math.abs(w)>999?w.toExponential(1):w.toFixed(3))+"   loss = "+(loss(w)>9999?loss(w).toExponential(1):loss(w).toFixed(3));
+  document.getElementById("w2div").hidden=Math.abs(w-2)<60;
+}
+function step(){
+  var lr=+document.getElementById("w2lr").value;
+  var g=grad(w);
+  if(document.getElementById("w2sto").checked){g+=1.6*NS[ni%NS.length];ni++;}
+  w=w-lr*g;path.push(w);if(path.length>60)path.shift();draw();
+}
+document.getElementById("w2lr").addEventListener("input",function(){document.getElementById("w2lrv").textContent=(+this.value).toFixed(2);});
+document.getElementById("w2step").addEventListener("click",step);
+document.getElementById("w2run").addEventListener("click",function(){for(var i=0;i<20;i++)step();});
+document.getElementById("w2rst").addEventListener("click",function(){w=w0;path=[w0];ni=0;draw();});
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Linear Regression:</strong> Predicting a continuous output as a weighted sum of inputs</li>

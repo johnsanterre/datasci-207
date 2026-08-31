@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>A model trained on history learns history's patterns — including the ones a
@@ -93,6 +93,73 @@ is accurate" as the beginning of the evaluation, not the end. This is also where
 this course's practicum instinct lives — the systems you build will touch people
 who never saw the training data.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Two groups, one impossible ask</div>
+  <p class="figintro">A hiring model scored two groups. Group A&rsquo;s base rate is 50% qualified; group B&rsquo;s is 25% — the history the model learned from. Set the thresholds and try to satisfy both fairness criteria at once.</p>
+  <div class="figrow">
+    <label>threshold A <input type="range" id="w12a" min="0" max="1" step="0.01" value="0.5"> <span class="readout" id="w12av">0.50</span></label>
+    <label>threshold B <input type="range" id="w12b" min="0" max="1" step="0.01" value="0.5"> <span class="readout" id="w12bv">0.50</span></label>
+    <label><input type="checkbox" id="w12lock" checked> keep thresholds equal</label>
+  </div>
+  <canvas id="w12cv" class="figcv"></canvas>
+  <div id="w12stats">
+    <p class="statline" id="w12sel"></p>
+    <p class="statline" id="w12par"></p>
+    <p class="statline" id="w12odds"></p>
+  </div>
+  <p class="fignote">With equal thresholds, selection rates differ — demographic parity fails — because the base rates differ. Split the thresholds to force parity and the error rates diverge instead. That is the impossibility theorem experienced rather than stated: when base rates differ, these criteria cannot all hold at once, as arithmetic, not as an engineering shortfall. The measurement toolkit is module 5&rsquo;s confusion matrix, pointed at people; choosing which fairness definition to satisfy is a decision about values, made measurable.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var AP=[0.55,0.62,0.68,0.72,0.75,0.8,0.84,0.88,0.92,0.96],
+    AN=[0.08,0.15,0.22,0.28,0.34,0.4,0.45,0.5,0.58,0.66],
+    BP=[0.5,0.6,0.7,0.8,0.9],
+    BN=[0.05,0.1,0.16,0.22,0.25,0.3,0.35,0.36,0.42,0.45,0.48,0.54,0.6,0.66,0.72];
+var cc=cv("w12cv",660,190),ctx=cc[1],clr=cc[2],W=660,H=190;
+function px(s){return 26+s*(W-46);}
+function strip(y0,pos,neg,t,label){
+  ctx.fillStyle="#4a5568";ctx.font="600 12px Inter,sans-serif";ctx.fillText(label,26,y0-24);
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.moveTo(px(0),y0+12);ctx.lineTo(px(1),y0+12);ctx.stroke();
+  var i;
+  for(i=0;i<neg.length;i++){ctx.strokeStyle="#1a365d";ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(px(neg[i]),y0-(i%2)*11,4,0,7);ctx.stroke();}
+  for(i=0;i<pos.length;i++){ctx.fillStyle="#c05621";ctx.beginPath();ctx.arc(px(pos[i]),y0-(i%2)*11,4,0,7);ctx.fill();}
+  ctx.strokeStyle="#c53030";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px(t),y0-16);ctx.lineTo(px(t),y0+12);ctx.stroke();
+}
+function rates(pos,neg,t){
+  var tp=0,fp=0,i;
+  for(i=0;i<pos.length;i++)if(pos[i]>=t)tp++;
+  for(i=0;i<neg.length;i++)if(neg[i]>=t)fp++;
+  return {sel:(tp+fp)/(pos.length+neg.length),tpr:tp/pos.length,fpr:fp/neg.length};
+}
+function gap(a,b){return Math.abs(a-b);}
+function fmt(v){return (v*100).toFixed(0)+"%";}
+function mark(ok){return ok?'<span class="ok">holds</span>':'<span class="no">fails</span>';}
+function draw(){
+  var ta=+document.getElementById("w12a").value,tb=+document.getElementById("w12b").value;
+  document.getElementById("w12av").textContent=ta.toFixed(2);
+  document.getElementById("w12bv").textContent=tb.toFixed(2);
+  clr();
+  strip(64,AP,AN,ta,"group A (50% qualified)  filled = qualified, hollow = not");
+  strip(150,BP,BN,tb,"group B (25% qualified)");
+  var ra=rates(AP,AN,ta),rb=rates(BP,BN,tb);
+  document.getElementById("w12sel").innerHTML="selected: A "+fmt(ra.sel)+" / B "+fmt(rb.sel)+" &nbsp;&middot;&nbsp; TPR: A "+fmt(ra.tpr)+" / B "+fmt(rb.tpr)+" &nbsp;&middot;&nbsp; FPR: A "+fmt(ra.fpr)+" / B "+fmt(rb.fpr);
+  var pgap=gap(ra.sel,rb.sel),tgap=gap(ra.tpr,rb.tpr),fgap=gap(ra.fpr,rb.fpr);
+  document.getElementById("w12par").innerHTML="demographic parity (equal selection rates): "+mark(pgap<=0.05)+" (gap "+fmt(pgap)+")";
+  document.getElementById("w12odds").innerHTML="equalized odds (equal TPR and FPR): "+mark(tgap<=0.05&&fgap<=0.05)+" (TPR gap "+fmt(tgap)+", FPR gap "+fmt(fgap)+")";
+}
+document.getElementById("w12a").addEventListener("input",function(){
+  if(document.getElementById("w12lock").checked)document.getElementById("w12b").value=this.value;
+  draw();
+});
+document.getElementById("w12b").addEventListener("input",function(){
+  if(document.getElementById("w12lock").checked)document.getElementById("w12a").value=this.value;
+  draw();
+});
+document.getElementById("w12lock").addEventListener("change",draw);
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Algorithmic Bias:</strong> Systematic unfairness in predictions</li>

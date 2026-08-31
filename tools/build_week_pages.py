@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+import sys
+sys.exit("RETIRED 2026-08-30: week pages are hand-maintained now — Read & play "
+         "interactive figures were inserted directly into each week_XX/index.html "
+         "(see scratchpad insert207.py in the session that added them, and "
+         "Retrospective/references/course-site-playbook.md). Re-running this "
+         "generator would silently WIPE all 13 figures. Edit the pages in place.")
 """Rebuild each week_XX/index.html as a scroll-through module sequence.
 
 Extracts the existing intro, learning objectives, key concepts, prerequisites

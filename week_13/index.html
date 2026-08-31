@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Module 9 left text as averaged word vectors — order ignored, context lost. The
@@ -93,6 +93,78 @@ architecture. The course ends on a deliberate note: the exotic frontier of AI is
 matrix multiplies, softmax, and gradient descent — every piece of which you have
 now implemented from scratch.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Weighted looking</div>
+  <p class="figintro">Click any token to make it the query. Its attention weights over every position — softmax of the query-key scores — appear as bars. Then squeeze the scores and mask the future.</p>
+  <div class="figrow" id="w13toks"></div>
+  <div class="figrow">
+    <label>score scale <input type="range" id="w13s" min="0.3" max="3" step="0.05" value="1"> <span class="readout" id="w13sv">1.00</span></label>
+    <label><input type="checkbox" id="w13mask"> causal mask (no looking forward)</label>
+  </div>
+  <canvas id="w13cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w13out"></span></div>
+  <p class="fignote">Query &ldquo;it&rdquo; and the weight lands on &ldquo;animal&rdquo; forty characters back, in one step — the long-range link averaged word vectors could never make. The scale slider is why the &radic;d&#8342; division exists: unscaled scores saturate softmax into a one-hot spike and its gradients die. The causal mask zeroes attention to future positions — what makes next-token training honest, and what turns this machine into a text predictor at all.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var TOK=["the","animal","did","not","cross","the","street","because","it","was","too","tired"];
+var BON={it:{animal:6,tired:2.5,street:1.5},tired:{animal:4,it:3},cross:{street:5,animal:2.5,not:1.5},animal:{cross:2,tired:2},street:{cross:3},because:{tired:2,not:1.5},was:{it:2.5,animal:1.5},too:{tired:3},not:{cross:2.5},did:{cross:2}};
+var q=8;
+var wrap=document.getElementById("w13toks");
+for(var i=0;i<TOK.length;i++){
+  var b=document.createElement("button");
+  b.className="chip";b.textContent=TOK[i];b.dataset.i=i;
+  b.addEventListener("click",function(){q=+this.dataset.i;draw();});
+  wrap.appendChild(b);
+}
+function score(qi,ki){
+  var s=(qi===ki?2:0)-0.35*Math.abs(qi-ki);
+  var bq=BON[TOK[qi]];
+  if(bq&&bq[TOK[ki]]!==undefined)s+=bq[TOK[ki]];
+  return s;
+}
+var cc=cv("w13cv",660,230),ctx=cc[1],clr=cc[2],W=660,H=230;
+function draw(){
+  var chips=wrap.querySelectorAll(".chip");
+  for(var i=0;i<chips.length;i++)chips[i].className="chip"+(+chips[i].dataset.i===q?" on":"");
+  var sc=+document.getElementById("w13s").value;
+  document.getElementById("w13sv").textContent=sc.toFixed(2);
+  var mask=document.getElementById("w13mask").checked;
+  var ex=[],tot=0,i2;
+  for(i2=0;i2<TOK.length;i2++){
+    if(mask&&i2>q){ex.push(0);continue;}
+    var e=Math.exp(sc*score(q,i2));ex.push(e);tot+=e;
+  }
+  var wts=ex.map(function(e){return tot>0?e/tot:0;});
+  clr();
+  var bw=(W-40)/TOK.length;
+  for(i2=0;i2<TOK.length;i2++){
+    var x=20+i2*bw,hgt=wts[i2]*(H-70);
+    ctx.fillStyle=i2===q?"#c05621":"#2b6cb0";
+    ctx.fillRect(x+4,H-44-hgt,bw-8,hgt);
+    ctx.save();
+    ctx.fillStyle=i2===q?"#c05621":"#4a5568";
+    ctx.font=(i2===q?"700 ":"")+"11px Inter,sans-serif";
+    ctx.fillText(TOK[i2],x+4,H-28);
+    ctx.restore();
+    if(wts[i2]>0.04){ctx.font="10px Menlo,monospace";var ly=H-50-hgt;if(ly<26){ctx.fillStyle="#fff";ctx.fillText(wts[i2].toFixed(2),x+6,H-30-hgt);}else{ctx.fillStyle="#718096";ctx.fillText(wts[i2].toFixed(2),x+4,ly);}}
+    if(mask&&i2>q){ctx.fillStyle="#cbd5e0";ctx.font="11px Inter,sans-serif";ctx.fillText("masked",x+4,H-56);}
+  }
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";
+  ctx.fillText("attention weights for query: "+TOK[q],20,16);
+  var order=[];
+  for(i2=0;i2<TOK.length;i2++)order.push(i2);
+  order.sort(function(a,b){return wts[b]-wts[a];});
+  var parts=[];
+  for(i2=0;i2<3;i2++)if(wts[order[i2]]>0.03)parts.push(wts[order[i2]].toFixed(2)+" x "+TOK[order[i2]]+"["+order[i2]+"]");
+  document.getElementById("w13out").textContent="output["+TOK[q]+"] = "+parts.join(" + ")+" + ...";
+}
+document.getElementById("w13s").addEventListener("input",draw);
+document.getElementById("w13mask").addEventListener("change",draw);
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Attention:</strong> Learn which parts of input to focus on</li>

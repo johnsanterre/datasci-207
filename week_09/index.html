@@ -66,7 +66,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Models eat numbers, and text is not numbers. Every technique in this module is
@@ -90,6 +90,68 @@ classical ML meet: the token-and-vector pipeline you build here by hand is,
 scaled a million-fold, the front end of every transformer — which is exactly
 where module 13 ends the course.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Similarity is geometry</div>
+  <p class="figintro">Twelve words, each a 2-D embedding (real ones use hundreds of dimensions; the geometry is the same). Pick any two and read the angle.</p>
+  <div class="figrow" id="w9words"></div>
+  <canvas id="w9cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w9cos"></span> <span class="readout" id="w9bow"></span></div>
+  <p class="fignote">Cosine similarity is the angle between vectors: synonyms point the same way, unrelated words sit near ninety degrees, opposites past it. The second readout is the counting methods&rsquo; verdict on the same pair — bag-of-words gives two different words no shared dimensions at all, which is exactly the blindness embeddings fix. Learned from the company words keep, similarity becomes geometry.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var WORDS=[["excellent",0.95,0.28],["outstanding",0.9,0.42],["superb",0.98,0.15],["terrible",-0.92,0.35],["awful",-0.85,0.5],["gradient",0.2,-0.95],["matrix",0.35,-0.9],["tensor",0.05,-0.99],["pizza",-0.45,-0.85],["taco",-0.6,-0.78],["king",0.55,0.8],["queen",0.48,0.86]];
+var sel=[0,1];
+var wrap=document.getElementById("w9words");
+for(var i=0;i<WORDS.length;i++){
+  var b=document.createElement("button");
+  b.className="chip";b.textContent=WORDS[i][0];b.dataset.i=i;
+  b.addEventListener("click",function(){
+    var k=+this.dataset.i;
+    if(sel.indexOf(k)>=0)return;
+    sel=[sel[1],k];draw();
+  });
+  wrap.appendChild(b);
+}
+var cc=cv("w9cv",660,320),ctx=cc[1],clr=cc[2],W=660,H=320,C=[W/2,H/2],S=130;
+function draw(){
+  var chips=wrap.querySelectorAll(".chip");
+  for(var i=0;i<chips.length;i++)chips[i].className="chip"+(sel.indexOf(+chips[i].dataset.i)>=0?" on":"");
+  clr();
+  ctx.strokeStyle="#edf2f7";
+  ctx.beginPath();ctx.moveTo(C[0]-S-20,C[1]);ctx.lineTo(C[0]+S+20,C[1]);ctx.moveTo(C[0],C[1]-S-20);ctx.lineTo(C[0],C[1]+S+20);ctx.stroke();
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.arc(C[0],C[1],S,0,7);ctx.stroke();
+  for(var j=0;j<WORDS.length;j++){
+    var on=sel.indexOf(j)>=0,x=C[0]+WORDS[j][1]*S,y=C[1]-WORDS[j][2]*S;
+    ctx.fillStyle=on?"#c05621":"#a0aec0";
+    ctx.beginPath();ctx.arc(x,y,on?5:3.5,0,7);ctx.fill();
+    ctx.fillStyle=on?"#1a365d":"#a0aec0";ctx.font=(on?"600 ":"")+"12px Inter,sans-serif";
+    ctx.fillText(WORDS[j][0],x+7,y+4);
+  }
+  var A=WORDS[sel[0]],B=WORDS[sel[1]];
+  var pts=[A,B];
+  for(var m=0;m<2;m++){
+    var v=pts[m];
+    ctx.strokeStyle="#2b6cb0";ctx.lineWidth=2.2;
+    ctx.beginPath();ctx.moveTo(C[0],C[1]);ctx.lineTo(C[0]+v[1]*S,C[1]-v[2]*S);ctx.stroke();
+  }
+  var dot=A[1]*B[1]+A[2]*B[2],na=Math.sqrt(A[1]*A[1]+A[2]*A[2]),nb=Math.sqrt(B[1]*B[1]+B[2]*B[2]);
+  var cos=dot/(na*nb),ang=Math.acos(Math.max(-1,Math.min(1,cos)));
+  var a0=Math.atan2(-A[2],A[1]),a1=Math.atan2(-B[2],B[1]);
+  ctx.strokeStyle="#c05621";ctx.lineWidth=1.6;
+  ctx.beginPath();
+  var d=a1-a0;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;
+  ctx.arc(C[0],C[1],34,a0,a0+d,d<0);
+  ctx.stroke();
+  var el=document.getElementById("w9cos");
+  el.textContent="cosine("+A[0]+", "+B[0]+") = "+cos.toFixed(2)+"   ("+(ang*180/Math.PI).toFixed(0)+" deg)";
+  el.className="readout"+(cos>0.85?" good":cos<-0.3?" bad":"");
+  document.getElementById("w9bow").textContent="bag-of-words overlap: 0 shared dimensions";
+}
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Bag-of-Words:</strong> Count word occurrences</li>

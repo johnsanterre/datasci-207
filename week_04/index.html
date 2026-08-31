@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Regression predicts a number. Classification predicts a category, and the first
@@ -92,6 +92,69 @@ same update loop you derived last week.</p>
 <p>Sigmoid, boundary, threshold, cross-entropy: four pieces, one pipeline, and the
 template for every classifier in the rest of the course.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; The squash and the dial</div>
+  <p class="figintro">Fourteen cases along one feature. The model is a linear score pushed through the sigmoid; the threshold turns probability into decision. Steer all three dials.</p>
+  <div class="figrow">
+    <label>steepness w <input type="range" id="w4w" min="0.3" max="4" step="0.05" value="1.2"> <span class="readout" id="w4wv">1.20</span></label>
+    <label>midpoint b <input type="range" id="w4b" min="2" max="8" step="0.1" value="5"> <span class="readout" id="w4bv">5.0</span></label>
+  </div>
+  <div class="figrow">
+    <label>threshold <input type="range" id="w4t" min="0.05" max="0.95" step="0.01" value="0.5"> <span class="readout" id="w4tv">0.50</span></label>
+    <button class="figbtn alt" id="w4med">screening (0.15)</button>
+    <button class="figbtn alt" id="w4spam">spam filter (0.90)</button>
+  </div>
+  <canvas id="w4cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w4ll"></span> <span class="readout" id="w4cm"></span></div>
+  <p class="fignote">The boundary sits where the curve crosses the threshold — a single point here, a hyperplane in general; the geometry underneath stays linear. Fit chooses w and b (watch log-loss as you steer them); the threshold is not fit at all. It is an application decision: screening lowers it and accepts false alarms, spam filtering raises it and accepts misses.</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var D=[[1,0],[1.8,0],[2.3,0],[3.1,0],[3.8,0],[4.4,0],[5.2,0],[4.1,1],[4.9,1],[5.6,1],[6.3,1],[7.1,1],[8,1],[8.8,1]];
+var cc=cv("w4cv",660,300),ctx=cc[1],clr=cc[2],W=660,H=300;
+function px(x){return 34+x/10*(W-54);}
+function py(p){return H-30-p*(H-58);}
+function sig(z){return 1/(1+Math.exp(-z));}
+function draw(){
+  var w=+document.getElementById("w4w").value,b=+document.getElementById("w4b").value,t=+document.getElementById("w4t").value;
+  document.getElementById("w4wv").textContent=w.toFixed(2);
+  document.getElementById("w4bv").textContent=b.toFixed(1);
+  document.getElementById("w4tv").textContent=t.toFixed(2);
+  function p(x){return sig(w*(x-b));}
+  clr();
+  var i;
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.moveTo(px(0),py(0));ctx.lineTo(px(10),py(0));ctx.stroke();
+  ctx.strokeStyle="#cbd5e0";ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px(0),py(t));ctx.lineTo(px(10),py(t));ctx.stroke();ctx.setLineDash([]);
+  var xb=b+Math.log(t/(1-t))/w;
+  if(xb>0&&xb<10){ctx.strokeStyle="#c05621";ctx.lineWidth=1.6;ctx.setLineDash([5,3]);ctx.beginPath();ctx.moveTo(px(xb),py(0)+16);ctx.lineTo(px(xb),py(1));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#c05621";ctx.font="12px Inter,sans-serif";
+    if(xb<6.5){ctx.fillText("decide positive from here",px(xb)+6,py(0.86));}
+    else{ctx.textAlign="right";ctx.fillText("decide positive from here",px(xb)-6,py(0.86));ctx.textAlign="left";}}
+  ctx.strokeStyle="#2b6cb0";ctx.lineWidth=2;ctx.beginPath();
+  for(i=0;i<=200;i++){var xx=10*i/200;if(i===0)ctx.moveTo(px(xx),py(p(xx)));else ctx.lineTo(px(xx),py(p(xx)));}
+  ctx.stroke();
+  var tp=0,fp=0,fn=0,tn=0,ll=0;
+  for(i=0;i<D.length;i++){
+    var q=Math.min(1-1e-6,Math.max(1e-6,p(D[i][0]))),y=D[i][1];
+    ll-=y*Math.log(q)+(1-y)*Math.log(1-q);
+    var dec=q>=t?1:0;
+    if(y===1&&dec===1)tp++;else if(y===0&&dec===1)fp++;else if(y===1&&dec===0)fn++;else tn++;
+    ctx.fillStyle=y===1?"#c05621":"#1a365d";
+    ctx.beginPath();ctx.arc(px(D[i][0]),py(y===1?0.97:0.03),5,0,7);ctx.fill();
+  }
+  ctx.fillStyle="#4a5568";ctx.font="12px Inter,sans-serif";
+  ctx.fillText("navy = negative cases (bottom lane)   orange = positive cases (top lane)",40,16);
+  document.getElementById("w4ll").textContent="log-loss "+(ll/D.length).toFixed(3);
+  document.getElementById("w4cm").textContent="caught "+tp+"/7 positives, "+fp+" false alarms, "+fn+" missed";
+}
+var ids=["w4w","w4b","w4t"];
+for(var i=0;i<ids.length;i++)document.getElementById(ids[i]).addEventListener("input",draw);
+document.getElementById("w4med").addEventListener("click",function(){document.getElementById("w4t").value=0.15;draw();});
+document.getElementById("w4spam").addEventListener("click",function(){document.getElementById("w4t").value=0.9;draw();});
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Binary Classification:</strong> Predicting one of two classes</li>

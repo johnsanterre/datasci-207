@@ -67,7 +67,7 @@
             </section>
 
             <section class="seg" data-seg="read">
-              <div class="stype">3 &middot; Read</div>
+              <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
 <p>Models see only the numbers you hand them. This module is about the gap between
@@ -91,6 +91,56 @@ steps.</p>
 <p>The habit to build this week: when a model underperforms, look at the features
 before reaching for a fancier algorithm. Most of the fix is usually here.</p>
               </div>
+              <div class="fig">
+  <div class="figlabel">Figure &middot; Features make it linear</div>
+  <p class="figintro">The data is curved; the model is linear and stays linear. The only thing you control is which columns it sees. Toggle features and watch the same least-squares solver succeed or fail.</p>
+  <div class="figrow" id="w3feats">
+    <label><input type="checkbox" data-f="x" checked> x <span class="readout" id="w3wx">w = 0</span></label>
+    <label><input type="checkbox" data-f="x2"> x&sup2; <span class="readout" id="w3wx2">off</span></label>
+    <label><input type="checkbox" data-f="ax"> |x| <span class="readout" id="w3wax">off</span></label>
+    <label><input type="checkbox" data-f="sx"> sin 3x <span class="readout" id="w3wsx">off</span></label>
+  </div>
+  <canvas id="w3cv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="w3mse"></span></div>
+  <p class="fignote">With x alone the best line misses the shape entirely. Add the x&sup2; column and the fit snaps in — no new algorithm, just a better table handed to the same solver. That is feature engineering: the model is only as expressive as the columns you build. (|x| gets partway there; sin 3x is a wrong guess and the solver correctly gives it little weight.)</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+function solveSys(A,b){var n=b.length,i,j,r,c2;for(c2=0;c2<n;c2++){var mx=c2;for(r=c2+1;r<n;r++)if(Math.abs(A[r][c2])>Math.abs(A[mx][c2]))mx=r;var t=A[c2];A[c2]=A[mx];A[mx]=t;var tb=b[c2];b[c2]=b[mx];b[mx]=tb;var pv=A[c2][c2]||1e-12;for(r=0;r<n;r++){if(r===c2)continue;var f=A[r][c2]/pv;for(j=c2;j<n;j++)A[r][j]-=f*A[c2][j];b[r]-=f*b[c2];}}var w=[];for(i=0;i<n;i++)w.push(b[i]/(A[i][i]||1e-12));return w;}
+function fitCols(cols,ys,lam){var n=cols.length,m=ys.length,A=[],b=[],i,j,k;for(i=0;i<n;i++){A.push([]);b.push(0);for(j=0;j<n;j++)A[i].push(0);}for(k=0;k<m;k++){for(i=0;i<n;i++){b[i]+=cols[i][k]*ys[k];for(j=0;j<n;j++)A[i][j]+=cols[i][k]*cols[j][k];}}for(i=0;i<n;i++)A[i][i]+=lam;return solveSys(A,b);}
+var XS=[-1,-0.82,-0.63,-0.45,-0.27,-0.09,0.09,0.27,0.45,0.63,0.82,1],
+    NZ=[0.06,-0.05,0.08,-0.07,0.04,-0.06,0.05,-0.04,0.07,-0.08,0.05,-0.06];
+function truth(x){return 1.1*x*x-0.3*x;}
+var YS=XS.map(function(x,i){return truth(x)+NZ[i];});
+var FN={x:function(v){return v;},x2:function(v){return v*v;},ax:function(v){return Math.abs(v);},sx:function(v){return Math.sin(3*v);}};
+var cc=cv("w3cv",660,300),ctx=cc[1],clr=cc[2],W=660,H=300;
+function px(x){return 40+(x+1.15)/2.3*(W-60);}
+function py(y){return H-28-(y+0.55)/2.2*(H-52);}
+function draw(){
+  var boxes=document.querySelectorAll("#w3feats input"),act=[],i;
+  for(i=0;i<boxes.length;i++)if(boxes[i].checked)act.push(boxes[i].dataset.f);
+  var cols=[XS.map(function(){return 1;})],k;
+  for(i=0;i<act.length;i++)cols.push(XS.map(FN[act[i]]));
+  var w=fitCols(cols,YS.slice(),1e-8);
+  function pred(x){var s=w[0],j;for(j=0;j<act.length;j++)s+=w[j+1]*FN[act[j]](x);return s;}
+  clr();
+  ctx.strokeStyle="#e2e8f0";ctx.beginPath();ctx.moveTo(px(-1.15),py(0));ctx.lineTo(px(1.15),py(0));ctx.stroke();
+  ctx.strokeStyle="#2b6cb0";ctx.lineWidth=2;ctx.beginPath();
+  for(i=0;i<=200;i++){var xx=-1.1+2.2*i/200,yy=pred(xx);if(i===0)ctx.moveTo(px(xx),py(Math.max(-0.55,Math.min(1.65,yy))));else ctx.lineTo(px(xx),py(Math.max(-0.55,Math.min(1.65,yy))));}
+  ctx.stroke();
+  for(i=0;i<XS.length;i++){ctx.fillStyle="#1a365d";ctx.beginPath();ctx.arc(px(XS[i]),py(YS[i]),4.5,0,7);ctx.fill();}
+  var s=0;for(i=0;i<XS.length;i++){var d=pred(XS[i])-YS[i];s+=d*d;}
+  document.getElementById("w3mse").textContent="MSE "+(s/XS.length).toFixed(4)+"   (columns: intercept"+(act.length?", "+act.join(", ").replace("x2","x^2").replace("ax","|x|").replace("sx","sin3x"):"")+")";
+  var ids={x:"w3wx",x2:"w3wx2",ax:"w3wax",sx:"w3wsx"};
+  for(var f in ids){var el=document.getElementById(ids[f]),idx=act.indexOf(f);
+    el.textContent=idx>=0?"w = "+w[idx+1].toFixed(2):"off";}
+}
+var bs=document.querySelectorAll("#w3feats input");
+for(var i=0;i<bs.length;i++)bs[i].addEventListener("change",draw);
+draw();
+})();
+  </script>
+</div>
               <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
               <ul>
                 <li><strong>Multivariate Regression:</strong> Multiple input features</li>
