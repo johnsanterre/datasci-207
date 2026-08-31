@@ -79,15 +79,28 @@ converge in a handful of iterations. Its catch is honest and unavoidable — you
 chose k. The elbow method (where does adding a cluster stop paying?) and the
 silhouette score (how much closer is each point to its own cluster than the next?)
 are evidence for that choice, not proofs.</p>
+<p>K-means draws hard borders; Gaussian mixture models admit what the borders
+hide. Model the data as k overlapping normal distributions — each with its own
+mean, spread, and weight — and every point gets a probability of belonging to
+each component. Fitting is expectation-maximization, which is k-means with the
+certainty removed: the E-step softly assigns points to components, the M-step
+re-estimates each component from its weighted points, and the loop repeats to
+convergence. The normal distribution and maximum likelihood earn their place
+here — a mixture is the course&rsquo;s first genuinely generative model: it can
+invent plausible new points, not just group the old ones.</p>
 <p>PCA compresses instead of grouping: find the orthogonal directions along which
 the data varies most and keep the top few. Built from scratch, it is an
 eigendecomposition of the covariance matrix; used well, it turns hundreds of
 correlated columns into a handful of axes that preserve most of the variance —
 for visualization, denoising, or as features for the supervised models you
-already know.</p>
-<p>Hierarchical clustering closes the module by removing the need to pick k up
-front: merge the closest pair of clusters repeatedly and read the dendrogram at
-whatever depth serves the question.</p>
+already know. SVD is the same machinery in its general form, and t-SNE gives up
+global axes entirely to buy neighborhood-faithful 2-D pictures — good for
+looking, dangerous for measuring.</p>
+<p>Hierarchical clustering removes the need to pick k up front: merge the
+closest pair of clusters repeatedly and read the dendrogram at whatever depth
+serves the question. DBSCAN removes it differently — grow clusters wherever
+points are dense and call the rest noise, so the number of clusters falls out
+instead of being chosen.</p>
 <p>The caveat that governs all of it: with no labels there is no ground truth, so
 "the algorithm found four segments" means four was a defensible reading of the
 evidence — not a fact about the world. Unsupervised results are hypotheses.</p>
@@ -194,6 +207,9 @@ reset();
                 <li><strong>PCA:</strong> Find directions of maximum variance</li>
                 <li><strong>Eigenvalues:</strong> Amount of variance explained</li>
                 <li><strong>Silhouette Score:</strong> Measure cluster quality</li>
+                <li><strong>Gaussian Mixture Model:</strong> Soft clustering with overlapping normals</li>
+                <li><strong>Expectation-Maximization:</strong> Alternate soft assignment and re-estimation</li>
+                <li><strong>t-SNE:</strong> Neighborhood-faithful 2-D maps, for looking not measuring</li>
             </ul>
 
               <button class="mark" data-for="read">Mark complete</button>
@@ -202,8 +218,9 @@ reset();
             <section class="seg" data-seg="code">
               <div class="stype">4 &middot; Code</div>
               <h2>The lecture notebook</h2>
-              <p>Six parts, from scratch before any framework. Run every cell; change
-              things and rerun &mdash; the notebook is the lecture.</p>
+              <p>Eight parts, from scratch before any framework &mdash; k-means through
+              EM, then the sklearn tour. Run every cell; change things and rerun
+              &mdash; the notebook is the lecture.</p>
               <nav class="module-nav">
                 <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_08/lecture.ipynb">Open Lecture in Colab</a>
                 <a href="https://github.com/johnsanterre/datasci-207/blob/main/week_08/lecture.py">View Code on GitHub</a>

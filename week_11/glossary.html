@@ -33,134 +33,81 @@
 
             <dl>
                 <div class="glossary-term">
-                    <dt>Regularization</dt>
+                    <dt>Functional API</dt>
                     <dd>
-                        Regularization is any technique that constrains the model to prevent overfitting,
-                        typically by penalizing complexity. Common approaches include adding a penalty term
-                        to the loss function (L1, L2), randomly dropping units during training (dropout),
-                        and stopping training early. Regularization introduces a bias-variance tradeoff:
-                        more regularization reduces variance (overfitting) but may increase bias (underfitting).
+                        The Keras style in which layers are functions called on tensors and a model is whatever graph runs from its inputs to its outputs. Branches, merges, multiple inputs, and multiple heads are all expressed the same way; the Sequential stack is the special case.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>L2 Regularization (Ridge)</dt>
+                    <dt>Sequential API</dt>
                     <dd>
-                        L2 regularization adds the sum of squared weights times a penalty factor (λ) to the
-                        loss function: Loss + λ×Σw². This penalizes large weights, causing all weights to
-                        shrink toward zero but rarely reaching exactly zero. L2 regularization is also called
-                        Ridge regression or weight decay. It is computationally efficient because the penalty
-                        is differentiable everywhere.
+                        The stack-shaped special case: one input, layers in a line, one output. Enough for every model in this course before this module.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>L1 Regularization (Lasso)</dt>
+                    <dt>Named Input</dt>
                     <dd>
-                        L1 regularization adds the sum of absolute weights times a penalty factor (λ) to the
-                        loss function: Loss + λ×Σ|w|. Unlike L2, L1 encourages sparse solutions where some
-                        weights become exactly zero, performing automatic feature selection. Lasso stands for
-                        "Least Absolute Shrinkage and Selection Operator." The non-differentiability at zero
-                        requires special optimization techniques.
+                        A keras.Input with a name. With several inputs, data is fed as a dict keyed by these names — the names are the contract between the data pipeline and the model.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Elastic Net</dt>
+                    <dt>Concatenate</dt>
                     <dd>
-                        Elastic Net combines L1 and L2 regularization: Loss + α×λ×Σ|w| + (1-α)×λ×Σw², where
-                        α controls the balance between L1 and L2. This provides the sparsity benefits of L1
-                        while maintaining the stability of L2 when features are correlated. Elastic Net is
-                        particularly useful when the number of features exceeds the number of samples or
-                        when groups of correlated features should be selected together.
+                        The merge layer that joins the per-feature paths into one flat vector, feeding the shared trunk. The width of that vector drives the trunk&rsquo;s parameter count.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Dropout</dt>
+                    <dt>Discretization (Bucketing)</dt>
                     <dd>
-                        Dropout is a regularization technique for neural networks that randomly sets activations
-                        to zero during training with a specified probability (typically 0.1-0.5). This prevents
-                        neurons from co-adapting too strongly and can be viewed as training an ensemble of
-                        sub-networks. During inference, dropout is disabled and activations are scaled
-                        accordingly. Dropout is one of the most effective regularizers for deep networks.
+                        A layer that maps a number into one of a few ranges and emits a one-hot of the range. Zero trainable parameters; used when a feature&rsquo;s effect is not smooth, so each range can earn its own learned effect.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Early Stopping</dt>
+                    <dt>One-Hot Encoding</dt>
                     <dd>
-                        Early stopping monitors validation performance during training and stops when it stops
-                        improving, preventing overfitting that occurs in later epochs. A patience parameter
-                        specifies how many epochs to wait for improvement before stopping. The best model
-                        (based on validation performance) is typically saved and restored. Early stopping
-                        requires no additional hyperparameter tuning beyond setting patience.
+                        A category as an indicator vector: all zeros except one slot. Costs width but no parameters. Keras lookup layers reserve an extra out-of-vocabulary slot, so widths run one wider than the raw category count.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Hyperparameter</dt>
+                    <dt>StringLookup / IntegerLookup</dt>
                     <dd>
-                        A hyperparameter is a configuration value set before training that controls the learning
-                        process or model structure. Unlike parameters (weights) learned during training,
-                        hyperparameters are chosen by the practitioner or through search algorithms. Examples
-                        include learning rate, regularization strength, number of layers, and dropout rate.
-                        Hyperparameter tuning is crucial for achieving good performance.
+                        Layers that map raw category values (strings or integers) to indices or one-hot vectors against a fixed vocabulary, with a reserved slot for values never seen in training.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Cross-Validation</dt>
+                    <dt>Embedding Layer (tabular)</dt>
                     <dd>
-                        Cross-validation is a technique for estimating model performance by training and
-                        evaluating on multiple different train/validation splits. In k-fold cross-validation,
-                        data is split into k folds; each fold serves as validation once while training on the
-                        remaining k-1 folds. The k performance scores are averaged for a robust estimate.
-                        Cross-validation uses all data for both training and validation without data leakage.
+                        A learned vector per category — vocabulary size &times; dimension parameters. Buys geometry: categories the task treats alike can drift together. The only encoding that scales to thousands of categories.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Grid Search</dt>
+                    <dt>Multi-Output Model</dt>
                     <dd>
-                        Grid search is a hyperparameter tuning method that exhaustively evaluates all
-                        combinations of specified parameter values. For each combination, the model is
-                        trained and evaluated using cross-validation. Grid search guarantees finding the
-                        best combination within the specified grid but becomes computationally expensive
-                        as the number of parameters and values grows (curse of dimensionality).
+                        One trunk, several heads, each predicting its own target with its own loss. Training minimizes a weighted sum of the per-head losses jointly.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Random Search</dt>
+                    <dt>Loss Weights</dt>
                     <dd>
-                        Random search samples hyperparameter combinations randomly from specified distributions
-                        rather than trying all combinations. With a fixed computational budget, random search
-                        often finds better solutions than grid search because it can explore the full range of
-                        continuous parameters. Research shows that some hyperparameters matter more than others,
-                        making random exploration more efficient than uniform grid coverage.
+                        The coefficients on each head&rsquo;s loss in the joint sum. They set the exchange rate between objectives that share one trunk.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Pipeline</dt>
+                    <dt>Baseline (rule-based)</dt>
                     <dd>
-                        A pipeline chains multiple data processing steps and a final estimator into a single
-                        object that can be fit and used for prediction. Pipelines ensure that preprocessing
-                        (scaling, encoding, PCA) is correctly applied during cross-validation—fitting only
-                        on training folds. This prevents data leakage and simplifies code. scikit-learn's
-                        Pipeline and ColumnTransformer are standard tools for building robust ML workflows.
+                        The bar to clear before wiring anything: the majority class, then one honest rule. A network that cannot beat one rule is decoration.
                     </dd>
                 </div>
-
                 <div class="glossary-term">
-                    <dt>Data Leakage</dt>
+                    <dt>plot_model</dt>
                     <dd>
-                        Data leakage occurs when information from the test or validation set improperly
-                        influences model training or preprocessing. Common examples include fitting a scaler
-                        on all data before splitting, or using future information to predict past events.
-                        Data leakage leads to overly optimistic performance estimates that don't hold in
-                        production. Pipelines and proper train/test separation prevent most forms of leakage.
+                        The Keras utility that draws the graph you wired, shapes included. For a Functional model, the drawing is the design document.
+                    </dd>
+                </div>
+                <div class="glossary-term">
+                    <dt>Regularization (the tuning thread)</dt>
+                    <dd>
+                        Not a lecture week in this course — it runs as a practice thread through the assignments: learning curves, grid and random search, early stopping, keras-tuner. See the tuning-thread figure in this module&rsquo;s Go deeper section.
                     </dd>
                 </div>
             </dl>

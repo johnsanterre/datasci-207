@@ -1,125 +1,78 @@
 """
-DATASCI 207: Module 11 - Exercise: Regularization and CV
+DATASCI 207 - Module 11 Exercise: Wire a Wider Model
+
+Six inputs (incl. an engineered, bucketed family_size), Functional API,
+hand-predicted parameter count, one-hot vs embedding comparison.
 """
 
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
 np.random.seed(42)
+tf.random.set_seed(42)
 
+df = sns.load_dataset("titanic")[
+    ["survived", "age", "fare", "sex", "pclass", "embarked", "sibsp", "parch"]
+].copy()
+df["age"] = df["age"].fillna(df["age"].median())
+df["embarked"] = df["embarked"].fillna("S")
+df["family_size"] = df["sibsp"] + df["parch"] + 1
 
+idx = np.random.permutation(len(df))
+cut = int(0.8 * len(df))
+train, dev = df.iloc[idx[:cut]].copy(), df.iloc[idx[cut:]].copy()
+y_train = train["survived"].values.astype("float32")
+y_dev = dev["survived"].values.astype("float32")
+print(len(train), "train /", len(dev), "dev")
 # =============================================================================
-# EXERCISE 1: Implement K-Fold Split
+# TODO 1: ENCODING LAYERS
 # =============================================================================
+# TODO 1: Build the encoding layers.
+# - norm_age, norm_fare: Normalization layers, adapted on the TRAINING data only
+# - lookup_sex: StringLookup(vocabulary=["male", "female"], output_mode="one_hot")
+# - lookup_emb: StringLookup(vocabulary=["S", "C", "Q"], output_mode="one_hot")
+# - buck_family: Discretization(bin_boundaries=[1.5, 2.5, 4.5], output_mode="one_hot")
+#   (buckets: alone / pair / small family / large family)
+# - lookup_cls: IntegerLookup(vocabulary=[1, 2, 3], output_mode="one_hot")
 
-def k_fold_split(n_samples, k=5, shuffle=True):
-    """
-    Generate k-fold train/validation indices.
-    
-    Args:
-        n_samples: Total number of samples
-        k: Number of folds
-        shuffle: Whether to shuffle before splitting
-    
-    Yields:
-        (train_indices, val_indices) for each fold
-    """
-    # TODO: Implement k-fold splitting
-    # 1. Create array of indices
-    # 2. Optionally shuffle
-    # 3. Split into k folds
-    # 4. Yield train/val indices for each fold
-    
-    pass  # Replace with implementation
-
-
+norm_age = ...
+norm_fare = ...
+lookup_sex = ...
+lookup_emb = ...
+buck_family = ...
+lookup_cls = ...
 # =============================================================================
-# EXERCISE 2: Cross-Validation Score
+# TODO 2: WIRE THE MODEL
 # =============================================================================
+# TODO 2: Wire the six-input model with the Functional API.
+# Named inputs: age, fare (float), sex, embarked (string), pclass, family_size (int64 / float).
+# Route each through its encoder, Flatten the one-hot outputs, Concatenate,
+# then Dense(16, relu) -> Dense(1, sigmoid, name="survived").
+# Build `model = keras.Model(inputs=[...], outputs=out)`.
 
-def cross_val_mse(X, y, model_fn, k=5):
-    """
-    Compute k-fold cross-validation MSE.
-    
-    Args:
-        X: Features
-        y: Targets
-        model_fn: Function that returns (fit, predict) functions
-        k: Number of folds
-    
-    Returns:
-        Array of k MSE scores
-    """
-    # TODO: Implement cross-validation
-    # 1. For each fold:
-    #    - Split data
-    #    - Fit model on train
-    #    - Predict on val
-    #    - Compute MSE
-    # 2. Return array of scores
-    
-    scores = None  # Replace
-    return scores
-
-
+model = ...
 # =============================================================================
-# EXERCISE 3: L2 Regularized Linear Regression
+# TODO 3: PREDICT THE BILL, THEN PAY IT
 # =============================================================================
+# TODO 3: Predict the parameter count BEFORE running this cell.
+# Work it out on paper: concat width -> (width + 1) * 16 + 17.
+# Then compile, train 30 epochs (verbose=0), and evaluate on dev.
 
-def ridge_closed_form(X, y, lambda_):
-    """
-    Ridge regression closed-form solution.
-    
-    w = (X'X + λI)^(-1) X'y
-    
-    Args:
-        X: Features with bias column
-        y: Targets
-        lambda_: Regularization strength
-    
-    Returns:
-        weights
-    """
-    # TODO: Implement ridge regression
-    weights = None  # Replace
-    return weights
+paper_count = ...   # your hand computation, an integer
 
-
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+# model.fit(...)
+# print evaluate(...) and the sum of trainable_weights shapes; it should equal paper_count
+# (count_params() also includes Normalization's frozen mean/variance - trainable only!)
 # =============================================================================
-# TESTING
+# TODO 4: EMBEDDING SWAP
 # =============================================================================
-
-if __name__ == "__main__":
-    print("Testing Regularization and CV\n")
-    
-    # Test 1: K-Fold Split
-    print("=" * 50)
-    print("Test 1: K-Fold Split")
-    print("=" * 50)
-    
-    folds = list(k_fold_split(20, k=5))
-    if folds:
-        print(f"Generated {len(folds)} folds")
-        for i, (train, val) in enumerate(folds):
-            print(f"  Fold {i+1}: train={len(train)}, val={len(val)}")
-        if len(folds) == 5 and all(len(v) == 4 for _, v in folds):
-            print("PASS")
-    else:
-        print("Not implemented yet")
-    
-    # Test 2: Ridge Regression
-    print("\n" + "=" * 50)
-    print("Test 2: Ridge Regression")
-    print("=" * 50)
-    
-    X = np.array([[1, 1], [1, 2], [1, 3], [1, 4]])
-    y = np.array([2, 4, 5, 4])
-    
-    w = ridge_closed_form(X, y, lambda_=1.0)
-    if w is not None:
-        print(f"Weights: {w}")
-        y_pred = X @ w
-        mse = np.mean((y - y_pred)**2)
-        print(f"MSE: {mse:.4f}")
-        if len(w) == 2:
-            print("PASS")
-    else:
-        print("Not implemented yet")
+# TODO 4: Swap embarked's one-hot for an Embedding(input_dim=4, output_dim=4)
+# (StringLookup WITHOUT output_mode, then Embedding, then Flatten).
+# Rebuild, retrain, and answer in a comment:
+#   - how did count_params() change, and where did the change come from?
+#   - did dev accuracy move enough to justify the parameters?

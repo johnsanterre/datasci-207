@@ -284,6 +284,80 @@ except ImportError:
     print("(scikit-learn not available)")
 
 
+
+# =============================================================================
+# PART 7: GAUSSIAN MIXTURE MODELS AND EM
+# =============================================================================
+
+print("\n=== Part 7: Gaussian Mixture Models and EM ===\n")
+
+np.random.seed(7)
+data = np.concatenate([np.random.normal(-2.0, 0.6, 150),
+                       np.random.normal(1.5, 1.0, 100)])
+
+mu = np.array([-1.0, 1.0])      # initial guesses, deliberately mediocre
+sd = np.array([1.0, 1.0])
+pi = np.array([0.5, 0.5])       # mixture weights
+
+def normal_pdf(x, m, s):
+    return np.exp(-0.5 * ((x - m) / s) ** 2) / (s * np.sqrt(2 * np.pi))
+
+for it in range(100):
+    # E-step: responsibility of each component for each point
+    dens = np.stack([pi[k] * normal_pdf(data, mu[k], sd[k]) for k in range(2)])
+    resp = dens / dens.sum(axis=0)
+    # M-step: re-estimate each component from its weighted points
+    nk = resp.sum(axis=1)
+    new_mu = (resp * data).sum(axis=1) / nk
+    sd = np.sqrt((resp * (data - new_mu[:, None]) ** 2).sum(axis=1) / nk)
+    pi = nk / len(data)
+    moved = np.abs(new_mu - mu).max()
+    mu = new_mu
+    if moved < 1e-6:
+        break
+
+print("converged after", it + 1, "iterations")
+print("means:", mu.round(2), "  (true: -2.0, 1.5)")
+print("stds:", sd.round(2), "   (true: 0.6, 1.0)")
+print("weights:", pi.round(2), " (true: 0.6, 0.4)")
+
+# Soft assignment: a point in the overlap gets a probability, not a verdict
+x0 = -0.3
+d = np.array([pi[k] * normal_pdf(x0, mu[k], sd[k]) for k in range(2)])
+d /= d.sum()
+print("p(component | x = %.1f):" % x0, d.round(2), " <- no hard border")
+
+# Generative: sample new points from the fitted mixture
+comp = np.random.choice(2, size=5, p=pi)
+print("5 invented points:", np.random.normal(mu[comp], sd[comp]).round(2))
+
+
+# =============================================================================
+# PART 8: DBSCAN AND t-SNE
+# =============================================================================
+
+print("\n=== Part 8: DBSCAN and t-SNE ===\n")
+
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_moons, make_blobs
+from sklearn.manifold import TSNE
+
+# DBSCAN on two interleaved moons - a shape k-means cannot cut correctly
+X_moons, _ = make_moons(n_samples=300, noise=0.07, random_state=3)
+db = DBSCAN(eps=0.2, min_samples=5).fit(X_moons)
+n_found = len(set(db.labels_)) - (1 if -1 in db.labels_ else 0)
+print("DBSCAN found", n_found, "clusters and", int((db.labels_ == -1).sum()), "noise points")
+print("k was never chosen - density decided.\n")
+
+# t-SNE: 10-D blobs down to 2-D; neighborhoods survive the trip
+X10, y10 = make_blobs(n_samples=300, n_features=10, centers=4, random_state=5)
+emb = TSNE(n_components=2, random_state=5, perplexity=30).fit_transform(X10)
+D = np.linalg.norm(emb[:, None, :] - emb[None, :, :], axis=2)
+same = y10[:, None] == y10[None, :]
+print("mean 2-D distance within a true cluster: %.1f" % D[same].mean())
+print("mean 2-D distance between clusters:      %.1f" % D[~same].mean())
+print("neighborhoods preserved - but the axes mean nothing. Look, do not measure.")
+
 # =============================================================================
 # SUMMARY
 # =============================================================================
@@ -315,4 +389,15 @@ print("""
    - Silhouette score: compactness vs separation
    - Elbow method: diminishing returns on k
    - Always scale data first!
+""")
+
+print("""
+6. GAUSSIAN MIXTURES + EM:
+   - k overlapping normals; every point gets a probability per component
+   - E-step soft-assigns, M-step re-estimates; k-means minus the certainty
+   - A fitted mixture is generative: it can sample new points
+
+7. DBSCAN AND t-SNE:
+   - DBSCAN: clusters where points are dense, noise elsewhere; k falls out
+   - t-SNE: neighborhood-faithful 2-D pictures - for looking, not measuring
 """)

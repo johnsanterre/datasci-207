@@ -385,6 +385,94 @@ def s_fairbars(kicker, title):
                     font=F(24), fill=INK)
     return draw
 
+def s_gmm(kicker, title):
+    def draw(dr, t, rng):
+        kick(dr, kicker)
+        dr.text((80, 112), title, font=F(38, bold=True), fill=NAVY)
+        x0, y0, w, h = 170, 210, 520, 340
+        axes(dr, x0, y0, w, h)
+        def bell(c, s_, amp):
+            return lambda u: amp * math.exp(-0.5 * ((u - c) / s_) ** 2)
+        fa, fb = bell(0.32, 0.10, 0.85), bell(0.62, 0.14, 0.60)
+        if t > 0.08:
+            plot(dr, x0, y0, w, h, fa, sub(t, 0.08, 0.32), BLUE)
+        if t > 0.28:
+            plot(dr, x0, y0, w, h, fb, sub(t, 0.28, 0.52), RED)
+        if t > 0.58:
+            u = 0.47
+            X = x0 + u * w
+            Y = y0 + h - 0.02 * h
+            a = ease(sub(t, 0.58, 0.7))
+            dr.ellipse([X-9, Y-9, X+9, Y+9], fill=mix(CARD, NAVY, a), outline=INK, width=2)
+            da, db = fa(u), fb(u)
+            pa = da / (da + db)
+            dr.text((X - 60, Y - 56), "p = %.2f / %.2f" % (pa, 1 - pa),
+                    font=F(22, med=True), fill=mix(PAPER, INK, a))
+        steps = [("E-step: soft-assign every point", 0.36),
+                 ("M-step: re-estimate each normal", 0.5),
+                 ("repeat until nothing moves", 0.64)]
+        for i, (txt, at) in enumerate(steps):
+            if t > at:
+                dr.text((760, 280 + i * 44), txt, font=F(25),
+                        fill=mix(PAPER, INK, ease(sub(t, at, at + 0.1))))
+        if t > 0.84:
+            dr.text((760, 440), "k-means minus the certainty", font=F(27, bold=True), fill=NAVY)
+    return draw
+
+def s_wiring(kicker, title):
+    def draw(dr, t, rng):
+        kick(dr, kicker)
+        dr.text((80, 112), title, font=F(38, bold=True), fill=NAVY)
+        ins = [("age", "raw number"), ("fare", "raw number"),
+               ("sex", "one-hot"), ("class", "embed 3 x 4")]
+        ys = [200, 290, 380, 470]
+        for i, (nm, enc) in enumerate(ins):
+            at = 0.04 + i * 0.06
+            if t <= at:
+                continue
+            a = ease(sub(t, at, at + 0.1))
+            y = ys[i]
+            dr.rounded_rectangle([90, y, 240, y + 52], 8,
+                                 fill=mix(PAPER, CARD, a), outline=mix(PAPER, NAVY, a), width=3)
+            dr.text((108, y + 14), nm, font=F(22, med=True), fill=mix(PAPER, INK, a))
+            dr.rounded_rectangle([272, y + 3, 480, y + 49], 8,
+                                 fill=mix(PAPER, CARD, a), outline=mix(PAPER, BORD, a), width=2)
+            dr.text((288, y + 14), enc, font=F(20), fill=mix(PAPER, MUT, a))
+        if t > 0.34:
+            a = ease(sub(t, 0.34, 0.48))
+            for i in range(4):
+                y = ys[i] + 26
+                ty = 320 + i * 27
+                dr.line([480, y, 480 + (556 - 480) * a, y + (ty - y) * a], fill=BORD, width=4)
+        if t > 0.44:
+            a = ease(sub(t, 0.44, 0.54))
+            dr.rectangle([556, 290, 584, 460], fill=mix(PAPER, BLUE, a * 0.5),
+                         outline=mix(PAPER, BLUE, a), width=3)
+            dr.text((526, 252), "concat", font=F(20, med=True), fill=mix(PAPER, NAVY, a))
+        if t > 0.54:
+            a = ease(sub(t, 0.54, 0.66))
+            dr.line([584, 375, 584 + 56 * a, 375], fill=BORD, width=4)
+            dr.rounded_rectangle([640, 345, 852, 405], 8, fill=mix(PAPER, CARD, a),
+                                 outline=mix(PAPER, NAVY, a), width=3)
+            dr.text((658, 362), "Dense(16) relu", font=F(22, med=True), fill=mix(PAPER, INK, a))
+            dr.text((640, 415), "(width + 1) x 16 params", font=F(18), fill=mix(PAPER, MUT, a))
+        if t > 0.66:
+            a = ease(sub(t, 0.66, 0.76))
+            dr.line([852, 365, 852 + 46 * a, 365 - 60 * a], fill=BORD, width=4)
+            dr.rounded_rectangle([900, 270, 1076, 322], 8, fill=mix(PAPER, CARD, a),
+                                 outline=mix(PAPER, GREEN, a), width=3)
+            dr.text((918, 284), "survival", font=F(22, med=True), fill=mix(PAPER, INK, a))
+        if t > 0.78:
+            a = ease(sub(t, 0.78, 0.88))
+            dr.line([852, 385, 852 + 46 * a, 385 + 60 * a], fill=BORD, width=4)
+            dr.rounded_rectangle([900, 428, 1076, 480], 8, fill=mix(PAPER, CARD, a),
+                                 outline=mix(PAPER, RED, a), width=3)
+            dr.text((918, 442), "fare bracket", font=F(22, med=True), fill=mix(PAPER, INK, a))
+        if t > 0.88:
+            dr.text((90, 560), "two heads, one trunk - the graph is the design document",
+                    font=F(26, bold=True), fill=NAVY)
+    return draw
+
 def s_attend(kicker, title):
     def draw(dr, t, rng):
         kick(dr, kicker)
@@ -563,11 +651,14 @@ VIDEOS = {
   "Every module so far had labels — the right answers came with the data. This one takes them away and asks what structure the inputs carry on their own. Two answers: group the examples, or compress the dimensions."),
  (s_clusters("The loop", "K-means, converging"),
   "K-means at its most direct: place centroids, assign each point to the nearest, move each centroid to the mean of its points, repeat until nothing moves. Watch the squares find the clouds. The catch is honest — you chose k, and the elbow and silhouette methods are evidence for that choice, not proof."),
- (s_bullets("Compression", "PCA and hierarchies", [
+ (s_gmm("Soft borders", "Gaussian mixtures and EM"),
+  "K-means draws hard borders; Gaussian mixtures admit what the borders hide. Model the data as overlapping normal distributions, and every point gets a probability of belonging to each. Expectation maximization fits it: softly assign, re-estimate, repeat. It is k-means minus the certainty — and the fitted mixture is generative: it can invent plausible new points."),
+ (s_bullets("Compression", "PCA, trees, density, pictures", [
    "PCA: keep the directions of greatest variance",
-   "Hundreds of correlated columns → a few axes",
-   "Hierarchical clustering: merge pairs, read the tree at any depth"]),
-  "PCA compresses instead of grouping: find the directions along which the data varies most and keep the top few — hundreds of correlated columns become a handful of axes for visualization, denoising, or downstream features. Hierarchical clustering removes the choice of k: merge the closest pair repeatedly and cut the tree where it serves the question."),
+   "SVD: the same machinery, general form",
+   "Hierarchies read a tree; DBSCAN lets density decide k",
+   "t-SNE: pictures to look at, never to measure"]),
+  "PCA compresses instead of grouping: keep the directions of greatest variance, and hundreds of correlated columns become a handful of axes. S V D is the same machinery in general form. Hierarchical clustering reads a tree at any depth; DBSCAN lets density decide the number of clusters and calls sparse points noise. And t-SNE draws neighborhood-faithful pictures — for looking, never for measuring."),
  (s_bullets("This module", "The caveat that governs it", [
    "No labels → no ground truth",
    "“Four segments” is a reading, not a fact",
@@ -610,21 +701,22 @@ VIDEOS = {
   "The two closing ideas are the ones practitioners lean on daily. Transfer learning: a network pretrained on millions of images has already learned edges and textures — start from it and retrain the top. Augmentation: flip, crop, and shift what you have. Between them, serious vision work gets done on small datasets."),
 ],
 "week_11": [
- (s_title("Module 11 · Regularization and tuning", "Constrain on purpose",
-          "and choose settings by evidence, not taste."),
-  "Module one named the enemy: overfitting. This module arms you against it. The theme throughout — constrain the model on purpose, and choose every setting by evidence instead of taste. This is the module that makes models defensible."),
- (s_scatter_fit("The cure", "Penalize complexity", wiggle=True),
-  "Regularization writes the cure into the loss itself: a penalty for large weights, so the model pays for complexity. L2 shrinks weights smoothly; L1 drives some exactly to zero, selecting features as a side effect. Dropout and early stopping do the same job for networks. The red model stops being affordable."),
- (s_bullets("Honest tuning", "Cross-validation and search", [
-   "The test set stays untouched until the end",
-   "Cross-validation: rotate the validation fold, average",
-   "Random search usually beats grid search",
-   "Pipelines make leakage structurally impossible"]),
-  "Tuning hyperparameters against the test set is self-deception — that data stays sealed until the end. Cross-validation is the honest instrument: split the training data k ways, rotate, average. Random search usually finds a good configuration faster than grids. And pipelines fit your scaling inside each fold, making the silent leak that inflates scores structurally impossible."),
- (s_bullets("This module", "Why this one matters", [
-   "The difference between a demo and a defensible model",
-   "Also the module interviews draw on most"], closing=True),
-  "This module is the difference between a model that demos well and one you can defend to a skeptic. It is also, not coincidentally, the material technical interviews draw on most. The notebook sweeps penalties, runs the searches, and builds a leak-proof pipeline end to end."),
+ (s_title("Module 11 · Network architecture design", "Wiring, not stacking",
+          "build the network around the data you have."),
+  "Module eleven changes the question. Until now, every network was a stack — layers in a line. Real data is not a stack: a passenger manifest mixes numbers with categories. This module builds the network as a graph, wired around the data you actually have."),
+ (s_wiring("The graph", "Four features, four front doors"),
+  "Four features, four front doors. Raw numbers flow straight in. A number whose effect is not smooth gets bucketed into ranges. Categories become one-hot vectors — or embeddings, which buy geometry with parameters. Concatenate merges the paths into a shared trunk, and the trunk can feed two heads at once, each with its own loss. This graph is the Keras functional A P I, and the drawing is the design document."),
+ (s_bullets("The ladder", "Five models on one manifest", [
+   "Baselines first: majority class, then one rule",
+   "Sequential, then Functional — same model, two APIs",
+   "Buckets, named inputs, embeddings, two outputs",
+   "Read the parameter count like a bill"]),
+  "The lecture climbs five models on the Titanic manifest. Baselines first — the majority class, then one honest rule, because a network that cannot beat one rule is decoration. Then the same model in both A P Is, then bucketed inputs, then multiple named inputs, then embedded categoricals, then a second output head. At every rung, read the parameter count like a bill: every wiring choice prices in."),
+ (s_bullets("This module", "Architecture is a claim", [
+   "Every wire encodes a belief about the data",
+   "Bucketing asserts: this effect is not smooth",
+   "The notebook wires and trains the real thing"], closing=True),
+  "One idea to carry out the door: architecture is a hypothesis. Bucketing age claims its effect is not smooth. An embedding claims the categories have geometry worth learning. Make the claims deliberately, and let the dev set judge them. The notebook wires the real thing — and the tuning thread continues in the assignments."),
 ],
 "week_12": [
  (s_title("Module 12 · Fairness and responsible AI", "Accurate and unfair",

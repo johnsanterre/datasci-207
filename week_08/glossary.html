@@ -167,6 +167,30 @@
                         ambiguous, so silhouette scores or domain knowledge should supplement this method.
                     </dd>
                 </div>
+                <div class="glossary-term">
+                    <dt>Gaussian Mixture Model (GMM)</dt>
+                    <dd>
+                        The data modeled as k overlapping normal distributions, each with its own mean, spread, and weight. Every point gets a probability of belonging to each component rather than a hard cluster label — and the fitted mixture can generate new points.
+                    </dd>
+                </div>
+                <div class="glossary-term">
+                    <dt>Expectation-Maximization (EM)</dt>
+                    <dd>
+                        The fitting loop for mixtures: the E-step softly assigns points to components (responsibilities), the M-step re-estimates each component from its weighted points. K-means is the hard-assignment special case.
+                    </dd>
+                </div>
+                <div class="glossary-term">
+                    <dt>DBSCAN</dt>
+                    <dd>
+                        Density-based clustering: grow clusters wherever points are dense, label sparse points as noise. The number of clusters falls out of the density rather than being chosen up front.
+                    </dd>
+                </div>
+                <div class="glossary-term">
+                    <dt>t-SNE</dt>
+                    <dd>
+                        A dimensionality-reduction method that maps high-dimensional data to 2-D while preserving neighborhoods. Superb for visualization; distances and axes in the picture are not measurements.
+                    </dd>
+                </div>
             </dl>
 
             <footer>

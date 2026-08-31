@@ -33,7 +33,7 @@
 
             <div class="quiz-score" id="quiz-score">
                 <span class="score-label">Questions</span>
-                <span class="score-value">5</span>
+                <span class="score-value">6</span>
             </div>
 
             <div class="quiz-container">
@@ -134,6 +134,25 @@
                                 non-standardized data</label></li>
                         <li><label><input type="radio" name="q5" value="d"> Standardization is only needed for
                                 categorical features</label></li>
+                    </ul>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+
+                <div class="quiz-question" data-correct="b" data-explanations='{
+                    "a": "GMM and k-means both require choosing k; that is not the difference.",
+                    "b": "Correct. K-means gives each point one hard cluster; a Gaussian mixture gives each point a probability per component, fit by EM - soft assignment in the E-step, re-estimation in the M-step. And a fitted mixture is generative: it can sample new points.",
+                    "c": "EM converges to a local optimum, like k-means - neither guarantees the global one.",
+                    "d": "A mixture uses normal distributions, but the components overlap - that is the point."
+                }'>
+                    <span class="question-number">Question 6</span>
+                    <h4>What does a Gaussian mixture model give you that k-means does not?</h4>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="q6" value="a"> No need to choose k</label></li>
+                        <li><label><input type="radio" name="q6" value="b"> Soft assignment - a probability per
+                                component - and a generative model that can sample new points</label></li>
+                        <li><label><input type="radio" name="q6" value="c"> A guaranteed global optimum</label></li>
+                        <li><label><input type="radio" name="q6" value="d"> Clusters that never overlap</label></li>
                     </ul>
                     <div class="quiz-feedback"></div>
                 </div>

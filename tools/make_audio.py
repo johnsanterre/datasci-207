@@ -119,9 +119,13 @@ SCRIPTS = {
  "first — assign points to the nearest centroid, move centroids to the mean, "
  "repeat — and you will implement the loop from scratch and watch it converge. "
  "The elbow method and silhouette score give evidence for your choice of k, but "
- "only evidence. PCA answers the second: keep the directions of greatest "
- "variance, and hundreds of correlated columns become a few axes. Hierarchical "
- "clustering closes the module by deferring the choice of k entirely. " + WALK +
+ "only evidence. Gaussian mixtures soften the borders: overlapping normal "
+ "distributions, fit by expectation maximization — softly assign, re-estimate, "
+ "repeat — k-means minus the certainty, and generative besides. PCA answers the "
+ "second question: keep the directions of greatest variance, and hundreds of "
+ "correlated columns become a few axes; S V D is the same machinery in general "
+ "form. Hierarchical clustering defers the choice of k, DBSCAN lets density "
+ "decide it, and t-SNE draws pictures you may look at but never measure. " + WALK +
  "The pitfall is certainty. With no labels there is no ground truth — when the "
  "algorithm reports four segments, that is a defensible reading, not a fact. "
  "Treat every unsupervised result as a hypothesis to test, not a discovery to "
@@ -154,18 +158,18 @@ SCRIPTS = {
  "default — millions of images already taught the network edges and textures, "
  "and your data teaches it your task.",
 
-"week_11": "Module eleven is the defense module. Regularization writes a penalty "
- "for complexity into the loss itself: L2 shrinks weights smoothly, L1 drives "
- "some exactly to zero and selects features as a side effect; dropout and early "
- "stopping do the same job for networks. Then honest tuning: the test set stays "
- "sealed until the end, cross-validation rotates a validation fold through the "
- "training data, random search usually beats grids, and pipelines fit your "
- "preprocessing inside each fold so the silent leak that inflates scores becomes "
- "structurally impossible. " + WALK +
- "The pitfall is quiet and common: any decision made by peeking at test "
- "performance poisons the estimate. This module is the difference between a model "
- "that demos well and one you can defend — and it is the material technical "
- "interviews draw on most.",
+"week_11": "Module eleven changes the question from what to how: not which "
+ "model, but how the network is wired around the data. Real tables mix numbers "
+ "with categories, and the Keras functional A P I treats the model as a graph — "
+ "named inputs, one encoding path per feature, merged into a shared trunk. Raw "
+ "numbers flow straight in; a number whose effect is not smooth gets bucketed; "
+ "categories become one-hot vectors or embeddings that buy geometry with "
+ "parameters. The lecture climbs five models on the Titanic manifest, from one "
+ "input to two output heads trained jointly — with baselines first, because a "
+ "network that cannot beat one honest rule is decoration. " + WALK +
+ "The pitfall is spending parameters without noticing. Read the trainable count "
+ "like a bill at every step — and when a column becomes a target, take it out of "
+ "the inputs, or you have built leakage into the wiring itself.",
 
 "week_12": "Module twelve is fairness, and it starts with a deliberately "
  "uncomfortable demonstration: a hiring classifier trained on biased history "

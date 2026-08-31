@@ -248,3 +248,11 @@ For visualization only (not general dimensionality reduction):
 - [Links to be added]
 - Introduction to Statistical Learning, Chapter 10
 - scikit-learn clustering documentation
+
+## Gaussian Mixture Models and EM
+
+K-means draws hard borders; a GMM models the data as k overlapping normals and gives every point a probability per component. EM fits it: soft-assign (E), re-estimate (M), repeat. The fitted mixture is generative — it can sample plausible new points. The normal distribution and maximum likelihood are the machinery underneath.
+
+## DBSCAN and t-SNE
+
+DBSCAN clusters by density — k falls out, sparse points become noise. t-SNE maps high dimensions to 2-D preserving neighborhoods: for looking, never for measuring.

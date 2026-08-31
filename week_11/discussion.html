@@ -74,129 +74,70 @@
             <p class="subtitle">Higher-Order Thinking for Class Engagement</p>
 
             <p>
-                These discussion prompts are designed to move beyond technical definitions toward
-                critical analysis, synthesis, and evaluation. Use them to spark deeper conversation
-                about <em>why</em> we regularize and tune, and what choices reveal about our values.
+                These discussion prompts move beyond the mechanics of the Functional API toward
+                what an architecture <em>claims</em> — about the data, about the task, and about
+                the people in the rows.
             </p>
 
             <div class="discussion-topic">
-                <span class="thinking-level">Philosophy / Analysis</span>
-                <h3>1. What Does "Simple" Mean?</h3>
+                <span class="thinking-level">Epistemology / Analysis</span>
+                <h3>1. Architecture as Hypothesis</h3>
                 <p>
-                    Regularization penalizes "complexity" to prefer "simpler" models. But what makes
-                    a model simple? Small weights? Fewer features? Fewer parameters?
+                    Bucketing age asserts that age&rsquo;s effect is not smooth. An embedding asserts that categories have geometry worth learning. Every wire in the diagram encodes a belief about the world.
                 </p>
                 <ul class="probing-questions">
-                    <li>L2 prefers small weights. Is a model with many tiny weights simpler than one with few large
-                        weights?</li>
-                    <li>Occam's Razor says simpler explanations are better. Why should this apply to prediction?</li>
-                    <li>A polynomial of degree 3 with complex coefficients vs. degree 10 with simple coefficients—which
-                        is simpler?</li>
-                    <li>Is "simplicity" objective or in the eye of the beholder?</li>
+                    <li>What belief does giving fare its own normalized path encode? What would make it false?</li>
+                    <li>What would the data have to look like for raw age to beat bucketed age?</li>
+                    <li>Is a model diagram a scientific claim? Could you design an experiment to falsify one wiring against another?</li>
+                    <li>The lecture chose bucket boundaries 12 / 25 / 40 / 60 by hand. What is that, if not a prior?</li>
                 </ul>
-                <p class="activity-note">Try: Have students rank models by "simplicity" and compare their rankings.</p>
+                <p class="activity-note">Try: have students propose one wiring change each and state the belief it encodes before running it.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Engineering / Evaluation</span>
+                <h3>2. The Parameter Bill</h3>
+                <p>
+                    The figure on the module page prices every wiring choice in parameters. Treat the count as a budget and the architecture as spending.
+                </p>
+                <ul class="probing-questions">
+                    <li>An embedding for a 3-category column costs 16 parameters here. What breaks first as the vocabulary grows to 30,000 — one-hot&rsquo;s width or the embedding&rsquo;s parameters?</li>
+                    <li>The trunk dominates the bill at (width + 1) &times; 16. When does narrowing the concat matter more than shrinking any encoder?</li>
+                    <li>Is a lower parameter count ever worth a worse dev accuracy? Who decides?</li>
+                    <li>Hand-compute the bill for one model, then verify with the trainable-weights sum. Where does count_params() mislead, and why?</li>
+                </ul>
+                <p class="activity-note">Try: give teams the same dev-accuracy target and rank their models by parameter count.</p>
+            </div>
+
+            <div class="discussion-topic">
+                <span class="thinking-level">Synthesis / Design</span>
+                <h3>3. The Second Head</h3>
+                <p>
+                    The two-headed model predicts survival and fare bracket from one trunk — and fare had to leave the inputs to become a target.
+                </p>
+                <ul class="probing-questions">
+                    <li>When does an auxiliary head help the main task, and when do the two objectives fight over the trunk?</li>
+                    <li>The loss weights were 1.0 and 0.5. What is that ratio a statement about? Who should set it?</li>
+                    <li>Predicting a value you also feed in is leakage. Find one subtler leakage risk in this module&rsquo;s pipeline.</li>
+                    <li>Propose a third head for this dataset that would plausibly help survival prediction — and one that would plausibly hurt it.</li>
+                </ul>
+                <p class="activity-note">Try: train the survival-only model against the two-headed one and discuss the gap, whichever direction it goes.</p>
             </div>
 
             <div class="discussion-topic">
                 <span class="thinking-level">Ethics / Critical Analysis</span>
-                <h3>2. The Meaning of Regularization Strength</h3>
+                <h3>4. A Manifest of People</h3>
                 <p>
-                    Lambda (λ) controls how much we penalize complexity. But who chooses λ, and what
-                    does that choice represent?
+                    The rows are passengers who lived or died in 1912, and the strongest single feature is sex. The convenience of the dataset is exactly what deserves examination.
                 </p>
                 <ul class="probing-questions">
-                    <li>High λ means we trust the prior (simple models) more than the data. When is that appropriate?
-                    </li>
-                    <li>If we tune λ on a validation set, are we letting the data decide? Or is that circular?</li>
-                    <li>In a medical model, should λ be set by data scientists, doctors, or patients?</li>
-                    <li>Is there a "right" λ, or is it always a judgment call?</li>
+                    <li>The one-rule baseline (&ldquo;females survived&rdquo;) is strong because of a social protocol. What does the model learn, physics or policy?</li>
+                    <li>Would you ship a model whose top feature is a protected attribute? What if removing it tanks accuracy?</li>
+                    <li>What does cabin class stand in for? Is pclass a feature or a proxy?</li>
+                    <li>This is the doorstep of module 12. Which fairness questions can already be asked of the two-headed model, with the tools you have?</li>
                 </ul>
-                <p class="activity-note">Try: Show how predictions change with different λ values. Discuss what
-                    stakeholders would prefer.</p>
+                <p class="activity-note">Try: compute survival-head accuracy per sex and per class before module 12 names the metrics.</p>
             </div>
-
-            <div class="discussion-topic">
-                <span class="thinking-level">Synthesis / Epistemology</span>
-                <h3>3. Cross-Validation as Oracle</h3>
-                <p>
-                    We use cross-validation to estimate future performance. But CV assumes the future
-                    looks like the past. When does this assumption fail?
-                </p>
-                <ul class="probing-questions">
-                    <li>If data is non-stationary (changes over time), what does CV even measure?</li>
-                    <li>High CV variance suggests instability. But is instability always bad?</li>
-                    <li>CV gives a number. How much should we trust a single number to summarize model quality?</li>
-                    <li>If we try 100 configurations and select the best CV score, are we overfitting to the validation
-                        data?</li>
-                </ul>
-                <p class="activity-note">Try: Compare CV estimates to true test performance. Discuss the gap.</p>
-            </div>
-
-            <div class="discussion-topic">
-                <span class="thinking-level">Systems Thinking / Ethics</span>
-                <h3>4. The Hyperparameter Search Space</h3>
-                <p>
-                    Grid search explores a finite set of hyperparameters. Who decides which values
-                    to try? What's excluded by those choices?
-                </p>
-                <ul class="probing-questions">
-                    <li>If we search learning rates [0.01, 0.1, 1], we'll never find that 0.05 was optimal. How do we
-                        know what to include?</li>
-                    <li>Random search is more efficient, but it still requires defining distributions. Do those encode
-                        assumptions?</li>
-                    <li>AutoML promises to automate hyperparameter search. Does that make the process more or less
-                        transparent?</li>
-                    <li>Is extensive hyperparameter tuning scientific rigor or algorithmic cherry-picking?</li>
-                </ul>
-                <p class="activity-note">Try: Define a grid that would miss the optimal hyperparameters. Discuss
-                    how we'd know.</p>
-            </div>
-
-            <div class="discussion-topic">
-                <span class="thinking-level">Perspective-Taking / Application</span>
-                <h3>5. Early Stopping: When to Quit</h3>
-                <p>
-                    Early stopping halts training when validation loss stops improving. But "improvement"
-                    and "patience" are choices. What values do they embed?
-                </p>
-                <ul class="probing-questions">
-                    <li>More patience might find a better model—or waste compute and overfit. How do we balance?</li>
-                    <li>In life, when should we "early stop" and when should we persist?</li>
-                    <li>If early stopping saves money but slightly hurts performance, how should organizations decide?
-                    </li>
-                    <li>Is early stopping regularization, or is it just practical resource management?</li>
-                </ul>
-                <p class="activity-note">Try: Train with different patience values. Discuss the tradeoffs.</p>
-            </div>
-
-            <div class="discussion-topic">
-                <span class="thinking-level">Metacognition / Evaluation</span>
-                <h3>6. The Reproducibility Challenge</h3>
-                <p>
-                    Small changes in hyperparameters can dramatically change results. How do we build
-                    science on such sensitive foundations?
-                </p>
-                <ul class="probing-questions">
-                    <li>If a paper's results depend on precise hyperparameters, is the finding robust or fragile?</li>
-                    <li>Should papers report hyperparameter sensitivity, not just best results?</li>
-                    <li>Random seeds affect results. Is a finding "real" if it only appears with certain seeds?</li>
-                    <li>If two reasonable hyperparameter choices give opposite conclusions, what should we believe?</li>
-                </ul>
-                <p class="activity-note">Try: Rerun the same model with different random seeds. Discuss the
-                    variance.</p>
-            </div>
-
-            <h2>Discussion Facilitation Tips</h2>
-            <ul>
-                <li><strong>Think-Pair-Share:</strong> Give 2 min to think, 3 min in pairs, then class discussion.</li>
-                <li><strong>Devil's Advocate:</strong> Assign students to argue positions they disagree with.</li>
-                <li><strong>Real Stakes:</strong> Tie abstract questions to real systems (medical AI, hiring tools,
-                    self-driving cars).</li>
-                <li><strong>Discomfort is Learning:</strong> The best discussions happen when there's no clear right
-                    answer.</li>
-                <li><strong>Return to Fundamentals:</strong> Circle back to technical content after abstract
-                    discussion—"How does this change how you'd build a model?"</li>
-            </ul>
 
             <footer>
                 <p><a href="index.html">Back to Module 11</a></p>

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Module 11: Regularization and Hyperparameter Tuning - DATASCI 207">
-    <title>Module 11: Regularization and Hyperparameter Tuning - DATASCI 207</title>
+    <meta name="description" content="Module 11: Network Architecture Design - DATASCI 207">
+    <title>Module 11: Network Architecture Design - DATASCI 207</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,19 +28,19 @@
                 <span>Module 11</span>
             </nav>
 
-            <h1>Module 11: Regularization and Hyperparameter Tuning</h1>
+            <h1>Module 11: Network Architecture Design</h1>
 
-            <p>This module covers techniques to prevent overfitting and optimize model performance. You will learn regularization methods (L1, L2, dropout, early stopping) and systematic approaches to hyperparameter tuning including cross-validation, grid search, and random search.</p>
+            <p>This module is about wiring. Real datasets mix numbers and categories, and a single input stack rarely fits them well. Through a passenger-survival case study you will move from the Sequential API to the Functional API, give each feature its own encoding path (raw, bucketed, one-hot, embedded), merge them into one network, and finish with a model that has more than one output.</p>
 
             <div class="learning-objectives">
 <h3>Learning Objectives</h3>
                 <ul>
-                    <li>Identify overfitting from training and validation curves.</li>
-                    <li>Apply L1 (Lasso) and L2 (Ridge) regularization.</li>
-                    <li>Explain dropout and early stopping for neural networks.</li>
-                    <li>Perform k-fold cross-validation.</li>
-                    <li>Use grid search and random search for hyperparameter tuning.</li>
-                    <li>Build scikit-learn Pipelines for robust workflows.</li>
+                    <li>Establish rule-based baselines before building any network.</li>
+                    <li>Build the same model with the Sequential and Functional APIs and explain when only Functional will do.</li>
+                    <li>Encode numeric features raw or bucketed (Discretization) and justify the choice.</li>
+                    <li>Encode categorical features as one-hot vectors or learned embeddings.</li>
+                    <li>Combine multiple named inputs into one model and read its parameter count.</li>
+                    <li>Add a second output head and train it jointly with per-head losses.</li>
                 </ul>
             </div>
 
@@ -61,7 +61,7 @@
             <section class="seg" data-seg="listen">
               <div class="stype">2 &middot; Listen</div>
               <h2>Orientation audio</h2>
-              <p>Regularization and honest tuning — the module that makes models defensible.</p>
+              <p>Architecture as a design decision — wiring a network around the data you actually have.</p>
               <audio controls preload="none" src="../audio/week_11.m4a"></audio>
               <button class="mark" data-for="listen">Mark complete</button>
             </section>
@@ -70,30 +70,190 @@
               <div class="stype">3 &middot; Read &amp; play</div>
               <h2>The through-line</h2>
               <div class="through">
-<p>Module 1 named the enemy — overfitting — and every module since has walked past
-it. This one arms you. The theme throughout: constrain the model on purpose, and
-choose its settings by evidence instead of taste.</p>
-<p>Regularization adds a penalty for large weights directly into the loss, so the
-model pays for complexity. L2 shrinks weights smoothly toward zero; L1 drives
-some weights exactly to zero, which performs feature selection as a side effect —
-the sparsity difference between the two is derived and then demonstrated. Dropout
-and early stopping apply the same philosophy to networks: randomly silence units
-during training, or quit while validation error is still falling.</p>
-<p>Choosing the penalty strength — or any hyperparameter — with the test set is
-self-deception; that data must stay untouched until the end. Cross-validation is
-the honest instrument: split the training data k ways, rotate which fold
-validates, average. Grid search sweeps combinations exhaustively; random search
-usually finds as good a configuration faster, because most hyperparameters barely
-matter and random sampling explores the ones that do.</p>
-<p>Pipelines close the module as the guardrail that makes all of it trustworthy:
-chain preprocessing and model into one object so scaling is fit inside each
-training fold — never on data the fold will validate on. That subtle leak
-inflates scores silently, and pipelines make it structurally impossible.</p>
-<p>This module is the difference between a model that demos well and one you can
-defend. It is also, not coincidentally, the module interviews draw on most.</p>
+<p>Every network so far was a stack: one input tensor, layers in a line, one
+output. That is the Sequential API, and it is enough — until the data stops
+being one homogeneous block. A passenger manifest mixes ages and fares
+(numbers) with sex and cabin class (categories), and this module&rsquo;s question is
+architectural: how do you wire a network around the data you actually have?</p>
+<p>The Functional API is the answer, and it is a small shift with large
+consequences. Layers become functions you call on tensors, inputs get names,
+and a model is whatever graph you wire from inputs to outputs. Stacks turn out
+to be the special case; branches, merges, and multiple heads come free. And
+plot_model draws the graph you built — the drawing is the design document.</p>
+<p>Different columns deserve different front doors. A number can flow in raw,
+or a Discretization layer can bucket it when its effect is not smooth, so the
+model learns a separate effect per range. Categories become one-hot vectors,
+or embeddings — module 9&rsquo;s idea pointed at any categorical column: a learned
+vector per category, parameters spent so that categories the task treats
+alike can land near each other.</p>
+<p>With each input&rsquo;s path wired, Concatenate merges them into a shared trunk,
+and the trunk can feed more than one head — predict survival and a second
+target, each head with its own loss, trained jointly as a weighted sum. The
+lecture climbs exactly this ladder in five models: one input, bucketed input,
+multiple named inputs, embedded categoricals, multiple outputs.</p>
+<p>The discipline stays the course&rsquo;s. Baselines first — majority class, then a
+one-rule model — because a network that cannot beat one honest rule is
+decoration. And read the parameter count the way you read a bill: every wiring
+choice prices in parameters, and the count tells you what you bought.</p>
               </div>
               <div class="fig">
-  <div class="figlabel">Figure &middot; Pay for complexity</div>
+  <div class="figlabel">Figure &middot; Wire the model</div>
+  <p class="figintro">Four features, one survival model. Choose each feature&rsquo;s front door, then read the wiring and the bill. The trunk is Dense(16); every parameter count is exact.</p>
+  <div class="figrow"><span style="font-size:.88rem;width:3.2rem">age</span>
+    <button class="chip wach on" data-inp="age" data-val="raw">raw number</button>
+    <button class="chip wach" data-inp="age" data-val="buck">5 buckets</button>
+  </div>
+  <div class="figrow"><span style="font-size:.88rem;width:3.2rem">fare</span>
+    <button class="chip wach on" data-inp="fare" data-val="raw">raw number</button>
+    <button class="chip wach" data-inp="fare" data-val="buck">4 buckets</button>
+  </div>
+  <div class="figrow"><span style="font-size:.88rem;width:3.2rem">sex</span>
+    <button class="chip wach on" data-inp="sex" data-val="oh">one-hot (2)</button>
+    <button class="chip wach" data-inp="sex" data-val="emb">embedding (dim 4)</button>
+  </div>
+  <div class="figrow"><span style="font-size:.88rem;width:3.2rem">class</span>
+    <button class="chip wach on" data-inp="cls" data-val="oh">one-hot (3)</button>
+    <button class="chip wach" data-inp="cls" data-val="emb">embedding (dim 4)</button>
+  </div>
+  <div class="figrow">
+    <label><input type="checkbox" id="waaux"> add a second head (predict fare bracket, 3 classes)</label>
+  </div>
+  <canvas id="wacv" class="figcv"></canvas>
+  <div class="figrow"><span class="readout" id="wawidth"></span> <span class="readout" id="watotal"></span></div>
+  <p class="fignote">Nothing here is hidden: every choice reprices the network. Bucketing and one-hot cost width but zero parameters; an embedding buys geometry for its categories at a price you can read; the second head costs 51 parameters and changes what the trunk is asked to learn. The Functional API exists because this diagram is a graph, not a stack — the notebook wires the real thing and trains it. (One wrinkle there: Keras lookup layers reserve an out-of-vocabulary slot, so the notebook&rsquo;s one-hot widths run one wider. Same arithmetic.)</p>
+  <script>
+(function(){
+function cv(id,w,h){var c=document.getElementById(id);c.width=w*2;c.height=h*2;c.style.maxWidth=w+"px";var x=c.getContext("2d");return [c,x,function(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,w,h);x.fillStyle="#fff";x.fillRect(0,0,w,h);}];}
+var state={age:"raw",fare:"raw",sex:"oh",cls:"oh"};
+var SPEC={
+  age:{raw:{w:1,p:0,tag:"raw"},buck:{w:5,p:0,tag:"Discretization(5)"}},
+  fare:{raw:{w:1,p:0,tag:"raw"},buck:{w:4,p:0,tag:"Discretization(4)"}},
+  sex:{oh:{w:2,p:0,tag:"one-hot"},emb:{w:4,p:8,tag:"Embedding 2x4"}},
+  cls:{oh:{w:3,p:0,tag:"one-hot"},emb:{w:4,p:12,tag:"Embedding 3x4"}}
+};
+var NAMES={age:"age",fare:"fare",sex:"sex",cls:"class"};
+var cc=cv("wacv",660,300),ctx=cc[1],clr=cc[2],W=660,H=300;
+function box(x,y,w,h,label,sub,fill,stroke){
+  ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.rect(x,y,w,h);ctx.fill();ctx.stroke();
+  ctx.fillStyle="#1a365d";ctx.font="600 11px Inter,sans-serif";
+  ctx.fillText(label,x+7,y+16);
+  if(sub){ctx.fillStyle="#4a5568";ctx.font="10px Menlo,monospace";ctx.fillText(sub,x+7,y+29);}
+}
+function arrow(x1,y1,x2,y2){
+  ctx.strokeStyle="#a0aec0";ctx.lineWidth=1.3;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+}
+function draw(){
+  var keys=["age","fare","sex","cls"],i,Wc=0,embP=0;
+  for(i=0;i<keys.length;i++){var sp=SPEC[keys[i]][state[keys[i]]];Wc+=sp.w;embP+=sp.p;}
+  var aux=document.getElementById("waaux").checked;
+  var trunkP=(Wc+1)*16,mainP=17,auxP=aux?51:0,total=embP+trunkP+mainP+auxP;
+  clr();
+  var ys=[26,96,166,236];
+  for(i=0;i<keys.length;i++){
+    var k=keys[i],sp=SPEC[k][state[k]];
+    box(14,ys[i],92,38,NAMES[k],"width "+sp.w,"#edf2f7","#cbd5e0");
+    box(150,ys[i],150,38,sp.tag,sp.p>0?sp.p+" params":"0 params","#fff","#cbd5e0");
+    arrow(106,ys[i]+19,150,ys[i]+19);
+    arrow(300,ys[i]+19,346,131+ (Wc>0? (i-1.5)*8 : 0));
+  }
+  var ch=Math.max(30,Wc*7);
+  box(346,150-ch/2,26,ch,"","","#bee3f8","#2b6cb0");
+  ctx.save();ctx.translate(359,150);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle="#1a365d";ctx.font="600 10px Inter,sans-serif";ctx.textAlign="center";
+  ctx.fillText("concat "+Wc,0,3);ctx.restore();ctx.textAlign="left";
+  arrow(372,150,410,150);
+  box(410,131,130,38,"Dense(16) relu",trunkP+" params","#fff","#2b6cb0");
+  if(aux){
+    arrow(540,142,566,96);arrow(540,158,566,204);
+    box(566,78,88,38,"survival","17 params","#fefcbf","#c05621");
+    box(566,186,88,38,"fare bracket","51 params","#fefcbf","#c05621");
+  }else{
+    arrow(540,150,566,150);
+    box(566,131,88,38,"survival","17 params","#fefcbf","#c05621");
+  }
+  document.getElementById("wawidth").textContent="concat width "+Wc;
+  document.getElementById("watotal").textContent="total "+total+" trainable parameters";
+}
+var chips=document.querySelectorAll(".wach");
+for(var i=0;i<chips.length;i++)chips[i].addEventListener("click",function(){
+  var inp=this.dataset.inp;
+  var group=document.querySelectorAll('.wach[data-inp="'+inp+'"]');
+  for(var j=0;j<group.length;j++)group[j].classList.remove("on");
+  this.classList.add("on");state[inp]=this.dataset.val;draw();
+});
+document.getElementById("waaux").addEventListener("change",draw);
+draw();
+})();
+  </script>
+</div>
+              <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
+              <ul>
+                <li><strong>Functional API:</strong> Models as graphs of layers, not stacks</li>
+                <li><strong>Named Inputs:</strong> One Input per feature, matched by name</li>
+                <li><strong>Discretization (Bucketing):</strong> A number becomes a category when its effect is not smooth</li>
+                <li><strong>Embedding (tabular):</strong> A learned vector per category</li>
+                <li><strong>Multi-Output Model:</strong> Several heads, per-head losses, joint training</li>
+                <li><strong>Baseline:</strong> The rule to beat before wiring anything</li>
+            </ul>
+
+              <button class="mark" data-for="read">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="code">
+              <div class="stype">4 &middot; Code</div>
+              <h2>The lecture notebook</h2>
+              <p>Six parts, wired in Keras end to end &mdash; baselines, both APIs,
+              then the five-model ladder. Run every cell; change things and rerun
+              &mdash; the notebook is the lecture.</p>
+              <nav class="module-nav">
+                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_11/lecture.ipynb">Open Lecture in Colab</a>
+                <a href="https://github.com/johnsanterre/datasci-207/blob/main/week_11/lecture.py">View Code on GitHub</a>
+                <a href="README.pdf">Module Summary (PDF)</a>
+              </nav>
+              <p class="medianote">In Colab: File &rarr; Save a copy in Drive keeps your work.</p>
+              <button class="mark" data-for="code">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="practice">
+              <div class="stype">5 &middot; Practice</div>
+              <h2>Exercise</h2>
+              <p>Attempt the exercise before opening the solution &mdash; the attempt is
+              where the learning happens.</p>
+              <nav class="module-nav">
+                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_11/exercises/exercise_01.ipynb">Open Exercise in Colab</a>
+                <a href="exercises/index.html">Exercise page (with solution link)</a>
+              </nav>
+              <button class="mark" data-for="practice">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="check">
+              <div class="stype">6 &middot; Check</div>
+              <h2>Knowledge check</h2>
+              <p>The quiz is self-graded and open-book. If a question surprises you,
+              the corresponding lecture part is the fastest fix.</p>
+              <nav class="module-nav">
+                <a href="quiz.html">Take the Knowledge Check</a>
+              </nav>
+              <button class="mark" data-for="check">Mark complete</button>
+            </section>
+
+            <section class="seg" data-seg="deeper">
+              <div class="stype">7 &middot; Go deeper</div>
+              <h2>Reference and discussion</h2>
+              <nav class="module-nav">
+                <a href="glossary.html">Glossary</a>
+                <a href="readings.html">Additional Readings</a>
+                <a href="discussion.html">Discussion Topics</a>
+              </nav>
+              <p style="margin-top:1rem">One more thing belongs here. In this course, regularization
+              and hyperparameter tuning are not a lecture week — they run as a
+              practice thread through the assignments: learning curves, grid and
+              random search, early stopping, keras-tuner. The dial below is that
+              whole thread in one motion; it pairs with module 1&rsquo;s memorizer.</p>
+              <div class="fig">
+  <div class="figlabel">The tuning thread &middot; Pay for complexity</div>
   <p class="figintro">A degree-9 polynomial on ten noisy points — module 1&rsquo;s memorizer. Now add the L2 penalty: loss + &lambda;&middot;&Sigma;w&sup2;. Slide &lambda; and watch the weights get taxed into line.</p>
   <div class="figrow">
     <label>&lambda; <input type="range" id="w11l" min="0" max="100" step="1" value="0"> <span class="readout" id="w11lv">0</span></label>
@@ -159,63 +319,6 @@ draw();
 })();
   </script>
 </div>
-              <h2 style="font-size:1.05rem;margin-top:1.4rem">Key concepts</h2>
-              <ul>
-                <li><strong>Regularization:</strong> Penalize model complexity</li>
-                <li><strong>L2 (Ridge):</strong> Shrink weights toward zero</li>
-                <li><strong>L1 (Lasso):</strong> Push some weights to exactly zero</li>
-                <li><strong>Cross-Validation:</strong> Robust performance estimation</li>
-                <li><strong>Hyperparameters:</strong> Settings chosen before training</li>
-            </ul>
-
-              <button class="mark" data-for="read">Mark complete</button>
-            </section>
-
-            <section class="seg" data-seg="code">
-              <div class="stype">4 &middot; Code</div>
-              <h2>The lecture notebook</h2>
-              <p>Six parts, from scratch before any framework. Run every cell; change
-              things and rerun &mdash; the notebook is the lecture.</p>
-              <nav class="module-nav">
-                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_11/lecture.ipynb">Open Lecture in Colab</a>
-                <a href="https://github.com/johnsanterre/datasci-207/blob/main/week_11/lecture.py">View Code on GitHub</a>
-                <a href="README.pdf">Module Summary (PDF)</a>
-              </nav>
-              <p class="medianote">In Colab: File &rarr; Save a copy in Drive keeps your work.</p>
-              <button class="mark" data-for="code">Mark complete</button>
-            </section>
-
-            <section class="seg" data-seg="practice">
-              <div class="stype">5 &middot; Practice</div>
-              <h2>Exercise</h2>
-              <p>Attempt the exercise before opening the solution &mdash; the attempt is
-              where the learning happens.</p>
-              <nav class="module-nav">
-                <a href="https://colab.research.google.com/github/johnsanterre/datasci-207/blob/main/week_11/exercises/exercise_01.ipynb">Open Exercise in Colab</a>
-                <a href="exercises/index.html">Exercise page (with solution link)</a>
-              </nav>
-              <button class="mark" data-for="practice">Mark complete</button>
-            </section>
-
-            <section class="seg" data-seg="check">
-              <div class="stype">6 &middot; Check</div>
-              <h2>Knowledge check</h2>
-              <p>The quiz is self-graded and open-book. If a question surprises you,
-              the corresponding lecture part is the fastest fix.</p>
-              <nav class="module-nav">
-                <a href="quiz.html">Take the Knowledge Check</a>
-              </nav>
-              <button class="mark" data-for="check">Mark complete</button>
-            </section>
-
-            <section class="seg" data-seg="deeper">
-              <div class="stype">7 &middot; Go deeper</div>
-              <h2>Reference and discussion</h2>
-              <nav class="module-nav">
-                <a href="glossary.html">Glossary</a>
-                <a href="readings.html">Additional Readings</a>
-                <a href="discussion.html">Discussion Topics</a>
-              </nav>
               <button class="mark" data-for="deeper">Mark complete</button>
             </section>
 
