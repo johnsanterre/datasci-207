@@ -187,23 +187,29 @@ model, different loss, same descent.</p>
       const done=!!state[s]; if(done)n++;
       const el=segEl(s); el.classList.toggle('done',done);
       const b=el.querySelector('button.mark[data-for="'+s+'"]');
-      if(b&&s!=='done'){b.disabled=done;b.textContent=done?'\u2713 Complete':'Mark complete'}
+      if(b&&s!=='done'){b.textContent=done?'\u2713 Complete \u2014 undo':'Mark complete'}
     }
     document.getElementById('pbar').style.width=(n/SEGS.length*100)+'%';
     document.getElementById('pdone').textContent=n;
     const others=SEGS.slice(0,-1).every(s=>state[s]);
     const fin=document.getElementById('finishBtn');
-    if(state.done){fin.disabled=true;fin.textContent='\u2713 Module 2 complete';
+    if(state.done){fin.disabled=false;fin.textContent='\u2713 Module 2 complete \u2014 undo';
       document.getElementById('doneHead').textContent='Module 2 complete';
       document.getElementById('doneMsg').textContent='Done. The next module is linked in the footer.';}
-    else{fin.disabled=!others;
+    else{fin.disabled=!others;fin.textContent='Complete Module 2';
+      document.getElementById('doneHead').textContent='Finish the module';
       document.getElementById('doneMsg').textContent=others?
         'Every stage above is done \u2014 claim it.':'Complete the stages above, then claim the finish here.'}
   }
   document.querySelectorAll('button.mark').forEach(b=>{
-    b.addEventListener('click',()=>{state[b.dataset.for]=true;save();render();
-      if(b.dataset.for==='done'&&window.goatcounter&&window.goatcounter.count){
-        window.goatcounter.count({path:'complete/'+KEY,event:true});}})
+    b.addEventListener('click',()=>{
+      const s=b.dataset.for;
+      state[s]=!state[s];save();render();
+      if(s==='done'&&state.done&&!state._counted){
+        state._counted=true;save();
+        if(window.goatcounter&&window.goatcounter.count){
+          window.goatcounter.count({path:'complete/'+KEY,event:true});}}
+    })
   });
   render();
 })();

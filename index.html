@@ -382,6 +382,28 @@
         // Check authentication on page load
         checkAuth();
     </script>
+
+    <script>
+        // Progress badges: read each module's stage progress (saved by the
+        // week pages in localStorage) and label the cards.
+        (function () {
+            const SEGS = ['watch', 'listen', 'read', 'code', 'practice', 'check', 'deeper', 'done'];
+            document.querySelectorAll('.week-card a[href^="week_"]').forEach(a => {
+                const m = a.getAttribute('href').match(/week_(\d\d)/);
+                if (!m) return;
+                let st = {};
+                try { st = JSON.parse(localStorage.getItem('datasci207-week_' + m[1]) || '{}'); }
+                catch (e) { return; }
+                const n = SEGS.filter(s => st[s]).length;
+                if (!n) return;
+                const badge = document.createElement('span');
+                badge.className = 'progress-badge' + (st.done ? ' complete' : '');
+                badge.textContent = st.done ? '\u2713 complete' : n + ' of 8';
+                const num = a.querySelector('.week-number');
+                if (num) num.appendChild(badge);
+            });
+        })();
+    </script>
 </body>
 
 </html>
