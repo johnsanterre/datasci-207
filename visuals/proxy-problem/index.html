@@ -93,8 +93,8 @@
   var eq, counter, cap, lFeat, lG = [], lTrack, lRef, lNow;
   function setup() {
     eq = V.el("eq", "");
-    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#7fc4b2}\\hat y} = \\sigma(w_0 + w_1 x + w_2 z), \\quad {\\color{#e8836a}\\rho} = \\operatorname{corr}(z, A)") + "</div>" +
-      "<div>" + katex.renderToString("{\\color{#7fc4b2}\\text{gap}} = P(\\hat Y{=}1 \\mid A{=}1) - P(\\hat Y{=}1 \\mid A{=}0)") + "</div>";
+    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#000000}\\hat y} = \\sigma(w_0 + w_1 x + w_2 z), \\quad {\\color{#000000}\\rho} = \\operatorname{corr}(z, A)") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#000000}\\text{gap}} = P(\\hat Y{=}1 \\mid A{=}1) - P(\\hat Y{=}1 \\mid A{=}0)") + "</div>";
     lFeat = V.el("label", "$x$: test score  ·  $z$: ZIP-code feature  ·  $A$: group, not in the model", { left: "72px", top: "318px" });
     counter = V.el("counter", "");
     cap = V.el("caption", "Simulated applicants, with past decisions that held group 0 to a higher bar. As the ZIP-code feature tracks the group, the model rebuilds the gap.");

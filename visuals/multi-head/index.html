@@ -81,8 +81,8 @@
   var eq, counter, cap, lHead, lQ, lK;
   function setup() {
     eq = V.el("eq", "");
-    eq.innerHTML = '<div class="teal">' + katex.renderToString("\\mathrm{head}_{\\textcolor{#e8836a}{i}} = \\mathrm{Attention}(QW_Q^{\\textcolor{#e8836a}{i}},\\, KW_K^{\\textcolor{#e8836a}{i}},\\, VW_V^{\\textcolor{#e8836a}{i}})") + "</div>" +
-      "<div>" + katex.renderToString("\\mathrm{MultiHead} = \\mathrm{Concat}(\\mathrm{head}_1, \\dots, \\mathrm{head}_{\\textcolor{#e8836a}{h}})\\, W_O") + "</div>";
+    eq.innerHTML = '<div class="teal">' + katex.renderToString("\\mathrm{head}_{\\textcolor{#000000}{i}} = \\mathrm{Attention}(QW_Q^{\\textcolor{#000000}{i}},\\, KW_K^{\\textcolor{#000000}{i}},\\, VW_V^{\\textcolor{#000000}{i}})") + "</div>" +
+      "<div>" + katex.renderToString("\\mathrm{MultiHead} = \\mathrm{Concat}(\\mathrm{head}_1, \\dots, \\mathrm{head}_{\\textcolor{#000000}{h}})\\, W_O") + "</div>";
     counter = V.el("counter", "");
     cap = V.el("caption", "These weights are constructed to illustrate, not taken from a trained model. Each head attends to the same sentence in a pattern of its own.");
     lQ = V.el("label", "queries", { left: (BIG.qx - 150) + "px", top: (BIG.y0 - 110) + "px", color: P.teal });

@@ -55,7 +55,7 @@
 
   var eq, counter, cap, L = [];
   function setup() {
-    var D = "\\textcolor{#e8836a}{d}";
+    var D = "\\textcolor{#000000}{d}";
     eq = V.el("eq", "");
     eq.innerHTML = '<div class="amber">' + katex.renderToString("w = \\mathrm{softmax}(q \\cdot k_j)", { trust: true }) + "</div>" +
       '<div class="teal">' + katex.renderToString("w = \\mathrm{softmax}(q \\cdot k_j / \\sqrt{" + D + "})", { trust: true }) + "</div>";

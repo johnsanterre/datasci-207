@@ -59,8 +59,8 @@
   var eq, counter, cap, lIn, lPool;
   function setup() {
     eq = V.el("eq", "");
-    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#7fc4b2}y_{ij}} = \\max_{m,\\,n \\,\\in\\, \\{0,1\\}} {\\color{#d8a65c}x_{2i+m,\\;2j+n}}") + "</div>" +
-      "<div>" + katex.renderToString("{\\color{#d8a65c}x_{i,\\,j}} \\;\\leftarrow\\; {\\color{#d8a65c}x_{i,\\,j-{\\color{#e8836a}\\Delta}}}") + "</div>";
+    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#000000}y_{ij}} = \\max_{m,\\,n \\,\\in\\, \\{0,1\\}} {\\color{#8a8a8a}x_{2i+m,\\;2j+n}}") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#8a8a8a}x_{i,\\,j}} \\;\\leftarrow\\; {\\color{#8a8a8a}x_{i,\\,j-{\\color{#000000}\\Delta}}}") + "</div>";
     counter = V.el("counter", "");
     cap = V.el("caption", "A simulated 8 × 8 feature map shifts right one pixel at a time. A pooled value holds whenever its window’s largest value stays inside the window.");
     lIn = V.el("label", "");

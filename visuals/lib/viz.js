@@ -10,6 +10,50 @@
     form: "#38351f", ink: "#e8e3d4", dim: "#8b887b", hair: "#24302c"
   };
   var W = 1080, H = 1920;
+  var FONT = '"Inter","Helvetica Neue",Arial,sans-serif';
+  // Themes (John, 2026-10-12: "look good but not identical ... a neutral colour and style ...
+  // I tend to like Edward Tufte style"). A theme swaps the values behind the same roles:
+  // teal = the first quantity, amber = the second, coral = the counter's accent.
+  var THEMES = {
+    night:    { },
+    tufte:    { ground: "#fffff8", ink: "#111111", dim: "#6f6c64", hair: "#bdb9ad", form: "#ebe7da",
+                teal: "#1a1a1a", amber: "#8c877b", coral: "#9e2a1e", histFill: 0, rangeFrame: true,
+                font: '"EB Garamond", Georgia, "Times New Roman", serif', fontHref: "family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400" },
+    multiples:{ ground: "#fffff8", ink: "#111111", dim: "#6f6c64", hair: "#bdb9ad", form: "#ebe7da",
+                teal: "#1a1a1a", amber: "#8c877b", coral: "#9e2a1e", histFill: 0, rangeFrame: true, layout: "multiples",
+                font: '"EB Garamond", Georgia, "Times New Roman", serif', fontHref: "family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400" },
+    graphite: { ground: "#f2f0eb", ink: "#22252a", dim: "#75726a", hair: "#c8c4ba", form: "#dedad0",
+                teal: "#2f4a63", amber: "#8f887a", coral: "#2f4a63", histFill: 0.10, rangeFrame: true,
+                font: '"Inter", "Helvetica Neue", Arial, sans-serif', fontHref: "family=Inter:wght@400;500;600;700" },
+    charcoal: { ground: "#181817", ink: "#ecebe7", dim: "#94928c", hair: "#3b3a37", form: "#2a2927",
+                teal: "#ecebe7", amber: "#8a8883", coral: "#c9a46a", histFill: 0.06, rangeFrame: true,
+                font: '"Source Serif 4", Georgia, serif', fontHref: "family=Source+Serif+4:opsz,wght@8..60,400;8..60,600" },
+    print:    { ground: "#ffffff", ink: "#000000", dim: "#5e5e5e", hair: "#b5b5b5", form: "#ededed",
+                teal: "#000000", amber: "#8a8a8a", coral: "#000000", histFill: 0, rangeFrame: true,
+                font: '"Source Serif 4", Georgia, serif', fontHref: "family=Source+Serif+4:opsz,wght@8..60,400;8..60,600" }
+  };
+  var T = {};
+  // The theme is read from the address when this file loads, before any artifact's own
+  // script runs, because artifacts copy colours into variables at load time.
+  var THEME_NAME = (/[?&]theme=([\w-]+)/.exec(location.search) || [])[1] || "print";
+  (function () {
+    var t = THEMES[THEME_NAME] || {};
+    ["ground", "ink", "dim", "hair", "form", "teal", "amber", "coral"].forEach(function (k) { if (t[k]) P[k] = t[k]; });
+    if (t.font) FONT = t.font;
+  })();
+  function applyTheme(name) {
+    T = THEMES[name] || {}; T.name = THEMES[name] ? name : "night";
+    ["ground", "ink", "dim", "hair", "form", "teal", "amber", "coral"].forEach(function (k) { if (T[k]) P[k] = T[k]; });
+    var st = document.getElementById("stage");
+    ["ground", "ink", "dim", "hair", "form", "teal", "amber", "coral"].forEach(function (k) { if (T[k]) st.style.setProperty("--" + k, T[k]); });
+    if (T.font) { FONT = T.font; st.style.setProperty("--font", T.font); }
+    if (T.fontHref && !document.getElementById("viz-font")) {
+      var l = document.createElement("link"); l.id = "viz-font"; l.rel = "stylesheet";
+      l.href = "https://fonts.googleapis.com/css2?" + T.fontHref + "&display=block"; document.head.appendChild(l);
+    }
+    if (T.ground) document.body.style.background = T.ground;
+    window.VIZ.T = T;
+  }
 
   function rgba(hex, a) {
     var n = parseInt(hex.slice(1), 16);
@@ -59,7 +103,7 @@
   }
   function text(ctx, s, x, y, color, size, align, weight) {
     ctx.save(); ctx.fillStyle = color || P.dim; ctx.textAlign = align || "left";
-    ctx.font = (weight || 500) + " " + (size || 28) + 'px "Inter","Helvetica Neue",Arial,sans-serif';
+    ctx.font = (weight || 500) + " " + (size || 28) + "px " + FONT;
     ctx.fillText(s, x, y); ctx.restore();
   }
 
@@ -85,6 +129,8 @@
 
   function run(A) {
     var stage = document.getElementById("stage");
+    var tm = /[?&]theme=([\w-]+)/.exec(location.search);
+    applyTheme(THEME_NAME);   // John, 2026-10-12: "let's standardize to print, white background"
     var cv = document.createElement("canvas"); cv.width = W; cv.height = H; stage.insertBefore(cv, stage.firstChild);
     var ctx = cv.getContext("2d");
     var mark = el("mark"); mark.innerHTML = "<b>" + (A.mark || "MSAI") + "</b>" + (A.course || "");   // A.mark: another course's wordmark
@@ -105,11 +151,11 @@
     var hold = /[?&]t=([\d.]+)/.exec(location.search);
     if (hold) { frame(+hold[1]); return; }
     if (reduce) { frame(A.poster === undefined ? A.duration * 0.8 : A.poster); return; }
-    (function loop(now) { frame(((now - t0) / 1000) % A.duration); requestAnimationFrame(loop); })(t0);
+    (function loop(now) { frame((Math.max(0, now - t0) / 1000) % A.duration); requestAnimationFrame(loop); })(t0);   // the first frame can arrive a hair before t0
   }
 
   window.VIZ = { P: P, W: W, H: H, rgba: rgba, clamp: clamp, lerp: lerp, ease: ease, span: span, rng: rng, normal: normal,
-    line: line, dot: dot, ring: ring, path: path, form: form, text: text, tex: tex, el: el, fade: fade, run: run };
+    line: line, dot: dot, ring: ring, path: path, form: form, text: text, tex: tex, el: el, fade: fade, run: run, THEMES: THEMES, T: T };
 })();
 
 /* Added 2026-10-12 (207 module 8: dendrogram, choosing-k). VIZ.hulls(ctx,

@@ -69,8 +69,8 @@
   function setup() {
     eq = V.el("eq", "");
     eq.innerHTML = "<div>" + katex.renderToString(
-        "\\displaystyle\\max\\; \\frac{1}{T}\\sum_{t=1}^{T}\\; \\sum_{-{\\color{#e8836a}c}\\,\\le j\\le {\\color{#e8836a}c},\\; j\\ne 0}" +
-        "\\log p\\big({\\color{#d8a65c}w_{t+j}} \\mid {\\color{#7fc4b2}w_t}\\big)") + "</div>";
+        "\\displaystyle\\max\\; \\frac{1}{T}\\sum_{t=1}^{T}\\; \\sum_{-{\\color{#000000}c}\\,\\le j\\le {\\color{#000000}c},\\; j\\ne 0}" +
+        "\\log p\\big({\\color{#8a8a8a}w_{t+j}} \\mid {\\color{#000000}w_t}\\big)") + "</div>";
     counter = V.el("counter", "");
     lab = V.el("label", "", { left: "72px", top: (LIST_Y - 112) + "px" });
     cap = V.el("caption", "Each word in turn is the centre. Every word within c positions of it makes a (centre, context) pair, and each pair is one training example.");

@@ -57,9 +57,9 @@
   function setup() {
     eq = V.el("eq", "");
     eq.innerHTML = "<div>" + katex.renderToString(
-        "{\\color{#d8a65c}\\text{TF-IDF}(t,d)} = {\\color{#7fc4b2}\\text{TF}(t,d)} \\times \\text{IDF}(t)") + "</div>" +
+        "{\\color{#8a8a8a}\\text{TF-IDF}(t,d)} = {\\color{#000000}\\text{TF}(t,d)} \\times \\text{IDF}(t)") + "</div>" +
       "<div>" + katex.renderToString(
-        "\\text{IDF}(t) = \\log\\big(N \\,/\\, {\\color{#e8836a}\\text{DF}(t)}\\big), \\quad N = " + N) + "</div>";
+        "\\text{IDF}(t) = \\log\\big(N \\,/\\, {\\color{#000000}\\text{DF}(t)}\\big), \\quad N = " + N) + "</div>";
     counter = V.el("counter", "");
     cap = V.el("caption", "The module's three example documents. “the” is in all three, so its IDF is log(3/3) = 0 and its bars vanish. Words found in one document now carry the most weight.");
   }

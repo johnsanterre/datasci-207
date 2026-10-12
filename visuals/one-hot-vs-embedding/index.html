@@ -60,9 +60,9 @@
     eq = V.el("eq", "");
     eq.innerHTML =
       '<div class="teal">' + katex.renderToString(
-        "\\text{one-hot: }\\big(({\\color{#e8836a}K} + 1) + 1\\big) \\times 16") + "</div>" +
+        "\\text{one-hot: }\\big(({\\color{#000000}K} + 1) + 1\\big) \\times 16") + "</div>" +
       '<div class="amber">' + katex.renderToString(
-        "\\text{embedding: }({\\color{#e8836a}K} + 1) \\times 4 \\;+\\; (4 + 1) \\times 16") + "</div>";
+        "\\text{embedding: }({\\color{#000000}K} + 1) \\times 4 \\;+\\; (4 + 1) \\times 16") + "</div>";
     counter = V.el("counter", "");
     cap = V.el("caption", "Drawn to one scale. One-hot hands Dense(16) one input per level; the embedding hands it 4 numbers and keeps K + 1 rows in its table.");
   }

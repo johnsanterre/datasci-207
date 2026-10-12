@@ -50,7 +50,7 @@
 
   var eq, counter, cap, lTop, lBot, lPat, lGhost;
   function setup() {
-    var POS = "\\textcolor{#e8836a}{pos}";
+    var POS = "\\textcolor{#000000}{pos}";
     eq = V.el("eq", "");
     eq.innerHTML = '<div class="teal">' + katex.renderToString("PE(" + POS + ", 2i) = \\sin\\!\\left(" + POS + " / 10000^{2i/d}\\right)") + "</div>" +
       '<div class="amber">' + katex.renderToString("PE(" + POS + ", 2i{+}1) = \\cos\\!\\left(" + POS + " / 10000^{2i/d}\\right)") + "</div>";

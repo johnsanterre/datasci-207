@@ -102,8 +102,8 @@
   function setup() {
     eq = V.el("eq", "");
     eq.innerHTML = "<div>" + katex.renderToString(
-      "{\\color{#7fc4b2}r_{\\color{#e8836a}\\ell}} = {\\color{#7fc4b2}r_{{\\color{#e8836a}\\ell}-1}} + ({\\color{#d8a65c}k_{\\color{#e8836a}\\ell}} - 1)\\textstyle\\prod_{i<{\\color{#e8836a}\\ell}} s_i") + "</div>" +
-      "<div>" + katex.renderToString("{\\color{#7fc4b2}r_0} = 1, \\quad {\\color{#d8a65c}k} = \\text{window}, \\quad s = \\text{stride}") + "</div>";
+      "{\\color{#000000}r_{\\color{#000000}\\ell}} = {\\color{#000000}r_{{\\color{#000000}\\ell}-1}} + ({\\color{#8a8a8a}k_{\\color{#000000}\\ell}} - 1)\\textstyle\\prod_{i<{\\color{#000000}\\ell}} s_i") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#000000}r_0} = 1, \\quad {\\color{#8a8a8a}k} = \\text{window}, \\quad s = \\text{stride}") + "</div>";
     counter = V.el("counter", "");
     rl = V.el("label", "", { color: P.teal, fontSize: "36px" });
     caps.push(V.el("caption", "Four 3 × 3 convolutions with stride 1. Each layer adds one pixel on every side of what the top unit sees."));
