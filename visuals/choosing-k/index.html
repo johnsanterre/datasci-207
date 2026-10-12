@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Choosing k</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, choosing k. Ninety simulated points (seeded) built with the module
+   notebook's recipe: three groups of 30, unit spread, centred at (0, 0),
+   (5, 5) and (5, 0). For k = 1 to 8 the page runs k-means (k-means++ starts,
+   ten runs, the lowest inertia kept, as KMeans(n_init=10) does), redraws the
+   clustering, and adds a point to two curves: the inertia J (teal), the
+   elbow method, and the mean silhouette score (amber). It ends back on k = 3,
+   the number of groups the data was built with. */
+(function () {
+  var V = VIZ, P = V.P;
+  var S = 56, CX = 540, CY = 690, MX = 2.5, MY = 2.5;     // scatter: pixels per unit, the data's centre on stage
+  var PB = 1372, PH = 230, LX0 = 120, LX1 = 480, RX0 = 600, RX1 = 960, KMAX = 8;
+  var PAD = 14;
+
+  // the notebook's recipe, on the seeded generator
+  var r = V.rng(8207), X = [];
+  [[0, 0], [5, 5], [5, 0]].forEach(function (c) { for (var i = 0; i < 30; i++) X.push([c[0] + V.normal(r), c[1] + V.normal(r)]); });
+  var N = X.length;
+  function d2(p, q) { return (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); }
+
+  function kmeansOnce(k, rr) {
+    var C = [X[Math.floor(rr() * N)].slice()];               // k-means++ starts
+    while (C.length < k) {
+      var D = X.map(function (p) { return Math.min.apply(null, C.map(function (c) { return d2(p, c); })); });
+      var tot = D.reduce(function (a, b) { return a + b; }, 0), u = rr() * tot, i = 0;
+      while (i < N - 1 && (u -= D[i]) > 0) i++;
+      C.push(X[i].slice());
+    }
+    var lab = new Array(N).fill(-1);
+    for (var it = 0; it < 100; it++) {
+      var moved = false;
+      X.forEach(function (p, i) {
+        var b = 0; for (var j = 1; j < k; j++) if (d2(p, C[j]) < d2(p, C[b])) b = j;
+        if (lab[i] !== b) { lab[i] = b; moved = true; }
+      });
+      C = C.map(function (c, j) {
+        var sx = 0, sy = 0, n = 0; X.forEach(function (p, i) { if (lab[i] === j) { sx += p[0]; sy += p[1]; n++; } });
+        return n ? [sx / n, sy / n] : c;
+      });
+      if (!moved) break;
+    }
+    var J = 0; X.forEach(function (p, i) { J += d2(p, C[lab[i]]); });
+    return { C: C, lab: lab, J: J };
+  }
+  function silhouette(lab, k) {                             // mean of s(i) = (b - a) / max(a, b)
+    var s = 0;
+    X.forEach(function (p, i) {
+      var sum = new Array(k).fill(0), cnt = new Array(k).fill(0);
+      X.forEach(function (q, j) { if (j !== i) { sum[lab[j]] += Math.sqrt(d2(p, q)); cnt[lab[j]]++; } });
+      if (!cnt[lab[i]]) return;                              // a lone point scores 0, as in scikit-learn
+      var a = sum[lab[i]] / cnt[lab[i]], b = Infinity;
+      for (var c = 0; c < k; c++) if (c !== lab[i] && cnt[c]) b = Math.min(b, sum[c] / cnt[c]);
+      s += (b - a) / Math.max(a, b);
+    });
+    return s / N;
+  }
+  var FIT = [null];
+  for (var k = 1; k <= KMAX; k++) {
+    var rr = V.rng(500 + k), best = null;
+    for (var rep = 0; rep < 10; rep++) { var f = kmeansOnce(k, rr); if (!best || f.J < best.J) best = f; }
+    best.sil = k > 1 ? silhouette(best.lab, k) : null;
+    FIT.push(best);
+  }
+  var J1 = FIT[1].J, SILBEST = 2;
+  for (var k2 = 2; k2 <= KMAX; k2++) if (FIT[k2].sil > FIT[SILBEST].sil) SILBEST = k2;
+
+  function sx(p) { return CX + S * (p[0] - MX); }
+  function sy(p) { return CY - S * (p[1] - MY); }
+  function lx(k) { return LX0 + (LX1 - LX0) * (k - 1) / (KMAX - 1); }
+  function rx(k) { return RX0 + (RX1 - RX0) * (k - 1) / (KMAX - 1); }
+  function jy(J) { return PB - PH * J / J1; }
+  function syl(s) { return PB - PH * s; }
+
+  // timeline: k = 1, 2, 3 slowly, then faster to 8, then back to 3 and hold
+  var PD = [2.6, 2.6, 2.6, 1.8, 1.8, 1.8, 1.8, 1.8], PS = [], tt = 0;
+  PD.forEach(function (d) { PS.push(tt); tt += d; });
+  var T_BACK = tt, T_HOLD = tt + 1.0, DUR = tt + 4.2, KFINAL = 3;
+
+  // one clustering: the cluster forms, each point's line to its centroid, the centroids
+  function drawFit(ctx, F, k, a) {
+    if (a <= 0.01) return;
+    var groups = [];
+    for (var j = 0; j < k; j++) groups.push(X.filter(function (_, i) { return F.lab[i] === j; }).map(function (p) { return [sx(p), sy(p)]; }));
+    V.hulls(ctx, groups, PAD, a);
+    X.forEach(function (p, i) { var c = F.C[F.lab[i]]; V.line(ctx, sx(p), sy(p), sx(c), sy(c), V.rgba(P.teal, 0.45 * a), 1.5); });
+  }
+  function drawCentroids(ctx, F, k, a) {
+    if (a <= 0.01) return;
+    for (var j = 0; j < k; j++) { V.ring(ctx, sx(F.C[j]), sy(F.C[j]), 13, V.rgba(P.teal, a), 3); V.dot(ctx, sx(F.C[j]), sy(F.C[j]), V.rgba(P.teal, a), 5); }
+  }
+
+  var eq, counter, cap, lJ, lS;
+  function setup() {
+    var T = "\\textcolor{" + P.teal + "}", A = "\\textcolor{" + P.amber + "}", C = "\\textcolor{" + P.coral + "}";
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString(T + "{J = \\textstyle\\sum_{j=1}^{" + C + "{k}} \\sum_{x \\in C_j} \\lVert x - \\mu_j \\rVert^2}") + "</div>" +
+      "<div>" + katex.renderToString(A + "{s(i) = \\big(b(i) - a(i)\\big) \\,/\\, \\max\\big(a(i),\\, b(i)\\big)}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "");
+    lJ = V.el("label", "inertia $J$", { left: LX0 + "px", top: (PB - PH - 92) + "px" });
+    lS = V.el("label", "silhouette", { left: RX0 + "px", top: (PB - PH - 92) + "px" });
+  }
+
+  function render(t, ctx) {
+    var k, kPrev, m, grow;                                     // m: crossfade to the new clustering, grow: the new curve segment
+    if (t < T_BACK) {
+      var i = 0; while (i < PD.length - 1 && t >= PS[i + 1]) i++;
+      k = i + 1; kPrev = Math.max(1, k - 1);
+      m = k === 1 ? V.span(t, 0, 0.8) : V.span(t, PS[i], PS[i] + 0.5);
+      grow = k === 1 ? 1 : V.span(t, PS[i] + 0.15, PS[i] + 0.75);
+    } else { k = KFINAL; kPrev = KMAX; m = V.span(t, T_BACK, T_HOLD); grow = 1; }
+    var kDraw = t < T_BACK ? k : KMAX;                         // how much of the curves exists
+    var kShow = m > 0.5 ? k : kPrev;                           // which clustering's numbers are on screen
+
+    // the clustering, crossfading from the previous k
+    if (t < 0.8) { ctx.save(); ctx.globalAlpha = m; drawFit(ctx, FIT[1], 1, 1); ctx.restore(); }
+    else { drawFit(ctx, FIT[kPrev], kPrev, 1 - m); drawFit(ctx, FIT[k], k, m); }
+    X.forEach(function (p) { V.dot(ctx, sx(p), sy(p), V.rgba(P.ink, 0.85 * (t < 0.8 ? m : 1)), 5); });
+    if (t < 0.8) drawCentroids(ctx, FIT[1], 1, m);
+    else { drawCentroids(ctx, FIT[kPrev], kPrev, 1 - m); drawCentroids(ctx, FIT[k], k, m); }
+
+    // the two curves, built one k at a time
+    V.line(ctx, LX0, PB, LX1, PB, P.hair, 2); V.line(ctx, RX0, PB, RX1, PB, P.hair, 2);
+    var jp = [], sp = [];
+    for (var q = 1; q <= kDraw; q++) {
+      var pj = [lx(q), jy(FIT[q].J)];
+      if (q === kDraw && q > 1 && grow < 1) pj = [V.lerp(lx(q - 1), lx(q), grow), V.lerp(jy(FIT[q - 1].J), jy(FIT[q].J), grow)];
+      jp.push(pj);
+      if (q >= 2) {
+        var ps = [rx(q), syl(FIT[q].sil)];
+        if (q === kDraw && q > 2 && grow < 1) ps = [V.lerp(rx(q - 1), rx(q), grow), V.lerp(syl(FIT[q - 1].sil), syl(FIT[q].sil), grow)];
+        sp.push(ps);
+      }
+    }
+    ctx.save(); ctx.globalAlpha = t < 0.8 ? m : 1;
+    if (jp.length > 1) V.path(ctx, jp, P.teal, 3);
+    if (sp.length > 1) V.path(ctx, sp, P.amber, 3);
+    jp.forEach(function (p, idx) { V.dot(ctx, p[0], p[1], P.teal, idx + 1 === kShow ? 9 : 5); });
+    sp.forEach(function (p, idx) { V.dot(ctx, p[0], p[1], P.amber, idx + 2 === kShow ? 9 : 5); });
+    ctx.restore();
+    if (t >= T_BACK) {
+      var a = V.span(t, T_BACK + 0.4, T_HOLD + 0.3);
+      ctx.save(); ctx.globalAlpha = a;
+      V.ring(ctx, lx(KFINAL), jy(FIT[KFINAL].J), 20, P.teal, 2);
+      V.ring(ctx, rx(SILBEST), syl(FIT[SILBEST].sil), 20, P.amber, 2);
+      ctx.restore();
+    }
+
+    // the numbers for the k on screen
+    var ya = PB - PH - 20;
+    V.text(ctx, FIT[kShow].J.toFixed(1), LX0, ya, P.teal, 36, "left", 600);
+    if (kShow > 1) V.text(ctx, FIT[kShow].sil.toFixed(2), RX0, ya, P.amber, 36, "left", 600);
+    else V.text(ctx, "needs k ≥ 2", RX0, ya, P.dim, 28);
+
+    V.tex(counter, "$k = " + kShow + "$");
+    V.tex(cap, "Ninety simulated points in three groups, built as in the module notebook. $J$ falls with every $k$, " +
+      (SILBEST === 3 ? "but the drop flattens after $k = 3$, and the silhouette peaks there." : "and the drop flattens after $k = 3$."));
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Choosing k", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

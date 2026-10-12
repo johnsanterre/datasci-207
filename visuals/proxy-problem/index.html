@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The proxy problem</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 12, fairness and responsible AI, "The Proxy Problem": even without
+   protected attributes as features, models can learn to predict them from
+   proxies such as ZIP code. Everything here is simulated with the seeded
+   generator (seed 207), on the shape of the module's lecture.py hiring
+   scenario: 1,000 applicants, group A = 0 with probability 0.3, qualification
+   q ~ N(0, 1), and past decisions made with the lecture's biased thresholds
+   (q > 0.5 for group 0, q > 0.0 for group 1). The model sees a noisy test
+   score x = q + 0.5 e and a ZIP-code feature z whose sample correlation with
+   A is exactly rho (z = rho * a + sqrt(1 - rho^2) * u, with u made orthogonal
+   to a, both standardized). It never sees A. A logistic regression is fitted
+   to the past decisions by Newton's method, and the top K applicants by score
+   are selected, K being the number the past decisions selected. The gap is
+   the difference in selection rates, P(Y^=1 | A=1) - P(Y^=1 | A=0), the
+   module's demographic parity comparison. The amber line is the same model
+   fitted with A as a feature. Every number on screen is computed below. */
+(function () {
+  var V = VIZ, P = V.P;
+  var N = 1000, RHOS = [0, 0.3, 0.6, 0.9];
+  var r = V.rng(207), A = [], q = [], x = [], u = [], h = [], jit = [];
+  for (var i = 0; i < N; i++) {
+    A.push(r() < 0.7 ? 1 : 0); q.push(V.normal(r)); x.push(q[i] + 0.5 * V.normal(r)); u.push(V.normal(r));
+    h.push(q[i] > (A[i] ? 0 : 0.5) ? 1 : 0);
+  }
+  for (var i0 = 0; i0 < N; i0++) jit.push(r());
+  function mean(v) { return v.reduce(function (s, a) { return s + a; }, 0) / v.length; }
+  var ma = mean(A), sa = Math.sqrt(mean(A.map(function (a) { return (a - ma) * (a - ma); })));
+  var as = A.map(function (a) { return (a - ma) / sa; });
+  var mu = mean(u); u = u.map(function (v) { return v - mu; });
+  var cu = mean(u.map(function (v, k) { return v * as[k]; })); u = u.map(function (v, k) { return v - cu * as[k]; });
+  var su = Math.sqrt(mean(u.map(function (v) { return v * v; }))); u = u.map(function (v) { return v / su; });
+  var K = h.reduce(function (s, a) { return s + a; }, 0);
+  var N0 = A.filter(function (a) { return a === 0; }).length, N1 = N - N0;
+
+  function logistic(X) {          // Newton's method on the past decisions h
+    var p = X[0].length, w = new Array(p).fill(0);
+    for (var it = 0; it < 30; it++) {
+      var g = new Array(p).fill(0), H = [];
+      for (var a = 0; a < p; a++) H.push(new Array(p + 1).fill(0));
+      for (var n = 0; n < N; n++) {
+        var s = 0; for (var a2 = 0; a2 < p; a2++) s += w[a2] * X[n][a2];
+        var m = 1 / (1 + Math.exp(-s));
+        for (var a3 = 0; a3 < p; a3++) { g[a3] += (h[n] - m) * X[n][a3]; for (var b = 0; b < p; b++) H[a3][b] += m * (1 - m) * X[n][a3] * X[n][b]; }
+      }
+      for (var a4 = 0; a4 < p; a4++) H[a4][p] = g[a4];
+      for (var c = 0; c < p; c++) for (var rr = 0; rr < p; rr++) if (rr !== c) {
+        var f = H[rr][c] / H[c][c]; for (var k = c; k <= p; k++) H[rr][k] -= f * H[c][k];
+      }
+      for (var a5 = 0; a5 < p; a5++) w[a5] += H[a5][p] / H[a5][a5];
+    }
+    return w;
+  }
+  function model(feat) {
+    var X = []; for (var n = 0; n < N; n++) X.push(feat(n));
+    var w = logistic(X), s = X.map(function (f) { return f.reduce(function (t, v, j) { return t + v * w[j]; }, 0); });
+    var ms = mean(s), sd = Math.sqrt(mean(s.map(function (v) { return (v - ms) * (v - ms); })));
+    var z = s.map(function (v) { return (v - ms) / sd; });
+    var order = z.map(function (v, k) { return k; }).sort(function (a, b) { return z[b] - z[a]; });
+    var sel = new Array(N).fill(0); for (var k2 = 0; k2 < K; k2++) sel[order[k2]] = 1;
+    var s0 = 0, s1 = 0; for (var n2 = 0; n2 < N; n2++) { if (A[n2]) s1 += sel[n2]; else s0 += sel[n2]; }
+    var cut = (z[order[K - 1]] + z[order[K]]) / 2;
+    return { z: z, sel: sel, r0: s0 / N0, r1: s1 / N1, gap: s1 / N1 - s0 / N0, cut: cut };
+  }
+  var WITH_A = model(function (n) { return [1, x[n], A[n]]; });
+  var M = RHOS.map(function (rho) { return model(function (n) { return [1, x[n], rho * as[n] + Math.sqrt(1 - rho * rho) * u[n]]; }); });
+  function pts(v) { return (100 * v).toFixed(1); }
+  function gapPts(m) { return ((Math.round(1000 * m.r1) - Math.round(1000 * m.r0)) / 10).toFixed(1); }   // matches the rates as shown
+
+  // layout
+  var SX0 = 110, SX1 = 970;                           // score axis for the strips
+  function sx(z) { return V.clamp(540 + 150 * z, SX0, SX1); }
+  var BANDS = [{ y: 560, hh: 70 }, { y: 820, hh: 110 }];   // group 0, group 1
+  var TB = 1330, TT = 1100, TX0 = 150, TX1 = 850, GMAX = 0.25;  // the gap tracker
+  function ty(g) { return TB - (TB - TT) * V.clamp(g, 0, GMAX) / GMAX; }
+  function tx(rho) { return TX0 + (TX1 - TX0) * rho; }
+
+  // timing: state k holds rho = RHOS[k]; each move glides the dots, then drops the tracker point
+  var T = [0, 4.4, 8.6, 12.6], GL = 1.4, DUR = 17.4;
+  function where(t) { var k = 0; for (var i = 1; i < T.length; i++) if (t >= T[i]) k = i; return { k: k, g: k === 0 ? 1 : V.span(t, T[k], T[k] + GL) }; }
+  function pointAt(k) { return (k === 0 ? 1.2 : T[k] + GL) ; }
+
+  var eq, counter, cap, lFeat, lG = [], lTrack, lRef, lNow;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#7fc4b2}\\hat y} = \\sigma(w_0 + w_1 x + w_2 z), \\quad {\\color{#e8836a}\\rho} = \\operatorname{corr}(z, A)") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#7fc4b2}\\text{gap}} = P(\\hat Y{=}1 \\mid A{=}1) - P(\\hat Y{=}1 \\mid A{=}0)") + "</div>";
+    lFeat = V.el("label", "$x$: test score  ·  $z$: ZIP-code feature  ·  $A$: group, not in the model", { left: "72px", top: "318px" });
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Simulated applicants, with past decisions that held group 0 to a higher bar. As the ZIP-code feature tracks the group, the model rebuilds the gap.");
+    lG.push(V.el("label", "")); lG.push(V.el("label", ""));
+    lTrack = V.el("label", "gap in selection rate", { left: TX0 + "px", top: (TT - 78) + "px" });
+    lRef = V.el("label", "", { color: P.amber });
+    lNow = V.el("label", "", { color: P.teal });
+  }
+  function place(d, x, y, align) {
+    d.style.left = (align === "right" ? x - d.offsetWidth : align === "center" ? x - d.offsetWidth / 2 : x) + "px";
+    d.style.top = (y - d.offsetHeight / 2) + "px";
+  }
+
+  function render(t, ctx) {
+    var w = where(t), k = w.k, g = w.g, cur = M[k], prev = M[Math.max(0, k - 1)];
+    var intro = V.span(t, 0, 0.6);
+
+    // the strips: one dot per applicant, placed by model score; teal if selected
+    ctx.save(); ctx.globalAlpha = intro;
+    for (var n = 0; n < N; n++) {
+      var B = BANDS[A[n] === 0 ? 0 : 1];
+      var X = V.lerp(sx(prev.z[n]), sx(cur.z[n]), g), Y = B.y - B.hh + 2 * B.hh * jit[n];
+      var sel = g < 0.5 ? prev.sel[n] : cur.sel[n];
+      V.dot(ctx, X, Y, sel ? V.rgba(P.teal, 0.85) : V.rgba(P.dim, 0.3), 5);
+    }
+    var cx = V.lerp(sx(prev.cut), sx(cur.cut), g);
+    BANDS.forEach(function (B) { V.line(ctx, cx, B.y - B.hh - 8, cx, B.y + B.hh + 8, V.rgba(P.teal, 0.6), 2, [8, 8]); });
+    ctx.restore();
+    var shown = g < 0.5 ? prev : cur;
+    V.tex(lG[0], "group 0, " + N0 + " people: " + pts(shown.r0) + "% selected");
+    V.tex(lG[1], "group 1, " + N1 + " people: " + pts(shown.r1) + "% selected");
+    place(lG[0], SX0, BANDS[0].y - BANDS[0].hh - 30); place(lG[1], SX0, BANDS[1].y - BANDS[1].hh - 30);
+    V.fade(lG[0], intro); V.fade(lG[1], intro);
+
+    // the tracker: amber for the model that sees A, teal points for the model without it
+    V.line(ctx, TX0, TB, TX1 + 60, TB, P.hair, 2);
+    var ra = V.span(t, 0.4, 1.2), ry = ty(WITH_A.gap);
+    V.path(ctx, [[TX0, ry], [TX1 + 60, ry]], V.rgba(P.amber, 0.8), 2, ra, [8, 8]);
+    V.tex(lRef, "with $A$ in the model: " + gapPts(WITH_A) + " points");
+    place(lRef, TX1 + 60, ry - 30, "right"); V.fade(lRef, ra);
+    V.fade(lTrack, intro);
+    var line = [], last = -1;
+    for (var j = 0; j < RHOS.length; j++) {
+      var a = V.span(t, pointAt(j), pointAt(j) + 0.4);
+      if (a <= 0) break;
+      var p = [tx(RHOS[j]), V.lerp(TB, ty(M[j].gap), a)];
+      line.push(p); last = j;
+    }
+    if (line.length > 1) V.path(ctx, line, P.teal, 3);
+    line.forEach(function (p) { V.dot(ctx, p[0], p[1], P.teal, 8); });
+    if (last >= 0) {
+      V.tex(lNow, "without $A$: " + gapPts(M[last]) + " points");
+      place(lNow, TX0, TB + 36);
+      V.fade(lNow, V.span(t, pointAt(last), pointAt(last) + 0.4));
+    } else V.fade(lNow, 0);
+
+    V.tex(counter, "$\\rho = " + RHOS[k].toFixed(1) + "$");
+    V.fade(counter, intro);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.2, setup: setup, render: render,
+            title: "The proxy problem", mark: "DATASCI 207", course: "module 12" });
+})();
+</script>
+</body></html>

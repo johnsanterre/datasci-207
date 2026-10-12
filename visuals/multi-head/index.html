@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multi-head attention</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 13, multi-head attention: head_i = Attention(Q W_Q^i, K W_K^i, V W_V^i),
+   MultiHead = Concat(head_1, ..., head_h) W_O. The sentence is the notes'
+   example, "The cat sat on the mat". Four heads are shown one at a time, then
+   side by side. Each head's weights are CONSTRUCTED to illustrate a pattern
+   (the previous word, the subject, the same word, the next word): a softmax
+   over scores that are 3 for the word the head looks at and 0 elsewhere.
+   They are not taken from a trained model, and the caption says so. */
+(function () {
+  var V = VIZ, P = V.P;
+  var TOK = ["The", "cat", "sat", "on", "the", "mat"], N = TOK.length;
+  var HEADS = [
+    { name: "the previous word", target: function (i) { return Math.max(0, i - 1); } },
+    { name: "the subject", target: function () { return 1; } },
+    { name: "the same word", target: function (i) { return i; } },
+    { name: "the next word", target: function (i) { return Math.min(N - 1, i + 1); } }
+  ];
+  // the constructed weights: softmax of 3 at the target, 0 elsewhere
+  HEADS.forEach(function (h) {
+    h.w = [];
+    for (var i = 0; i < N; i++) {
+      var e = [], z = 0;
+      for (var j = 0; j < N; j++) { var v = Math.exp(j === h.target(i) ? 3 : 0); e.push(v); z += v; }
+      h.w.push(e.map(function (v) { return v / z; }));
+    }
+  });
+
+  var INTRO = 1.2, PH = 3.4, MOVE = 1.6, HOLD = 3.4;
+  var T_ALL = INTRO + PH * HEADS.length, DUR = T_ALL + MOVE + HOLD;
+
+  // a diagram's geometry: query dots at qx, key dots at kx, rows from y0 every dy, words at size fs
+  var BIG = { qx: 330, kx: 750, y0: 500, dy: 150, fs: 36 };
+  var CELL_W = 450, CELL_H = 470;
+  var CELLS = [[72, 420], [558, 420], [72, 930], [558, 930]].map(function (c) {
+    return { cx: c[0], cy: c[1], qx: c[0] + 105, kx: c[0] + 345, y0: c[1] + 92, dy: 68, fs: 25 };
+  });
+  function mix(a, b, u) {
+    return { qx: V.lerp(a.qx, b.qx, u), kx: V.lerp(a.kx, b.kx, u), y0: V.lerp(a.y0, b.y0, u),
+             dy: V.lerp(a.dy, b.dy, u), fs: V.lerp(a.fs, b.fs, u) };
+  }
+
+  function curve(ctx, x1, y1, x2, y2, col, w) {
+    var c = (x2 - x1) * 0.45;
+    ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.bezierCurveTo(x1 + c, y1, x2 - c, y2, x2, y2); ctx.stroke(); ctx.restore();
+  }
+
+  // one head's diagram; rows[i] in [0, 1] is how far query i's lines have grown in
+  function diagram(ctx, g, head, alpha, rows, wordAlpha) {
+    var wa = wordAlpha === undefined ? 1 : wordAlpha;
+    if (alpha <= 0.01) return;
+    ctx.save(); ctx.globalAlpha = alpha;
+    var r = Math.max(4, g.fs * 0.2);
+    for (var i = 0; i < N; i++) {
+      var yi = g.y0 + g.dy * i, ri = rows ? rows[i] : 1;
+      if (ri > 0 && head) for (var j = 0; j < N; j++) {
+        var w = head.w[i][j];
+        if (w < 0.05) continue;
+        var yj = g.y0 + g.dy * j;
+        curve(ctx, g.qx, yi, V.lerp(g.qx, g.kx, ri), V.lerp(yi, yj, ri), V.rgba(P.teal, 0.15 + 0.85 * w), 1.5 + (g.fs / 36) * 10 * w);
+      }
+      V.dot(ctx, g.qx, yi, P.teal, r);
+      V.dot(ctx, g.kx, yi, P.amber, r);
+      V.text(ctx, TOK[i], g.qx - g.fs * 0.6, yi + g.fs * 0.34, V.rgba(P.ink, wa), g.fs, "right", 500);
+      V.text(ctx, TOK[i], g.kx + g.fs * 0.6, yi + g.fs * 0.34, V.rgba(P.ink, wa), g.fs, "left", 500);
+    }
+    ctx.restore();
+  }
+
+  var eq, counter, cap, lHead, lQ, lK;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = '<div class="teal">' + katex.renderToString("\\mathrm{head}_{\\textcolor{#e8836a}{i}} = \\mathrm{Attention}(QW_Q^{\\textcolor{#e8836a}{i}},\\, KW_K^{\\textcolor{#e8836a}{i}},\\, VW_V^{\\textcolor{#e8836a}{i}})") + "</div>" +
+      "<div>" + katex.renderToString("\\mathrm{MultiHead} = \\mathrm{Concat}(\\mathrm{head}_1, \\dots, \\mathrm{head}_{\\textcolor{#e8836a}{h}})\\, W_O") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "These weights are constructed to illustrate, not taken from a trained model. Each head attends to the same sentence in a pattern of its own.");
+    lQ = V.el("label", "queries", { left: (BIG.qx - 150) + "px", top: (BIG.y0 - 110) + "px", color: P.teal });
+    lK = V.el("label", "keys", { left: (BIG.kx - 10) + "px", top: (BIG.y0 - 110) + "px", color: P.amber });
+    lHead = V.el("label", "", { left: "0", right: "0", textAlign: "center", top: "1300px", color: P.ink });
+  }
+
+  function render(t, ctx) {
+    var words = V.span(t, 0.1, 0.9);
+    if (t < T_ALL) {
+      // one head at a time, its rows growing in one query after another
+      var k = Math.max(0, Math.min(HEADS.length - 1, Math.floor((t - INTRO) / PH)));
+      var u = t < INTRO ? -1 : (t - (INTRO + PH * k)) / PH;
+      var rows = [];
+      for (var i = 0; i < N; i++) rows.push(u < 0 ? 0 : V.span(u, 0.06 + 0.07 * i, 0.2 + 0.07 * i));
+      var out = k < HEADS.length - 1 ? 1 - V.span(u, 0.9, 1) : 1;
+      for (i = 0; i < N; i++) rows[i] *= out;
+      diagram(ctx, BIG, HEADS[k], words, rows);
+      V.tex(lHead, u < 0 ? "" : "head " + (k + 1) + ": " + HEADS[k].name);
+      V.fade(lHead, u < 0 ? 0 : V.span(u, 0.02, 0.1) * (k < HEADS.length - 1 ? 1 - V.span(u, 0.92, 1) : 1));
+      V.fade(lQ, words); V.fade(lK, words);
+      V.tex(counter, "$i = " + (k + 1) + "$");
+      V.fade(counter, u < 0 ? 0 : V.span(u, 0, 0.08));
+    } else {
+      // all four heads side by side: the last one shrinks into its cell, the others open out of it
+      var m = V.span(t, T_ALL, T_ALL + MOVE);
+      for (var h = 0; h < HEADS.length; h++) {
+        var a = h === HEADS.length - 1 ? 1 : V.span(m, 0.35, 1);   // the others appear once they have moved apart
+        var g = mix(BIG, CELLS[h], m);
+        diagram(ctx, g, HEADS[h], a, null, h === HEADS.length - 1 ? 1 : V.span(m, 0.75, 1));
+        var c = CELLS[h], la = V.span(t, T_ALL + MOVE * 0.7, T_ALL + MOVE);
+        V.text(ctx, "head " + (h + 1) + ": " + HEADS[h].name, c.cx + CELL_W / 2, c.cy + 20, V.rgba(P.dim, la), 26, "center", 500);
+      }
+      V.fade(lHead, 1 - V.span(t, T_ALL, T_ALL + 0.3));
+      V.fade(lQ, 1 - V.span(t, T_ALL, T_ALL + 0.3)); V.fade(lK, 1 - V.span(t, T_ALL, T_ALL + 0.3));
+      V.tex(counter, "$h = 4$");
+      V.fade(counter, 1);
+    }
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.5, setup: setup, render: render,
+            title: "Multi-head attention", mark: "DATASCI 207", course: "module 13" });
+})();
+</script>
+</body></html>

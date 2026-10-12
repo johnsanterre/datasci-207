@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TF-IDF</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* TF-IDF on the module's own three example documents (lecture.py, Part 1):
+   "the cat sat on the mat", "the dog sat on the log",
+   "the cat and the dog are friends".
+   Term frequencies grow as teal bars, one document at a time. Then the words
+   are taken in groups by document frequency, DF = 3, 2, 1, and each group's
+   bars are multiplied by IDF = log(N / DF) with N = 3, as the notebook's
+   compute_idf does. "the" is in all three documents, so log(3/3) = 0 erases
+   it. Every number is computed below from the three strings; nothing is
+   simulated. */
+(function () {
+  var V = VIZ, P = V.P;
+  var DOCS = ["the cat sat on the mat", "the dog sat on the log", "the cat and the dog are friends"];
+  var TOK = DOCS.map(function (d) { return d.split(" "); });
+  var N = DOCS.length;
+
+  // vocabulary, counts, TF = count / |d|, DF, IDF = log(N / DF)
+  var vocab = [];
+  TOK.forEach(function (ts) { ts.forEach(function (w) { if (vocab.indexOf(w) < 0) vocab.push(w); }); });
+  var DF = {}, TF = {}, IDF = {};
+  vocab.forEach(function (w) {
+    DF[w] = TOK.filter(function (ts) { return ts.indexOf(w) >= 0; }).length;
+    IDF[w] = Math.log(N / DF[w]);
+    TF[w] = TOK.map(function (ts) { return ts.filter(function (x) { return x === w; }).length / ts.length; });
+  });
+  // rows: most common first (DF = 3, then 2, then 1), alphabetical within a group
+  vocab.sort(function (a, b) { return DF[b] - DF[a] || (a < b ? -1 : 1); });
+  var GROUPS = [3, 2, 1];
+
+  // layout
+  var DOC_Y = [430, 490, 550], DOC_X = 150;
+  var HEAD_Y = 640, ROW0 = 690, PITCH = 66, GAP = 22;
+  var LAB_X = 214, COL_X = [244, 484, 724], BAR_MAX = 190, BAR_H = 30, MUL_X = 1008;
+  var SCALE = BAR_MAX / Math.max.apply(null, vocab.map(function (w) { return Math.max.apply(null, TF[w]); }));
+  function rowY(i) { var g = GROUPS.indexOf(DF[vocab[i]]); return ROW0 + i * PITCH + g * GAP; }
+
+  // timeline: TF grows column by column, then one DF group per phase, then a hold
+  var T_TF = [1.0, 4.0], PH = [[4.4, 8.4], [8.4, 11.9], [11.9, 15.4]], DUR = 18.6;
+  function groupState(t, df) {          // 0 before its phase, 0..1 while rescaling, 1 after
+    var k = GROUPS.indexOf(df), a = PH[k][0];
+    return V.span(t, a + 1.0, a + 2.4);
+  }
+  function activeGroup(t) { for (var k = PH.length - 1; k >= 0; k--) if (t >= PH[k][0]) return GROUPS[k]; return 0; }
+
+  var eq, counter, cap, heads = [];
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString(
+        "{\\color{#d8a65c}\\text{TF-IDF}(t,d)} = {\\color{#7fc4b2}\\text{TF}(t,d)} \\times \\text{IDF}(t)") + "</div>" +
+      "<div>" + katex.renderToString(
+        "\\text{IDF}(t) = \\log\\big(N \\,/\\, {\\color{#e8836a}\\text{DF}(t)}\\big), \\quad N = " + N) + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "The module's three example documents. “the” is in all three, so its IDF is log(3/3) = 0 and its bars vanish. Words found in one document now carry the most weight.");
+  }
+
+  function wordsLine(ctx, k, t, act) {
+    ctx.save(); ctx.font = '500 36px "Inter","Helvetica Neue",Arial,sans-serif'; ctx.textBaseline = "middle";
+    var a = V.span(t, 0.1 + 0.2 * k, 0.8 + 0.2 * k);
+    V.text(ctx, "d" + "₁₂₃"[k], 72, DOC_Y[k] + 12, V.rgba(P.dim, a), 30, "left", 500);
+    var x = DOC_X, sp = ctx.measureText(" ").width;
+    var growing = t >= T_TF[0] + k && t < T_TF[0] + k + 1.2;
+    TOK[k].forEach(function (w) {
+      var hot = act && DF[w] === act, c;
+      if (hot) c = P.ink;
+      else if (growing) c = V.rgba(P.teal, 0.95);
+      else c = V.rgba(P.dim, act ? 0.55 : 0.95);
+      ctx.fillStyle = V.rgba("#000000", 0); ctx.globalAlpha = a; ctx.fillStyle = c;
+      ctx.fillText(w, x, DOC_Y[k]);
+      if (hot) V.line(ctx, x, DOC_Y[k] + 26, x + ctx.measureText(w).width, DOC_Y[k] + 26, V.rgba(P.ink, 0.5 * a), 2);
+      x += ctx.measureText(w).width + sp;
+    });
+    ctx.restore();
+  }
+
+  function bar(ctx, x, y, w, col, dash, fillA) {
+    if (w < 0.5) return;
+    ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 2;
+    if (dash) ctx.setLineDash([8, 8]);
+    if (fillA) { ctx.fillStyle = V.rgba(col, fillA); ctx.fillRect(x, y - BAR_H / 2, w, BAR_H); }
+    ctx.strokeRect(x, y - BAR_H / 2, w, BAR_H); ctx.restore();
+  }
+
+  function fmt(x) { return x === 0 ? "0" : x.toFixed(2); }
+
+  function render(t, ctx) {
+    var act = activeGroup(t);
+    if (t > PH[2][1]) act = 0;                      // the hold: nothing singled out
+    for (var k = 0; k < N; k++) wordsLine(ctx, k, t, act);
+
+    var mA = V.span(t, 0.6, 1.2);
+    for (var c = 0; c < N; c++) V.text(ctx, "d" + "₁₂₃"[c], COL_X[c], HEAD_Y, V.rgba(P.dim, mA), 30);
+
+    vocab.forEach(function (w, i) {
+      var y = rowY(i), hot = act === DF[w], g = groupState(t, DF[w]);
+      V.text(ctx, w, LAB_X, y + 10, V.rgba(hot ? P.ink : P.dim, mA), 30, "right", hot ? 600 : 500);
+      for (var c = 0; c < N; c++) {
+        V.line(ctx, COL_X[c], y - BAR_H / 2 - 4, COL_X[c], y + BAR_H / 2 + 4, V.rgba(P.hair, mA), 2);
+        var grow = V.span(t, T_TF[0] + c, T_TF[0] + c + 1.0);
+        var tf = TF[w][c] * SCALE * grow, after = TF[w][c] * IDF[w] * SCALE;
+        if (!tf) continue;
+        if (g <= 0) { bar(ctx, COL_X[c], y, tf, P.teal, false, 0.12); continue; }
+        bar(ctx, COL_X[c], y, tf, V.rgba(P.teal, 0.6), true, 0);           // the count it had
+        bar(ctx, COL_X[c], y, V.lerp(tf, after, g), P.amber, false, 0.14); // the weight it keeps
+      }
+      // the multiplier, written in once its group's phase starts
+      var k = GROUPS.indexOf(DF[w]), mm = V.span(t, PH[k][0] + 0.3, PH[k][0] + 0.9);
+      if (mm > 0) V.text(ctx, "× " + fmt(IDF[w]), MUL_X, y + 10, V.rgba(hot ? P.amber : P.dim, mm), 28, "right", 500);
+    });
+
+    // counter: the document frequency of the group being weighted
+    var shown = activeGroup(t);                     // the counter holds its last value through the hold
+    if (shown) V.tex(counter, "$\\text{DF}(t) = " + shown + "$");
+    var cin = V.span(t, PH[0][0], PH[0][0] + 0.5);
+    V.fade(counter, t > PH[2][1] ? 1 : cin);
+    V.fade(cap, V.span(t, 0.4, 1.2));
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.5, setup: setup, render: render,
+            title: "TF-IDF", mark: "DATASCI 207", course: "module 9" });
+})();
+</script>
+</body></html>

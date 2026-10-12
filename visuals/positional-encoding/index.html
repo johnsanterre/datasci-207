@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sinusoidal positional encoding</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 13, positional encoding, with the notes' formula
+     PE(pos, 2i) = sin(pos / 10000^(2i/d)),  PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
+   and d = 16, the size the module's lecture code uses (positional_encoding(10, 16)).
+   Each of the 16 dimensions is one row: a wave over positions 0 to 63 whose
+   wavelength, 2 pi 10000^(2i/d), rises down the rows. A dashed line steps
+   through the positions; where it crosses the rows it reads off that position's
+   16 values, drawn below as its pattern, with the previous position's pattern
+   as a ghost. Everything is computed by the page from the formula. */
+(function () {
+  var V = VIZ, P = V.P;
+  var D = 16, PMAX = 63;
+  var X0 = 150, X1 = 960;
+  function px(p) { return X0 + (X1 - X0) * p / PMAX; }
+  var ROW0 = 430, ROWS = 40, AMP = 15;
+  function rowY(k) { return ROW0 + ROWS * k; }
+  function omega(k) { return 1 / Math.pow(10000, 2 * Math.floor(k / 2) / D); }
+  function pe(p, k) { return k % 2 === 0 ? Math.sin(p * omega(k)) : Math.cos(p * omega(k)); }
+  function col(k) { return k % 2 === 0 ? P.teal : P.amber; }
+
+  // the positions the dashed line visits: one at a time first, then larger jumps
+  var STEPS = [0, 1, 2, 3, 4, 5, 6, 8, 11, 15, 20, 26, 33, 40];
+  var INTRO = 2.0, SLOW = 1.2, FAST = 0.95, HOLD = 1.6;
+  var T = [INTRO];                                 // start time of each step after the first
+  for (var s = 1; s < STEPS.length; s++) T.push(T[s - 1] + (s <= 6 ? SLOW : FAST));
+  var DUR = T[T.length - 1] + FAST + HOLD;
+
+  // the waves, sampled once
+  var WAVES = [];
+  for (var k = 0; k < D; k++) {
+    var pts = [];
+    for (var j = 0; j <= 600; j++) { var p = PMAX * j / 600; pts.push([px(p), rowY(k) - AMP * pe(p, k)]); }
+    WAVES.push(pts);
+  }
+
+  // the pattern panel: one bar per dimension, up for positive values, down for negative
+  var BC = 1295, BAMP = 70, CW = (X1 - X0) / D;
+  function cellX(k) { return X0 + CW * (k + 0.5); }
+
+  var eq, counter, cap, lTop, lBot, lPat, lGhost;
+  function setup() {
+    var POS = "\\textcolor{#e8836a}{pos}";
+    eq = V.el("eq", "");
+    eq.innerHTML = '<div class="teal">' + katex.renderToString("PE(" + POS + ", 2i) = \\sin\\!\\left(" + POS + " / 10000^{2i/d}\\right)") + "</div>" +
+      '<div class="amber">' + katex.renderToString("PE(" + POS + ", 2i{+}1) = \\cos\\!\\left(" + POS + " / 10000^{2i/d}\\right)") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Each position reads down the dashed line as its own pattern of $d = 16$ values. Next to each other, two positions differ mostly in the fast rows at the top.");
+    var wl = function (k) { return Math.round(2 * Math.PI / omega(k) * 10) / 10; };
+    lTop = V.el("label", "dimension 0, wavelength " + wl(0).toFixed(1), { left: X0 + "px", top: (ROW0 - 72) + "px" });
+    lBot = V.el("label", "dimension 15, wavelength " + Math.round(wl(15)).toLocaleString("en-US"), { left: X0 + "px", top: (rowY(D - 1) + 30) + "px" });
+    lPat = V.el("label", "", { left: X0 + "px", top: (BC - BAMP - 62) + "px" });
+    lGhost = V.el("label", "", { right: (1080 - X1) + "px", top: (BC - BAMP - 62) + "px" });
+  }
+
+  function stepAt(t) {          // index of the current step, and the eased glide from the previous one
+    var s = 0;
+    while (s + 1 < STEPS.length && t >= T[s + 1]) s++;
+    if (t < INTRO) return { s: 0, p: 0, prev: 0, g: 1 };
+    var g = s === 0 ? 1 : V.span(t, T[s], T[s] + 0.4);
+    var prev = s === 0 ? 0 : STEPS[s - 1];
+    return { s: s, p: V.lerp(prev, STEPS[s], g), prev: prev, g: g };
+  }
+
+  function render(t, ctx) {
+    var trace = V.span(t, 0.1, 1.8);              // the waves are drawn in first
+    var on = V.span(t, 1.6, 2.0);                 // then the dashed line and the pattern appear
+    var st = stepAt(t), p = st.p, pos = STEPS[st.s];
+
+    // the waves: sine rows in teal, cosine rows in amber
+    for (var k = 0; k < D; k++) {
+      V.line(ctx, X0, rowY(k), X1, rowY(k), P.hair, 1);
+      V.path(ctx, WAVES[k], V.rgba(col(k), 0.85), 2.5, trace);
+    }
+
+    // the dashed line at the current position, and its value on every row
+    if (on > 0) {
+      var x = px(p);
+      V.line(ctx, x, ROW0 - 30, x, rowY(D - 1) + 22, V.rgba(P.ink, 0.6 * on), 2, [8, 8]);
+      for (k = 0; k < D; k++) V.dot(ctx, x, rowY(k) - AMP * pe(p, k), V.rgba(col(k), on), 7);
+    }
+
+    // the pattern: the previous position as a ghost outline, the current one in colour
+    V.line(ctx, X0, BC, X1, BC, P.hair, 2);
+    var ghost = st.s > 0 ? on * (1 - 0.6 * V.span(t, T[st.s] + 0.4, T[st.s] + 0.8)) : 0;
+    for (k = 0; k < D; k++) {
+      var bw = CW * 0.56, cx = cellX(k);
+      if (ghost > 0.02) {
+        var gh = BAMP * pe(st.prev, k);
+        ctx.save(); ctx.strokeStyle = V.rgba(P.dim, 0.75 * ghost); ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
+        ctx.strokeRect(cx - bw / 2 - 5, BC - Math.max(gh, 0), bw + 10, Math.abs(gh)); ctx.restore();
+      }
+      var h = BAMP * pe(p, k) * on;
+      ctx.save(); ctx.strokeStyle = col(k); ctx.lineWidth = 2; ctx.fillStyle = V.rgba(col(k), 0.12); ctx.globalAlpha = on;
+      ctx.fillRect(cx - bw / 2, BC - Math.max(h, 0), bw, Math.abs(h));
+      ctx.strokeRect(cx - bw / 2, BC - Math.max(h, 0), bw, Math.abs(h));
+      ctx.restore();
+    }
+    V.tex(lPat, "the 16 values at position " + pos);
+    V.fade(lPat, on);
+    V.tex(lGhost, st.s > 0 ? "dashed: position " + st.prev : "");
+    V.fade(lGhost, ghost);
+
+    V.tex(counter, "$pos = " + pos + "$");
+    V.fade(counter, on);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.5, setup: setup, render: render,
+            title: "Sinusoidal positional encoding", mark: "DATASCI 207", course: "module 13" });
+})();
+</script>
+</body></html>

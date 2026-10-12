@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One-hot or embedding</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Two front doors for one categorical column with K levels, from the module's
+   table: one-hot (width = vocab + OOV = K + 1, no parameters of its own) and
+   Embedding (width = dim, vocab x dim parameters). Both feed the trunk the
+   notebook uses, Dense(16), which costs (width + 1) x 16. The embedding width
+   is 4, as in the notebook's Embedding(output_dim=4), and its table has K + 1
+   rows (vocab + OOV), as in Embedding(input_dim=3) for two levels.
+   K steps through 10, 100, 1,000, 10,000. Each square is one input to the
+   trunk, both sides at one scale; the view zooms out tenfold between
+   K = 100 and K = 1,000. Every count is computed below; nothing is simulated. */
+(function () {
+  var V = VIZ, P = V.P;
+  var KS = [10, 100, 1000, 10000], UNITS = 16, DIM = 4, HOT = 7;
+  var T0 = 0.3, PHASE = 4.2, DUR = T0 + PHASE * KS.length + 1.6;
+  var P_BIG = 46, P_SMALL = 4.6;                       // pitch of one square, before and after the zoom
+
+  // levels 1..K laid out in powers of ten: a row of 10, a 10 x 10 square,
+  // ten squares side by side, then ten such strips stacked
+  function cellXY(i) {                                 // i = 0 .. K-1
+    var d0 = i % 10, d1 = Math.floor(i / 10) % 10, d2 = Math.floor(i / 100) % 10, d3 = Math.floor(i / 1000) % 10;
+    return [d0 + 10 * d2, d1 + 10 * d3];
+  }
+  function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
+
+  // layout
+  var A_HEAD = 410, A_Y = 450, A_NODES = 640;          // one-hot section
+  var B_HEAD = 1050, B_Y = 1150, B_NODES = 1200;       // embedding section
+  var NODE_X = 930, NODE_PITCH = 18, X_LEFT = 72;
+
+  function phaseAt(t) { return V.clamp(Math.floor((t - T0) / PHASE), 0, KS.length - 1); }
+  // how many levels are drawn at time t, and the pitch of a square
+  function state(t) {
+    var k = phaseAt(t), u = t - T0 - k * PHASE, K = KS[k], prev = k ? KS[k - 1] : 0, p = P_BIG, g;
+    if (k === 0) g = V.span(u, 0.2, 1.6);
+    else if (k === 1) g = V.span(u, 0.2, 2.0);
+    else if (k === 2) g = V.span(u, 1.5, 2.8);
+    else g = V.span(u, 0.2, 2.2);
+    if (k >= 2) p = Math.exp(V.lerp(Math.log(P_BIG), Math.log(P_SMALL), k === 2 ? V.span(u, 0.2, 1.4) : 1));
+    if (t < T0) g = 0;
+    var shown = Math.round(V.lerp(prev, K, g));
+    // grow in whole tens, hundreds or thousands so each new block lands complete
+    var unit = k === 0 ? 1 : KS[k - 1];
+    if (k > 0) shown = prev + Math.floor((shown - prev) / unit) * unit;
+    return { k: k, K: K, shown: shown, p: p };
+  }
+
+  var eq, counter, cap;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML =
+      '<div class="teal">' + katex.renderToString(
+        "\\text{one-hot: }\\big(({\\color{#e8836a}K} + 1) + 1\\big) \\times 16") + "</div>" +
+      '<div class="amber">' + katex.renderToString(
+        "\\text{embedding: }({\\color{#e8836a}K} + 1) \\times 4 \\;+\\; (4 + 1) \\times 16") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Drawn to one scale. One-hot hands Dense(16) one input per level; the embedding hands it 4 numbers and keeps K + 1 rows in its table.");
+  }
+
+  function nodes(ctx, cy, col, a) {
+    var ys = [];
+    for (var j = 0; j < UNITS; j++) ys.push(cy + (j - (UNITS - 1) / 2) * NODE_PITCH);
+    ys.forEach(function (y) { V.dot(ctx, NODE_X, y, V.rgba(col, a), 6); });
+    return ys;
+  }
+  function fan(ctx, srcs, ys, col, alpha) {   // every source wired to every unit, stroked as one sheet
+    ctx.save(); ctx.strokeStyle = V.rgba(col, alpha); ctx.lineWidth = 1.2; ctx.beginPath();
+    srcs.forEach(function (s) { ys.forEach(function (y) { ctx.moveTo(s[0], s[1]); ctx.lineTo(NODE_X - 8, y); }); });
+    ctx.stroke(); ctx.restore();
+  }
+  function cell(ctx, x, y, p, col, fillA, hot) {
+    var s = p > 12 ? p - 6 : Math.max(p - 1, 1.2);
+    if (hot) { ctx.fillStyle = col; ctx.fillRect(x, y, s, s); return; }
+    ctx.fillStyle = V.rgba(col, p > 12 ? fillA : 0.55); ctx.fillRect(x, y, s, s);
+    if (p > 12) { ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.strokeRect(x, y, s, s); }
+  }
+
+  function render(t, ctx) {
+    var S = state(t), p = S.p, a0 = V.span(t, 0.1, 0.8);
+    var width = S.K + 1;                                 // vocab + OOV: the numbers follow the counter
+    var GX = X_LEFT + 1.5 * p;                           // the OOV square sits left of the grid
+
+    // ---- one-hot ----
+    V.text(ctx, "one-hot", X_LEFT, A_HEAD, V.rgba(P.dim, a0), 30, "left", 600);
+    V.text(ctx, "width " + fmt(width), X_LEFT + 140, A_HEAD, V.rgba(P.teal, a0), 30, "left", 500);
+    V.text(ctx, "Dense(16)", NODE_X, A_HEAD, V.rgba(P.dim, a0), 28, "center", 500);
+    var ysA = nodes(ctx, A_NODES, P.teal, a0);
+    var srcs = [[X_LEFT + p / 2, A_Y + p / 2]], stride = Math.max(1, Math.ceil(S.shown / 400));
+    for (var i = 0; i < S.shown; i += stride) { var c = cellXY(i); srcs.push([GX + (c[0] + 0.5) * p, A_Y + (c[1] + 0.5) * p]); }
+    if (S.shown) fan(ctx, srcs, ysA, P.teal, (S.shown > 200 ? 0.07 : 0.16) * a0);
+    cell(ctx, X_LEFT, A_Y, p, P.dim, 0.12, false);                       // OOV
+    if (p > 30) V.text(ctx, "OOV", X_LEFT + p / 2 - 3, A_Y + p + 30, V.rgba(P.dim, a0 * V.clamp((p - 30) / 10, 0, 1)), 22, "center", 500);
+    for (var j = 0; j < S.shown; j++) {
+      var q = cellXY(j);
+      cell(ctx, GX + q[0] * p, A_Y + q[1] * p, p, P.teal, 0.12, j === HOT - 1);
+    }
+    var billA = "Dense(16): (" + fmt(width) + " + 1) × 16 = " + fmt((width + 1) * UNITS);
+    V.text(ctx, billA, X_LEFT, 980, V.rgba(P.teal, a0), 30, "left", 500);
+
+    // ---- embedding ----
+    V.text(ctx, "embedding", X_LEFT, B_HEAD, V.rgba(P.dim, a0), 30, "left", 600);
+    V.text(ctx, "width 4", X_LEFT + 186, B_HEAD, V.rgba(P.amber, a0), 30, "left", 500);
+    var ysB = nodes(ctx, B_NODES, P.amber, a0), srcB = [];
+    var by = B_NODES - p / 2;
+    for (var e = 0; e < DIM; e++) srcB.push([X_LEFT + (e + 0.5) * p, by + p / 2]);
+    fan(ctx, srcB, ysB, P.amber, 0.22 * a0);
+    for (var e2 = 0; e2 < DIM; e2++) cell(ctx, X_LEFT + e2 * p, by, p, P.amber, 0.3, false);
+    // once the zoom has made the four squares small, a ring marks where they are
+    var rk = V.clamp((20 - p) / 10, 0, 1);
+    if (rk > 0) V.ring(ctx, X_LEFT + 2 * p, B_NODES, 30, V.rgba(P.amber, 0.8 * rk), 2);
+    var billB1 = "Dense(16): (4 + 1) × 16 = " + fmt((DIM + 1) * UNITS);
+    var billB2 = "Embedding table: " + fmt(width) + " × 4 = " + fmt(width * DIM);
+    V.text(ctx, billB1, X_LEFT, 1384, V.rgba(P.amber, a0), 30, "left", 500);
+    V.text(ctx, billB2, X_LEFT, 1384 - 46, V.rgba(P.dim, a0), 28, "left", 500);
+
+    V.tex(counter, "$K = " + fmt(S.K).replace(/,/g, "{,}") + "$");
+    V.fade(counter, V.span(t, 0.1, 0.8));
+    V.fade(cap, V.span(t, 0.4, 1.2));
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.5, setup: setup, render: render,
+            title: "One-hot or embedding", mark: "DATASCI 207", course: "module 11" });
+})();
+</script>
+</body></html>

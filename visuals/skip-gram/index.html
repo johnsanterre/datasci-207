@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skip-gram training pairs</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Skip-gram, the Word2Vec variant in the module's notes: given a centre word,
+   predict the words around it. A window of half-width c slides along the
+   module's example sentence, "the quick brown fox jumps" (lecture.py, Part 3).
+   At each position the centre word lights teal, the words within c positions
+   light amber, and each (centre, context) pair drops into the list of
+   training examples. Two passes: c = 1, then c = 2. The pairs are generated
+   below from the sentence; nothing is simulated. */
+(function () {
+  var V = VIZ, P = V.P;
+  var WORDS = "the quick brown fox jumps".split(" ");
+  var CS = [1, 2];
+
+  // every pass: the pairs in the order the window emits them, with their timing
+  var PASSES = [], t = 1.0;
+  CS.forEach(function (c, k) {
+    var move = k === 0 ? 0.7 : 0.45, each = k === 0 ? 0.55 : 0.36;   // the second pass runs faster
+    var steps = [], pairs = [], start = t;
+    for (var i = 0; i < WORDS.length; i++) {
+      var s = { pos: i, t0: t };
+      t += move;
+      for (var j = -c; j <= c; j++) {
+        var q = i + j;
+        if (j === 0 || q < 0 || q >= WORDS.length) continue;
+        pairs.push({ centre: i, ctx: q, t0: t, idx: pairs.length });
+        t += each;
+      }
+      s.t1 = t; steps.push(s);
+    }
+    t += 0.9;
+    PASSES.push({ c: c, start: start, end: t, steps: steps, pairs: pairs });
+    t += 0.5;                                                     // the list clears, the window widens
+  });
+  var DUR = PASSES[1].end + 1.6;
+
+  // layout
+  var SENT_Y = 560, FONT = 50, LIST_Y = 830, ROW = 84, COLX = [132, 580];
+  var wx = [], ww = [];
+  (function measure() {
+    var c = document.createElement("canvas").getContext("2d");
+    c.font = '500 ' + FONT + 'px "Inter","Helvetica Neue",Arial,sans-serif';
+    var sp = 46, w = WORDS.map(function (s) { return c.measureText(s).width; });
+    var tot = w.reduce(function (a, b) { return a + b; }, 0) + sp * (WORDS.length - 1), x = (1080 - tot) / 2;
+    for (var i = 0; i < WORDS.length; i++) { wx.push(x + w[i] / 2); ww.push(w[i]); x += w[i] + sp; }
+  })();
+  function slot(p, n) {
+    var rows = Math.ceil(n / 2), col = Math.floor(p.idx / rows), r = p.idx % rows;
+    return [COLX[col], LIST_Y + r * ROW];
+  }
+  function passAt(time) { return time < PASSES[1].start ? 0 : 1; }
+  function stepAt(pass, time) {
+    var S = pass.steps, k = 0;
+    for (var i = 0; i < S.length; i++) if (time >= S[i].t0) k = i;
+    return k;
+  }
+
+  var eq, counter, cap, lab;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString(
+        "\\displaystyle\\max\\; \\frac{1}{T}\\sum_{t=1}^{T}\\; \\sum_{-{\\color{#e8836a}c}\\,\\le j\\le {\\color{#e8836a}c},\\; j\\ne 0}" +
+        "\\log p\\big({\\color{#d8a65c}w_{t+j}} \\mid {\\color{#7fc4b2}w_t}\\big)") + "</div>";
+    counter = V.el("counter", "");
+    lab = V.el("label", "", { left: "72px", top: (LIST_Y - 112) + "px" });
+    cap = V.el("caption", "Each word in turn is the centre. Every word within c positions of it makes a (centre, context) pair, and each pair is one training example.");
+  }
+
+  function word(ctx, s, x, y, col, size, align, weight) {
+    ctx.save(); ctx.fillStyle = col; ctx.textAlign = align || "center"; ctx.textBaseline = "middle";
+    ctx.font = (weight || 500) + " " + size + 'px "Inter","Helvetica Neue",Arial,sans-serif';
+    ctx.fillText(s, x, y); ctx.restore();
+  }
+  function rrect(ctx, x, y, w, h, r, col, lw) {
+    ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); ctx.stroke(); ctx.restore();
+  }
+
+  function render(t, ctx) {
+    var k = passAt(t), pass = PASSES[k], c = pass.c, n = pass.pairs.length;
+    var aIn = V.span(t, pass.start - 0.6, pass.start);
+    var aOut = k === 0 ? 1 - V.span(t, pass.end, pass.end + 0.4) : 1;
+    var si = stepAt(pass, t), st = pass.steps[si];
+    // the window glides from the previous position to this one
+    var prev = si > 0 ? pass.steps[si - 1].pos : 0, u = V.span(t, st.t0, st.t0 + (k === 0 ? 0.6 : 0.4));
+    var pos = V.lerp(prev, st.pos, u);
+    var done = t > pass.steps[pass.steps.length - 1].t1;
+
+    // the window: from c words left of the centre to c words right, clipped to the sentence
+    var lo = Math.max(0, st.pos - c), hi = Math.min(WORDS.length - 1, st.pos + c);
+    var plo = Math.max(0, Math.round(pos) - c), phi = Math.min(WORDS.length - 1, Math.round(pos) + c);
+    var L = wx[lo] - ww[lo] / 2 - 18, R = wx[hi] + ww[hi] / 2 + 18;
+    if (u < 1) {
+      var pL = wx[plo] - ww[plo] / 2 - 18, pR = wx[phi] + ww[phi] / 2 + 18;
+      if (si > 0) { var q0 = pass.steps[si - 1].pos, a0 = Math.max(0, q0 - c), b0 = Math.min(WORDS.length - 1, q0 + c);
+        pL = wx[a0] - ww[a0] / 2 - 18; pR = wx[b0] + ww[b0] / 2 + 18; }
+      else { pL = L; pR = R; }
+      L = V.lerp(pL, L, u); R = V.lerp(pR, R, u);
+    }
+    var winA = V.span(t, 0.4, 1.0) * (done ? 1 - 0.6 * V.span(t, pass.steps[4].t1, pass.steps[4].t1 + 0.4) : 1);
+    rrect(ctx, L, SENT_Y - 50, R - L, 100, 18, V.rgba(P.dim, 0.7 * winA), 2);
+
+    // the sentence: centre teal, its context amber, the rest dim
+    var sA = V.span(t, 0.0, 0.6);
+    for (var i = 0; i < WORDS.length; i++) {
+      var col = V.rgba(P.dim, sA);
+      if (!done && u > 0.5 && i === st.pos) col = P.teal;
+      else if (!done && u > 0.5 && i >= lo && i <= hi) col = P.amber;
+      word(ctx, WORDS[i], wx[i], SENT_Y, col, FONT, "center", 500);
+      // position marks under the words
+      V.text(ctx, String(i + 1), wx[i], SENT_Y + 84, V.rgba(P.dim, 0.6 * sA), 24, "center", 500);
+    }
+
+    // the pairs: each appears in its slot as the window emits it, then stays
+    var emitted = 0;
+    pass.pairs.forEach(function (p) {
+      if (t < p.t0) return;
+      emitted++;
+      // the pair settles into its slot; dashed connectors show which two words it came from
+      var f = V.span(t, p.t0, p.t0 + 0.4), s = slot(p, n), a = aOut * f, dy = 26 * (1 - f);
+      var link = V.span(t, p.t0, p.t0 + 0.15) * (1 - V.span(t, p.t0 + 0.45, p.t0 + 0.7));
+      if (link > 0) {
+        V.line(ctx, wx[p.centre], SENT_Y + 36, s[0] + 30, s[1] - 28, V.rgba(P.teal, 0.6 * link), 2, [8, 8]);
+        V.line(ctx, wx[p.ctx], SENT_Y + 36, s[0] + 230, s[1] - 28, V.rgba(P.amber, 0.6 * link), 2, [8, 8]);
+      }
+      word(ctx, WORDS[p.centre], s[0], s[1] - dy, V.rgba(P.teal, a), 40, "left", 500);
+      word(ctx, "\u2192", s[0] + 160, s[1] - dy, V.rgba(P.dim, a), 34, "center", 400);
+      word(ctx, WORDS[p.ctx], s[0] + 200, s[1] - dy, V.rgba(P.amber, a), 40, "left", 500);
+    });
+
+    V.tex(lab, "training pairs (centre → context): " + emitted);
+    V.fade(lab, V.span(t, 0.8, 1.2) * aOut);
+    V.tex(counter, "$c = " + c + "$");
+    V.fade(counter, k === 0 ? V.span(t, 0.6, 1.1) * (1 - V.span(t, pass.end + 0.1, pass.end + 0.4)) : aIn);
+    V.fade(cap, V.span(t, 0.6, 1.4));
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Skip-gram training pairs", mark: "DATASCI 207", course: "module 9" });
+})();
+</script>
+</body></html>

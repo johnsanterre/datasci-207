@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The first principal component</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, PCA. A tilted cloud of 60 simulated points (seeded). A line
+   through the centre turns from 0 to 180 degrees; every point drops a dashed
+   perpendicular onto it. The variance of the projections (teal) and the mean
+   squared length of the perpendiculars, the reconstruction error (amber),
+   always add to the same total, so the angle with the most projected
+   variance is the angle with the least error: the first principal component.
+   The loop sweeps the half turn, then returns to that angle and holds. */
+(function () {
+  var V = VIZ, P = V.P;
+  var N = 60, CX = 540, CY = 700, S = 82;          // cloud centre on stage, pixels per unit
+  var BOXW = 450, BOXH = 315;                      // the line is clipped to this half-box
+  var PX0 = 150, PX1 = 930, PBASE = 1372, PH = 210; // the panel of both quantities against the angle
+  var T_IN = 0.9, T_SW = 12.6, T_BACK0 = 13.2, T_BACK1 = 15.8, DUR = 19.8;
+
+  // simulate: spread 1.8 along 30 degrees, 0.6 across it, then centre on the sample mean
+  var r = V.rng(8108), X = [], mx = 0, my = 0, a0 = 30 * Math.PI / 180;
+  for (var i = 0; i < N; i++) {
+    var u = 1.8 * V.normal(r), w = 0.6 * V.normal(r);
+    var x = u * Math.cos(a0) - w * Math.sin(a0), y = u * Math.sin(a0) + w * Math.cos(a0);
+    X.push([x, y]); mx += x / N; my += y / N;
+  }
+  X.forEach(function (p) { p[0] -= mx; p[1] -= my; });
+  var Sxx = 0, Syy = 0, Sxy = 0;                   // covariance with 1/n, as in the notes
+  X.forEach(function (p) { Sxx += p[0] * p[0] / N; Syy += p[1] * p[1] / N; Sxy += p[0] * p[1] / N; });
+  var TOTAL = Sxx + Syy;
+  var TH1 = 0.5 * Math.atan2(2 * Sxy, Sxx - Syy) * 180 / Math.PI;   // the eigenvector's angle
+  if (TH1 < 0) TH1 += 180;
+  var tr = TOTAL / 2, det = Sxx * Syy - Sxy * Sxy, disc = Math.sqrt(tr * tr - det);
+  var L1 = tr + disc, L2 = tr - disc;              // the eigenvalues
+  function projVar(deg) { var c = Math.cos(deg * Math.PI / 180), s = Math.sin(deg * Math.PI / 180); return Sxx * c * c + 2 * Sxy * c * s + Syy * s * s; }
+
+  function sx(x) { return CX + S * x; }
+  function sy(y) { return CY - S * y; }
+  function px(deg) { return PX0 + (PX1 - PX0) * deg / 180; }
+  function py(v) { return PBASE - PH * v / (L1 * 1.08); }
+
+  // the 2-sigma ellipse of the cloud: the form behind the points
+  var ell = [];
+  for (var k = 0; k <= 120; k++) {
+    var ph = 2 * Math.PI * k / 120, c1 = Math.cos(TH1 * Math.PI / 180), s1 = Math.sin(TH1 * Math.PI / 180);
+    var e1 = 2 * Math.sqrt(L1) * Math.cos(ph), e2 = 2 * Math.sqrt(L2) * Math.sin(ph);
+    ell.push([sx(e1 * c1 - e2 * s1), sy(e1 * s1 + e2 * c1)]);
+  }
+
+  function angle(t) {
+    if (t < T_IN) return 0;
+    if (t < T_SW) return 180 * V.span(t, T_IN, T_SW);
+    if (t < T_BACK0) return 180;
+    return V.lerp(180, TH1, V.span(t, T_BACK0, T_BACK1));
+  }
+
+  var eq, counter, cap, lpc;
+  function setup() {
+    var T = "\\textcolor{" + P.teal + "}", A = "\\textcolor{" + P.amber + "}";
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("\\mathbf{w}_1 = \\arg\\max_{\\lVert \\mathbf{w} \\rVert = 1}\\; " + T + "{\\operatorname{Var}(X\\mathbf{w})}") + "</div>" +
+      "<div>" + katex.renderToString("\\phantom{\\mathbf{w}_1} = \\arg\\min_{\\lVert \\mathbf{w} \\rVert = 1}\\; " + A + "{\\tfrac{1}{n}\\textstyle\\sum_i \\lVert \\mathbf{x}_i - \\mathbf{w}\\mathbf{w}^{\\top}\\mathbf{x}_i \\rVert^2}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Sixty simulated points. The two quantities always add to the total variance, so the line with the most spread along it has the least left over. That line is PC1.");
+    lpc = V.el("label", "PC1", { color: P.teal });
+  }
+
+  function render(t, ctx) {
+    var th = angle(t), rad = th * Math.PI / 180, c = Math.cos(rad), s = Math.sin(rad);
+    var intro = V.span(t, 0, T_IN), done = V.span(t, T_BACK1, T_BACK1 + 0.6);
+
+    V.form(ctx, ell, 0.9 * intro);
+
+    // the line through the centre, clipped to the drawing's box
+    var L = Math.min(Math.abs(c) > 1e-6 ? BOXW / Math.abs(c) : 1e9, Math.abs(s) > 1e-6 ? BOXH / Math.abs(s) : 1e9);
+    ctx.save(); ctx.globalAlpha = intro;
+    V.line(ctx, sx(-L * c / S), sy(-L * s / S), sx(L * c / S), sy(L * s / S), P.teal, 4);
+    ctx.restore();
+
+    // each point, its dashed perpendicular (amber, the error) and its projection (teal)
+    X.forEach(function (p) {
+      var d = p[0] * c + p[1] * s, qx = d * c, qy = d * s;
+      V.line(ctx, sx(p[0]), sy(p[1]), sx(qx), sy(qy), V.rgba(P.amber, 0.6 * intro), 2, [8, 8]);
+    });
+    X.forEach(function (p) {
+      var d = p[0] * c + p[1] * s;
+      V.dot(ctx, sx(p[0]), sy(p[1]), V.rgba(P.ink, 0.85 * intro), 6);
+      V.dot(ctx, sx(d * c), sy(d * s), V.rgba(P.teal, intro), 5);
+    });
+
+    // PC1 named once the loop has settled on it
+    var lx = sx((BOXW - 10) * Math.cos(TH1 * Math.PI / 180) / S), ly = sy((BOXW - 10) * Math.sin(TH1 * Math.PI / 180) / S);
+    lpc.style.left = (Math.min(lx, 930) - 60) + "px"; lpc.style.top = (ly - 86) + "px";
+    V.fade(lpc, done);
+
+    // the panel: projected variance and reconstruction error against the angle
+    var reach = t < T_SW ? th : 180, tv = [], te = [];
+    for (var g = 0; g <= 360; g++) {
+      var deg = 180 * g / 360; if (deg > reach + 1e-9) break;
+      var v = projVar(deg); tv.push([px(deg), py(v)]); te.push([px(deg), py(TOTAL - v)]);
+    }
+    V.line(ctx, PX0, PBASE, PX1, PBASE, P.hair, 2);
+    ctx.save(); ctx.globalAlpha = intro;
+    V.path(ctx, te, P.amber, 3); V.path(ctx, tv, P.teal, 3);
+    ctx.restore();
+    // shown to two decimals, the error as total minus variance so the three printed numbers always add up
+    var vNow = Math.round(projVar(th) * 100) / 100, eNow = Math.round(TOTAL * 100) / 100 - vNow;
+    V.line(ctx, px(th), PBASE, px(th), py(L1) - 20, V.rgba(P.coral, 0.6 * intro), 2, [8, 8]);
+    V.dot(ctx, px(th), py(vNow), P.teal, 8);
+    V.dot(ctx, px(th), py(eNow), P.amber, 8);
+    if (done > 0) {
+      ctx.save(); ctx.globalAlpha = done;
+      V.ring(ctx, px(TH1), py(L1), 16, P.teal, 2); V.ring(ctx, px(TH1), py(L2), 16, P.amber, 2);
+      ctx.restore();
+    }
+
+    // the two numbers, labelled, in their colours
+    var ya = PBASE - PH - 70;
+    V.text(ctx, "projected variance", PX0, ya, P.dim, 28);
+    V.text(ctx, vNow.toFixed(2), PX0, ya + 44, P.teal, 36, "left", 600);
+    V.text(ctx, "reconstruction error", PX1, ya, P.dim, 28, "right");
+    V.text(ctx, eNow.toFixed(2), PX1, ya + 44, P.amber, 36, "right", 600);
+    V.text(ctx, "sum " + TOTAL.toFixed(2), CX, ya + 44, P.dim, 28, "center");
+
+    V.tex(counter, "$\\theta = " + Math.round(th) + "^\\circ$");
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.5, setup: setup, render: render,
+            title: "The first principal component", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

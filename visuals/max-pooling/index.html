@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Max pooling absorbs a shift</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 10, convolutional neural networks: "Pooling provides downsampling and
+   translation invariance." A simulated 8 x 8 feature map of whole numbers 0 to
+   9 (seeded generator, seed 9) is shifted right one pixel at a time, four
+   times; new values enter from the left. The 2 x 2 max pool with stride 2 (the
+   module's lecture.py max_pool2d) turns it into 4 x 4. After each shift the
+   page counts how many input values and how many pooled values differ from
+   the previous shift. Almost every input value changes; about half of the
+   pooled values do not, because a window's largest value that moves one pixel
+   and stays inside its window gives the same maximum. */
+(function () {
+  var V = VIZ, P = V.P;
+  var R = 8, C = 8, NS = 4, WC = C + NS;           // rows, visible columns, shifts, columns simulated
+  var r = V.rng(9), F = [];
+  for (var i = 0; i < R; i++) { F.push([]); for (var j = 0; j < WC; j++) F[i].push(Math.floor(r() * 10)); }
+  // shift s shows simulated columns NS - s .. NS - s + 7
+  function view(s) { return F.map(function (row) { return row.slice(NS - s, NS - s + C); }); }
+  function pool(v) {               // value and the simulated column of each window's maximum (first if tied)
+    var out = [];
+    for (var a = 0; a < R / 2; a++) { out.push([]); for (var b = 0; b < C / 2; b++) {
+      var best = -1, bi = 0, bj = 0;
+      for (var m = 0; m < 2; m++) for (var n = 0; n < 2; n++) { var x = v[2 * a + m][2 * b + n]; if (x > best) { best = x; bi = 2 * a + m; bj = 2 * b + n; } }
+      out[a].push({ v: best, i: bi, j: bj });
+    } }
+    return out;
+  }
+  var VW = [], PL = [], CI = [0], CP = [0], CHG = [null];
+  for (var s = 0; s <= NS; s++) { VW.push(view(s)); PL.push(pool(VW[s])); }
+  for (var s2 = 1; s2 <= NS; s2++) {
+    var ci = 0, cp = 0, ch = [];
+    for (var i2 = 0; i2 < R; i2++) for (var j2 = 0; j2 < C; j2++) if (VW[s2][i2][j2] !== VW[s2 - 1][i2][j2]) ci++;
+    for (var a2 = 0; a2 < R / 2; a2++) { ch.push([]); for (var b2 = 0; b2 < C / 2; b2++) {
+      var d = PL[s2][a2][b2].v !== PL[s2 - 1][a2][b2].v; ch[a2].push(d); if (d) cp++; } }
+    CI.push(ci); CP.push(cp); CHG.push(ch);
+  }
+  var TI = CI.reduce(function (x, y) { return x + y; }), TP = CP.reduce(function (x, y) { return x + y; });
+
+  var CS = 68, GX = (1080 - C * CS) / 2, GY = 440;           // input grid
+  var PS = 82, PX = (1080 - 4 * PS) / 2, PY = 1062;          // pooled grid
+  var INTRO = 1.8, STEPS = [3.6, 3.6, 2.8, 2.8], HOLD = 2.4, ENDS = [], acc = INTRO;
+  STEPS.forEach(function (d) { ENDS.push(acc); acc += d; });
+  var FIN = acc, DUR = acc + HOLD;
+  function where(t) {
+    if (t < INTRO) return { s: 0, u: 1 };
+    for (var k = NS - 1; k >= 0; k--) if (t >= ENDS[k]) return { s: k + 1, u: V.clamp((t - ENDS[k]) / STEPS[k], 0, 1) };
+  }
+
+  var eq, counter, cap, lIn, lPool;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("{\\color{#7fc4b2}y_{ij}} = \\max_{m,\\,n \\,\\in\\, \\{0,1\\}} {\\color{#d8a65c}x_{2i+m,\\;2j+n}}") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#d8a65c}x_{i,\\,j}} \\;\\leftarrow\\; {\\color{#d8a65c}x_{i,\\,j-{\\color{#e8836a}\\Delta}}}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "A simulated 8 × 8 feature map shifts right one pixel at a time. A pooled value holds whenever its window’s largest value stays inside the window.");
+    lIn = V.el("label", "");
+    lPool = V.el("label", "", { color: P.teal });
+  }
+  function place(d, x, y) { d.style.left = (x - d.offsetWidth / 2) + "px"; d.style.top = (y - d.offsetHeight / 2) + "px"; }
+  function num(ctx, s, x, y, color, size) {
+    ctx.save(); ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = "400 " + size + 'px "KaTeX_Main","Times New Roman",serif'; ctx.fillText(s, x, y); ctx.restore();
+  }
+
+  function render(t, ctx) {
+    var w = where(t), s = w.s, u = w.u, fin = V.span(t, FIN, FIN + 0.5);
+    var slide = s > 0 ? V.span(u, 0.06, 0.32) : 1, f = s > 0 ? s - 1 + slide : 0;
+    var swap = s > 0 ? V.span(u, 0.32, 0.42) : 1;
+    var show = s > 0 ? V.span(u, 0.42, 0.52) * (s === NS ? 1 : 1 - V.span(u, 0.95, 1)) : 0;
+
+    // input: the values slide right under the fixed 2 x 2 windows
+    ctx.save(); ctx.beginPath(); ctx.rect(GX, GY, C * CS, R * CS); ctx.clip();
+    for (var i = 0; i < R; i++) for (var q = 0; q < WC; q++) {
+      var x = GX + (q - NS + f) * CS, y = GY + i * CS;
+      if (x < GX - CS || x > GX + C * CS) continue;
+      var v = F[i][q];
+      ctx.fillStyle = V.rgba(P.form, 0.25 + 0.75 * v / 9); ctx.fillRect(x + 3, y + 3, CS - 6, CS - 6);
+      num(ctx, String(v), x + CS / 2, y + CS / 2 + 2, P.dim, 30);
+    }
+    // each window's maximum: old ones ride with the slide, new ones take over after it
+    function rings(sh, a, fs) {
+      if (a <= 0.01) return;
+      PL[sh].forEach(function (row, aa) { row.forEach(function (c) {
+        var qq = c.j + NS - sh, x = GX + (qq - NS + fs) * CS, y = GY + c.i * CS;
+        ctx.save(); ctx.strokeStyle = V.rgba(P.amber, a); ctx.lineWidth = 3; ctx.strokeRect(x + 6, y + 6, CS - 12, CS - 12); ctx.restore();
+        num(ctx, String(c.v), x + CS / 2, y + CS / 2 + 2, V.rgba(P.amber, a), 30);
+      }); });
+    }
+    if (s > 0) rings(s - 1, 1 - swap, f);
+    rings(s, s > 0 ? swap : 1, f);
+    ctx.restore();
+    for (var g = 0; g <= C; g++) {           // window boundaries every two pixels, cell lines between
+      var major = g % 2 === 0, col = major ? V.rgba(P.dim, 0.55) : V.rgba(P.hair, 1);
+      V.line(ctx, GX + g * CS, GY, GX + g * CS, GY + R * CS, col, major ? 2 : 1);
+      V.line(ctx, GX, GY + g * CS, GX + C * CS, GY + g * CS, col, major ? 2 : 1);
+    }
+
+    // pooled output
+    for (var a = 0; a < 4; a++) for (var b = 0; b < 4; b++) {
+      var x2 = PX + b * PS, y2 = PY + a * PS, nv = PL[s][a][b].v, ov = s > 0 ? PL[s - 1][a][b].v : nv;
+      var vv = nv === ov ? nv : null;
+      ctx.fillStyle = V.rgba(P.teal, 0.07); ctx.fillRect(x2 + 4, y2 + 4, PS - 8, PS - 8);
+      if (vv !== null) num(ctx, String(vv), x2 + PS / 2, y2 + PS / 2 + 2, P.teal, 40);
+      else {
+        num(ctx, String(ov), x2 + PS / 2, y2 + PS / 2 + 2, V.rgba(P.teal, 1 - swap), 40);
+        num(ctx, String(nv), x2 + PS / 2, y2 + PS / 2 + 2, V.rgba(P.teal, swap), 40);
+      }
+      if (s > 0 && CHG[s][a][b]) {
+        var oa = show * (1 - fin);
+        if (oa > 0.01) { ctx.save(); ctx.strokeStyle = V.rgba(P.teal, oa); ctx.lineWidth = 4; ctx.strokeRect(x2 + 4, y2 + 4, PS - 8, PS - 8); ctx.restore(); }
+      }
+    }
+    for (var g2 = 0; g2 <= 4; g2++) {
+      V.line(ctx, PX + g2 * PS, PY, PX + g2 * PS, PY + 4 * PS, V.rgba(P.dim, 0.55), 2);
+      V.line(ctx, PX, PY + g2 * PS, PX + 4 * PS, PY + g2 * PS, V.rgba(P.dim, 0.55), 2);
+    }
+
+    // readouts: what this shift changed, then the totals over all four
+    if (fin > 0.5) {
+      V.tex(lIn, "feature map, over four shifts: " + TI + " of " + (NS * R * C) + " values changed");
+      V.tex(lPool, "after 2 × 2 max pool: " + TP + " of " + (NS * 16) + " changed");
+      V.fade(lIn, V.span(t, FIN + 0.25, FIN + 0.6)); V.fade(lPool, V.span(t, FIN + 0.25, FIN + 0.6));
+    } else if (s === 0) {
+      V.tex(lIn, "feature map, 8 × 8"); V.tex(lPool, "after 2 × 2 max pool, 4 × 4");
+      V.fade(lIn, 1); V.fade(lPool, 1);
+    } else {
+      V.tex(lIn, "feature map: " + CI[s] + " of 64 values changed");
+      V.tex(lPool, "after 2 × 2 max pool: " + CP[s] + " of 16 changed");
+      var la = show * (1 - V.span(t, FIN, FIN + 0.25));
+      V.fade(lIn, la); V.fade(lPool, la);
+    }
+    place(lIn, 540, GY - 40); place(lPool, 540, PY - 40);
+    V.tex(counter, "$\\Delta = " + s + "$");
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.2, setup: setup, render: render,
+            title: "Max pooling absorbs a shift", mark: "DATASCI 207", course: "module 10" });
+})();
+</script>
+</body></html>

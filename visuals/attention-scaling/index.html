@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why attention divides by the square root of d</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 13, scaled dot-product attention: Scores = Q x K^T / sqrt(d_k).
+   One simulated query and eight simulated keys with standard normal entries
+   (seeded). Their dot products spread like sqrt(d). Without the scale the
+   softmax weights collapse onto one key and the softmax gradient (the size of
+   its Jacobian, diag(w) - w w^T) goes to zero; with the scale the weights stay
+   spread. The counter is d = 4, 16, 64, 256, 1,024. The first d entries of one
+   1,024-entry draw are used at every d, so each step adds dimensions. */
+(function () {
+  var V = VIZ, P = V.P;
+  var DS = [4, 16, 64, 256, 1024], PHASE = 3.6, N = 8, DMAX = 1024;
+  var X0 = 120, X1 = 960, SMAX = 8;             // score strip: -8 .. 8, the range where softmax is still soft
+  function sx(s) { return (X0 + X1) / 2 + (X1 - X0) / 2 * V.clamp(s / SMAX, -1, 1); }
+  var BAR_W = 70, BAR_H = 260;
+  function bx(j) { return X0 + (X1 - X0) * (j + 0.5) / N; }
+  var PANELS = [ // the unscaled panel (amber) and the scaled panel (teal)
+    { strip: 490, base: 820, col: P.amber, scaled: false },
+    { strip: 1000, base: 1325, col: P.teal, scaled: true }
+  ];
+
+  function softmax(s) {
+    var m = Math.max.apply(null, s), e = s.map(function (x) { return Math.exp(x - m); });
+    var z = e.reduce(function (a, b) { return a + b; }, 0);
+    return e.map(function (x) { return x / z; });
+  }
+  function jacobianNorm(w) {     // Frobenius norm of diag(w) - w w^T
+    var f = 0;
+    for (var i = 0; i < w.length; i++) for (var j = 0; j < w.length; j++) {
+      var v = (i === j ? w[i] : 0) - w[i] * w[j]; f += v * v;
+    }
+    return Math.sqrt(f);
+  }
+
+  // pre-simulate: one query, eight keys, standard normal entries
+  var r = V.rng(9), q = [], K = [];
+  for (var i = 0; i < DMAX; i++) q.push(V.normal(r));
+  for (var j = 0; j < N; j++) { var k = []; for (i = 0; i < DMAX; i++) k.push(V.normal(r)); K.push(k); }
+  var DATA = DS.map(function (d) {
+    var s = K.map(function (k) { var a = 0; for (var i = 0; i < d; i++) a += q[i] * k[i]; return a; });
+    var ss = s.map(function (x) { return x / Math.sqrt(d); });
+    var w = softmax(s), ws = softmax(ss);
+    return { d: d, raw: s, sc: ss, w: [w, ws], g: [jacobianNorm(w), jacobianNorm(ws)] };
+  });
+
+  var eq, counter, cap, L = [];
+  function setup() {
+    var D = "\\textcolor{#e8836a}{d}";
+    eq = V.el("eq", "");
+    eq.innerHTML = '<div class="amber">' + katex.renderToString("w = \\mathrm{softmax}(q \\cdot k_j)", { trust: true }) + "</div>" +
+      '<div class="teal">' + katex.renderToString("w = \\mathrm{softmax}(q \\cdot k_j / \\sqrt{" + D + "})", { trust: true }) + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Simulated: one query and eight keys with standard normal entries. Without the scale, softmax gives one key all the weight and its gradient vanishes.");
+    PANELS.forEach(function (p, n) {
+      L.push({
+        head: V.el("label", n ? "scaled by $1/\\sqrt{d}$" : "unscaled", { left: X0 + "px", top: (p.strip - 92) + "px", color: p.col }),
+        spread: V.el("label", "", { right: (1080 - X1) + "px", top: (p.strip - 92) + "px" }),
+        stat: V.el("label", "", { left: X0 + "px", top: (p.base + 18) + "px" })
+      });
+    });
+  }
+
+  // scores beyond the strip are marked by an outward chevron at its end
+  function chev(ctx, side, y, col) {
+    var x = side > 0 ? X1 + 22 : X0 - 22;
+    ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x - 7 * side, y - 11); ctx.lineTo(x + 5 * side, y); ctx.lineTo(x - 7 * side, y + 11); ctx.stroke(); ctx.restore();
+  }
+
+  function render(t, ctx) {
+    var k = Math.min(DS.length - 1, Math.floor(t / PHASE)), u = (t - k * PHASE) / PHASE;
+    var cur = DATA[k], prev = DATA[Math.max(0, k - 1)];
+    var m = V.span(u, 0.04, 0.3);                // eased move from the previous d
+    var grow = k === 0 ? V.span(t, 0.2, 1.4) : 1;  // the first frame grows in from nothing
+
+    PANELS.forEach(function (p, n) {
+      // the score strip: one dot per key, at its score
+      V.line(ctx, X0, p.strip, X1, p.strip, P.hair, 2);
+      V.line(ctx, sx(0), p.strip - 16, sx(0), p.strip + 16, P.hair, 2);
+      for (var j = 0; j < N; j++) {
+        var s0 = n ? prev.sc[j] : prev.raw[j], s1 = n ? cur.sc[j] : cur.raw[j];
+        if (k === 0) s0 = 0;
+        var sv = V.lerp(s0, s1, m), off = V.clamp((Math.abs(sv) - SMAX) / 2, 0, 1);
+        V.dot(ctx, sx(sv), p.strip, V.rgba(p.col, 0.85 * grow * (1 - off)), 8);
+        if (off > 0) chev(ctx, sv > 0 ? 1 : -1, p.strip, V.rgba(p.col, 0.85 * off));
+      }
+      // the softmax weights: one outlined bar per key
+      V.line(ctx, X0, p.base, X1, p.base, P.hair, 2);
+      var dashY = p.base - BAR_H;
+      V.line(ctx, X0, dashY, X1, dashY, V.rgba(P.dim, 0.35), 2, [8, 8]);
+      for (j = 0; j < N; j++) {
+        var w = V.lerp(k === 0 ? 1 / N : prev.w[n][j], cur.w[n][j], m) * grow;
+        var h = BAR_H * w;
+        if (h < 1) continue;
+        ctx.save(); ctx.strokeStyle = p.col; ctx.lineWidth = 2; ctx.fillStyle = V.rgba(p.col, 0.12);
+        ctx.fillRect(bx(j) - BAR_W / 2, p.base - h, BAR_W, h);
+        ctx.strokeRect(bx(j) - BAR_W / 2, p.base - h, BAR_W, h);
+        ctx.restore();
+      }
+      var wmax = V.lerp(k === 0 ? 1 / N : Math.max.apply(null, prev.w[n]), Math.max.apply(null, cur.w[n]), m);
+      var g = V.lerp(k === 0 ? 0 : prev.g[n], cur.g[n], m);
+      V.tex(L[n].stat, "largest weight " + wmax.toFixed(2) + "   ·   gradient size " + g.toFixed(2));
+      V.fade(L[n].stat, grow);
+      var sd = n ? 1 : Math.sqrt(cur.d);
+      V.tex(L[n].spread, "scores $q \\cdot k_j$, spread " + (n ? "1" : "$\\sqrt{d}$ = " + sd));
+    });
+    V.text(ctx, "weight 1", X1, PANELS[0].base - BAR_H - 12, V.rgba(P.dim, 0.8), 24, "right");
+    V.text(ctx, "weight 1", X1, PANELS[1].base - BAR_H - 12, V.rgba(P.dim, 0.8), 24, "right");
+
+    V.tex(counter, "$d = " + cur.d.toLocaleString("en-US").replace(",", "{,}") + "$");
+    V.fade(counter, k === 0 ? V.span(t, 0, 0.5) : 1);
+  }
+
+  VIZ.run({ duration: PHASE * DS.length + 1.4, poster: PHASE * DS.length + 1.0, setup: setup, render: render,
+            title: "Why attention divides by the square root of d", mark: "DATASCI 207", course: "module 13" });
+})();
+</script>
+</body></html>

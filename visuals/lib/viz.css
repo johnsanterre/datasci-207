@@ -1,0 +1,26 @@
+/* MSAI visual standard: the stage for a vertical artifact (see ../STYLE.md).
+   The stage is 1080 x 1920 in its own coordinates and is scaled to fit the
+   window for viewing; the renderer shoots it at full size. */
+:root{
+  --ground:#07120f; --ground-warm:#13110d;
+  --teal:#7fc4b2; --amber:#d8a65c; --coral:#e8836a;
+  --form:#38351f; --ink:#e8e3d4; --dim:#8b887b; --hair:#24302c;
+}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:50% 50%;
+  background:var(--ground);color:var(--ink);overflow:hidden;
+  font-family:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif}
+#stage.warm{background:var(--ground-warm)}
+#stage canvas{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#stage .mark{position:absolute;right:64px;top:56px;text-align:right;color:var(--dim);
+  font:600 22px/1.15 "Inter","Helvetica Neue",Arial,sans-serif;letter-spacing:.14em}
+#stage .mark b{display:block;color:var(--ink);font-size:34px;letter-spacing:.06em}
+#stage .title{position:absolute;left:0;right:0;top:150px;text-align:center;color:var(--ink);
+  font:700 54px/1.15 "Inter","Helvetica Neue",Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+#stage .eq{position:absolute;left:72px;top:170px;color:var(--ink);font-size:40px;line-height:1.5}
+#stage .eq .teal{color:var(--teal)} #stage .eq .amber{color:var(--amber)} #stage .eq .coral{color:var(--coral)}
+#stage .counter{position:absolute;left:0;right:0;top:1440px;text-align:center;color:var(--coral);font-size:120px}
+#stage .caption{position:absolute;left:96px;right:96px;bottom:110px;text-align:center;color:var(--dim);
+  font:400 31px/1.4 "Inter","Helvetica Neue",Arial,sans-serif}
+#stage .label{position:absolute;color:var(--dim);font:500 28px/1.2 "Inter","Helvetica Neue",Arial,sans-serif;white-space:nowrap}
+#stage .katex{font-size:1em}

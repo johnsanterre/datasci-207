@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The receptive field grows</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 10, convolutional neural networks. One unit in the top layer, traced
+   back through the stack to the input pixels it depends on: its receptive
+   field. Act one stacks four 3 x 3 convolutions with stride 1 on an 11 x 11
+   input, and the field grows 3, 5, 7, 9. Act two is the module's "Example:
+   Simple CNN" (Conv 3x3, MaxPool 2x2, Conv 3x3, MaxPool 2x2, Conv 3x3) on the
+   28 x 28 input of its Keras example; each pool's stride of 2 doubles every
+   later step. Valid padding, as in the Keras default. Every size and every
+   field is computed below from the layer list with
+     r_l = r_{l-1} + (k_l - 1) * (product of the strides below layer l).
+   Nothing is simulated. */
+(function () {
+  var V = VIZ, P = V.P;
+  var X0 = 80, PW = 580, SK = 140;               // plane width and the oblique skew
+  var IN_BASE = 1310;                            // front edge of the input plane
+
+  // a stack: input size and layer list; derive each plane's size, jump, offset
+  function stack(n, layers, sp, depth) {
+    var planes = [{ n: n, j: 1, off: 0, name: "input", k: 0, s: 1, r: 1 }];
+    layers.forEach(function (L) {
+      var p = planes[planes.length - 1];
+      var n2 = Math.floor((p.n - L.k) / L.s) + 1;                 // the module's output-size formula, no padding
+      var off = p.off + (L.s === 1 ? (L.k - 1) / 2 * p.j : 0);    // where unit 0 sits on the input
+      planes.push({ n: n2, j: p.j * L.s, off: off, name: L.name, k: L.k, s: L.s, r: p.r + (L.k - 1) * p.j });
+    });
+    return { nin: n, planes: planes, sp: sp, depth: depth };
+  }
+  var CONV = { k: 3, s: 1, name: "conv 3 × 3" }, POOL = { k: 2, s: 2, name: "pool 2 × 2" };
+  var ACTS = [stack(11, [CONV, CONV, CONV, CONV], 200, 160),
+              stack(28, [CONV, POOL, CONV, POOL, CONV], 166, 112)];
+  // the region a unit sees on each plane below it: [a, b] on plane m from plane m + 1
+  function trace(S, top) {
+    var c = Math.floor((S.planes[top].n - 1) / 2), R = [];
+    R[top] = [c, c];
+    for (var m = top; m > 0; m--) {
+      var L = S.planes[m];
+      R[m - 1] = [R[m][0] * L.s, R[m][1] * L.s + L.k - 1];
+    }
+    return R;
+  }
+
+  // timing: act one slower, act two faster; each step adds one layer and traces it
+  var A1 = 0.6, ST1 = [2.8, 2.8, 2.4, 2.4], A1END, A2, ST2 = 1.8, A2END, DUR;
+  A1END = A1 + ST1.reduce(function (a, b) { return a + b; }, 0);
+  A2 = A1END + 1.3; A2END = A2 + 0.3 + 5 * ST2; DUR = A2END + 1.7;
+  function where(t) {             // act, step (1-based layer), progress in the step, act alpha
+    if (t < A2 - 0.25) {
+      var a = 1 - V.span(t, A2 - 0.75, A2 - 0.25);
+      if (t < A1) return { act: 0, step: 0, u: 1, a: a };
+      var s0 = A1;
+      for (var i = 0; i < ST1.length; i++) {
+        if (t < s0 + ST1[i] || i === ST1.length - 1) return { act: 0, step: i + 1, u: V.clamp((t - s0) / ST1[i], 0, 1), a: a };
+        s0 += ST1[i];
+      }
+    }
+    var b = V.span(t, A2 - 0.25, A2 + 0.25);
+    if (t < A2 + 0.3) return { act: 1, step: 0, u: 1, a: b };
+    var k = Math.min(4, Math.floor((t - A2 - 0.3) / ST2));
+    return { act: 1, step: k + 1, u: V.clamp((t - A2 - 0.3 - k * ST2) / ST2, 0, 1), a: b };
+  }
+
+  // screen position of input coordinates (p across, q into the page) on plane m
+  function pt(S, m, p, q) {
+    var u = p / S.nin, v = q / S.nin, yb = IN_BASE - m * S.sp;
+    return [X0 + PW * u + SK * v, yb - S.depth * v];
+  }
+  function quad(S, m, p0, p1) { return [pt(S, m, p0, p0), pt(S, m, p1, p0), pt(S, m, p1, p1), pt(S, m, p0, p1)]; }
+  function span(S, m, a, b) { var L = S.planes[m]; return [L.off + a * L.j, L.off + (b + 1) * L.j]; }
+
+  function poly(ctx, Q, fill, stroke, w) {
+    ctx.save(); ctx.beginPath(); ctx.moveTo(Q[0][0], Q[0][1]);
+    for (var i = 1; i < Q.length; i++) ctx.lineTo(Q[i][0], Q[i][1]);
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = w || 2; ctx.lineJoin = "round"; ctx.stroke(); }
+    ctx.restore();
+  }
+  function plane(ctx, S, m, a) {
+    var L = S.planes[m], e = span(S, m, 0, L.n - 1);
+    ctx.save(); ctx.globalAlpha = a;
+    V.form(ctx, quad(S, m, e[0], e[1]), 0.95);
+    var gl = V.rgba(P.ground, L.n > 20 ? 0.45 : 0.7), lw = L.n > 20 ? 1 : 1.6;
+    for (var i = 0; i <= L.n; i++) {
+      var p = L.off + i * L.j, A = pt(S, m, p, e[0]), B = pt(S, m, p, e[1]), C = pt(S, m, e[0], p), D = pt(S, m, e[1], p);
+      V.line(ctx, A[0], A[1], B[0], B[1], gl, lw); V.line(ctx, C[0], C[1], D[0], D[1], gl, lw);
+    }
+    ctx.restore();
+  }
+
+  var eq, counter, rl, caps = [], labels = [];
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString(
+      "{\\color{#7fc4b2}r_{\\color{#e8836a}\\ell}} = {\\color{#7fc4b2}r_{{\\color{#e8836a}\\ell}-1}} + ({\\color{#d8a65c}k_{\\color{#e8836a}\\ell}} - 1)\\textstyle\\prod_{i<{\\color{#e8836a}\\ell}} s_i") + "</div>" +
+      "<div>" + katex.renderToString("{\\color{#7fc4b2}r_0} = 1, \\quad {\\color{#d8a65c}k} = \\text{window}, \\quad s = \\text{stride}") + "</div>";
+    counter = V.el("counter", "");
+    rl = V.el("label", "", { color: P.teal, fontSize: "36px" });
+    caps.push(V.el("caption", "Four 3 × 3 convolutions with stride 1. Each layer adds one pixel on every side of what the top unit sees."));
+    var S2 = ACTS[1], r3 = S2.planes[5].r, r3plain = 1 + 3 * 2;
+    caps.push(V.el("caption", "The module’s simple CNN on a 28 × 28 input. Each 2 × 2 pool with stride 2 doubles how far every later layer reaches, so three convolutions see " +
+      r3 + " × " + r3 + " pixels, not " + r3plain + " × " + r3plain + "."));
+    for (var i = 0; i < 6; i++) labels.push(V.el("label", ""));
+  }
+  function place(d, x, y, align) {
+    d.style.left = (align === "center" ? x - d.offsetWidth / 2 : x) + "px";
+    d.style.top = (y - d.offsetHeight / 2) + "px";
+  }
+
+  function render(t, ctx) {
+    var w = where(t), S = ACTS[w.act], top = w.step, u = w.u;
+    var last = (w.act === 1 && top === 5);
+    var fadeOut = (last || (w.act === 0 && top === 4)) ? 1 : 1 - V.span(u, 0.93, 1);
+    var R = top > 0 ? trace(S, top) : null;
+
+    // planes: those already built, and the new one fading in
+    for (var m = 0; m < S.planes.length; m++) {
+      var pa = m < top ? 1 : m === top ? (top === 0 ? 1 : V.span(u, 0, 0.14)) : 0;
+      pa *= w.a;
+      if (pa > 0.005) plane(ctx, S, m, pa);
+      var lb = labels[m];
+      if (pa > 0.005) {
+        V.tex(lb, S.planes[m].name === "input" ? "input " + S.nin + " × " + S.nin : S.planes[m].name);
+        place(lb, X0 + PW + SK + 22, IN_BASE - m * S.sp - S.depth * 0.5);
+      }
+      V.fade(lb, pa);
+    }
+    for (var m2 = S.planes.length; m2 < labels.length; m2++) V.fade(labels[m2], 0);
+
+    // the trace: from the top unit down, one plane at a time
+    if (R) {
+      var a0 = w.a * fadeOut, nlev = top, t0 = 0.2, t1 = 0.72;
+      var lev = function (m) { var i = top - 1 - m; return V.span(u, t0 + (t1 - t0) * i / nlev, t0 + (t1 - t0) * (i + 1) / nlev); };
+      for (var m3 = top - 1; m3 >= 0; m3--) {
+        var g = lev(m3); if (g <= 0) break;
+        var hi = span(S, m3 + 1, R[m3 + 1][0], R[m3 + 1][1]), lo = span(S, m3, R[m3][0], R[m3][1]);
+        var p0 = V.lerp(hi[0], lo[0], g), p1 = V.lerp(hi[1], lo[1], g);
+        var Q = quad(S, m3, p0, p1), Qh = quad(S, m3 + 1, hi[0], hi[1]);
+        var isK = m3 === top - 1, col = isK ? P.amber : P.teal;
+        poly(ctx, Q, V.rgba(col, 0.16 * a0 * g), V.rgba(col, a0 * g), m3 === 0 ? 4 : 2.5);
+        for (var c = 0; c < 4; c++) V.line(ctx, Qh[c][0], Qh[c][1], Q[c][0], Q[c][1], V.rgba(P.teal, 0.6 * a0 * g), 2, [8, 8]);
+      }
+      // the unit itself, the one coral point
+      var cu = span(S, top, R[top][0], R[top][1]), cc = pt(S, top, (cu[0] + cu[1]) / 2, (cu[0] + cu[1]) / 2);
+      var ua = V.span(u, 0.1, 0.2) * a0;
+      if (ua > 0) { poly(ctx, quad(S, top, cu[0], cu[1]), V.rgba(P.coral, 0.25 * ua)); V.dot(ctx, cc[0], cc[1], V.rgba(P.coral, ua), 9); }
+    }
+
+    // readouts
+    var done = R ? V.span(u, 0.72, 0.8) : 0, r = R ? S.planes[top].r : 1;
+    V.tex(rl, "receptive field  $r = " + r + "$");
+    place(rl, X0 + PW / 2, IN_BASE + 52, "center");
+    V.fade(rl, done * w.a * fadeOut);
+    V.tex(counter, "$\\ell = " + top + "$");
+    V.fade(counter, (top > 0 ? 1 : 0) * w.a);
+    V.fade(caps[0], w.act === 0 ? w.a : 0);
+    V.fade(caps[1], w.act === 1 ? w.a : 0);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.3, setup: setup, render: render,
+            title: "The receptive field grows", mark: "DATASCI 207", course: "module 10" });
+})();
+</script>
+</body></html>
