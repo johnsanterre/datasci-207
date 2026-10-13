@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scale before k-means</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, practical considerations: scaling. The notes: "Both k-means and
+   PCA are sensitive to scale: features with large variance dominate. Always
+   standardize before applying." 120 simulated customers (seeded): two age
+   groups of 60 (about 29 and 56 years old), and an income drawn from one
+   normal (mean $70,000, sd $20,000) for everyone, so income carries no group.
+   Step 1: the data, each axis fitted to the page.
+   Step 2: k-means (k = 2) on the raw features. The page first redraws the
+   data at the scale the distance uses, one year as long as one dollar, where
+   it collapses to a vertical line; the clusters it finds split by income.
+   Step 3: each feature standardized, z = (x - mean) / sd, and k-means run
+   again: the clusters are the age groups. Filled and open marks are the two
+   clusters; the dashed line is the k-means border. Numbers computed here. */
+(function () {
+  var V = VIZ, P = V.P;
+
+  // the data
+  var r = V.rng(8508), X = [], G = [];
+  [[29, 4], [56, 5]].forEach(function (a, g) {
+    for (var i = 0; i < 60; i++) {
+      X.push([a[0] + a[1] * V.normal(r), Math.max(15000, 70000 + 20000 * V.normal(r))]);
+      G.push(g);
+    }
+  });
+  var N = X.length;
+  function mean(f) { return X.reduce(function (s, p) { return s + p[f]; }, 0) / N; }
+  function sdv(f, m) { return Math.sqrt(X.reduce(function (s, p) { return s + (p[f] - m) * (p[f] - m); }, 0) / N); }
+  var MA = mean(0), MI = mean(1), SA = sdv(0, MA), SI = sdv(1, MI);
+  var Z = X.map(function (p) { return [(p[0] - MA) / SA, (p[1] - MI) / SI]; });
+  var ages = X.map(function (p) { return p[0]; }), incs = X.map(function (p) { return p[1]; });
+  var A0 = Math.min.apply(null, ages), A1 = Math.max.apply(null, ages), I0 = Math.min.apply(null, incs), I1 = Math.max.apply(null, incs);
+  var GROUPMEAN = [0, 1].map(function (g) { var s = 0, n = 0; X.forEach(function (p, i) { if (G[i] === g) { s += p[0]; n++; } }); return s / n; });
+
+  // k-means, k = 2: k-means++ starts, ten runs, lowest inertia kept
+  function d2(p, q) { return (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); }
+  function kmeans(D, seed) {
+    var rr = V.rng(seed), best = null;
+    for (var rep = 0; rep < 10; rep++) {
+      var C = [D[Math.floor(rr() * N)].slice()];
+      var W = D.map(function (p) { return d2(p, C[0]); }), tot = W.reduce(function (s, x) { return s + x; }, 0), u = rr() * tot, k = 0;
+      while (k < N - 1 && (u -= W[k]) > 0) k++;
+      C.push(D[k].slice());
+      var lab;
+      for (var it = 0; it < 100; it++) {
+        lab = D.map(function (p) { return d2(p, C[0]) <= d2(p, C[1]) ? 0 : 1; });
+        C = C.map(function (c, m) {
+          var s0 = 0, s1 = 0, n = 0; D.forEach(function (p, i) { if (lab[i] === m) { s0 += p[0]; s1 += p[1]; n++; } });
+          return n ? [s0 / n, s1 / n] : c;
+        });
+      }
+      var J = 0; D.forEach(function (p, i) { J += d2(p, C[lab[i]]); });
+      if (!best || J < best.J) best = { C: C, lab: lab, J: J };
+    }
+    return best;
+  }
+  var KR = kmeans(X, 31), KZ = kmeans(Z, 32);
+  // filled = the lower-income cluster on raw features, the younger cluster on standardized ones
+  if (KR.C[0][1] > KR.C[1][1]) { KR.C.reverse(); KR.lab = KR.lab.map(function (l) { return 1 - l; }); }
+  if (KZ.C[0][0] > KZ.C[1][0]) { KZ.C.reverse(); KZ.lab = KZ.lab.map(function (l) { return 1 - l; }); }
+  // how each clustering lines up with the age groups
+  var MIX = [[0, 0], [0, 0]]; X.forEach(function (_, i) { MIX[KR.lab[i]][G[i]]++; });
+  var HIT = 0; X.forEach(function (_, i) { if (KZ.lab[i] === G[i]) HIT++; });
+  HIT = Math.max(HIT, N - HIT);
+  var GAP = Math.round(A1 - A0);
+  // each feature's share of the total variance: what the squared distance is made of
+  var SHARE_A = SA * SA / (SA * SA + SI * SI);
+
+  // views: px = ax + bx * age, py = ay - by * income
+  var FV = (function () { var bx = 780 / (72 - 18), by = 700 / 140000; return { ax: 150 - 18 * bx, bx: bx, ay: 1150, by: by }; })();
+  var EV = { ax: 540 - FV.by * MA, bx: FV.by, ay: FV.ay, by: FV.by };                 // one year drawn as long as one dollar
+  var ZS = 128, ZV = { ax: 540 - ZS / SA * MA, bx: ZS / SA, ay: 780 + ZS / SI * MI, by: ZS / SI };
+  function mix(a, b, u) { return { ax: V.lerp(a.ax, b.ax, u), bx: V.lerp(a.bx, b.bx, u), ay: V.lerp(a.ay, b.ay, u), by: V.lerp(a.by, b.by, u) }; }
+
+  // timeline
+  var T2 = 4.2, T_E0 = 4.5, T_E1 = 6.0, T_K1 = 6.7, T_B0 = 8.0, T_B1 = 9.5, T_L1 = 9.8;
+  var T3 = 11.6, T_Z0 = 11.9, T_Z1 = 13.4, T_K2 = 13.9, T_L2 = 15.0, DUR = 19.5;
+  function view(t) {
+    if (t < T_E0) return FV;
+    if (t < T_B0) return mix(FV, EV, V.span(t, T_E0, T_E1));
+    if (t < T_Z0) return mix(EV, FV, V.span(t, T_B0, T_B1));
+    return mix(FV, ZV, V.span(t, T_Z0, T_Z1));
+  }
+
+  function mark(ctx, x, y, filled, a) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a;
+    if (filled) V.dot(ctx, x, y, P.ink, 7.5);
+    else { V.dot(ctx, x, y, P.ground, 7.5); V.ring(ctx, x, y, 7.5, P.ink, 2.5); }
+    ctx.restore();
+  }
+  function txt(ctx, s, x, y, color, size, align, a, weight) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a; V.text(ctx, s, x, y, color, size, align, weight); ctx.restore();
+  }
+  // a k-means border (the perpendicular bisector of the two centres) in feature space,
+  // returned as two raw-unit points; std = true when the features were standardized
+  function border(K, std) {
+    var c0 = K.C[0], c1 = K.C[1], n = [c1[0] - c0[0], c1[1] - c0[1]], m = [(c0[0] + c1[0]) / 2, (c0[1] + c1[1]) / 2];
+    var lo = std ? [(A0 - 3 - MA) / SA, (I0 - 6000 - MI) / SI] : [A0 - 3, I0 - 6000];
+    var hi = std ? [(A1 + 3 - MA) / SA, (I1 + 6000 - MI) / SI] : [A1 + 3, I1 + 6000];
+    var a, b;
+    if (Math.abs(n[1]) * (hi[1] - lo[1]) > Math.abs(n[0]) * (hi[0] - lo[0])) {      // nearly level: solve for the second feature
+      a = [lo[0], m[1] - n[0] * (lo[0] - m[0]) / n[1]]; b = [hi[0], m[1] - n[0] * (hi[0] - m[0]) / n[1]];
+    } else { a = [m[0] - n[1] * (lo[1] - m[1]) / n[0], lo[1]]; b = [m[0] - n[1] * (hi[1] - m[1]) / n[0], hi[1]]; }
+    if (std) { a = [MA + SA * a[0], MI + SI * a[1]]; b = [MA + SA * b[0], MI + SI * b[1]]; }
+    return [a, b];
+  }
+  var BR = border(KR, false), BZ = border(KZ, true);
+  function money(v) { return "$" + Math.round(v / 1000) + "k"; }
+  // the age share to one significant figure, and income as its complement to the same decimals, so they add to 100
+  function shares(f) {
+    var a = 100 * f, sa = a < 1 ? a.toPrecision(1) : a.toFixed(0), dec = (sa.split(".")[1] || "").length;
+    return [sa, (100 - parseFloat(sa)).toFixed(dec)];
+  }
+
+  var eq, counter, cap;
+  function setup() {
+    var A = "\\textcolor{" + P.amber + "}";
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("d^2 = (\\text{age} - \\text{age}')^2 + (\\text{income} - \\text{income}')^2") + "</div>" +
+      "<div>" + katex.renderToString(A + "{\\text{standardize: } z = (x - \\bar{x}) \\,/\\, s}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "");
+  }
+
+  function render(t, ctx) {
+    var vw = view(t), step = t < T2 ? 1 : t < T3 ? 2 : 3;
+    function px(a) { return vw.ax + vw.bx * a; }
+    function py(m) { return vw.ay - vw.by * m; }
+    var zu = t < T_Z0 ? 0 : V.span(t, T_Z0, T_Z1), eu = t < T_E0 || t >= T_Z0 ? 0 : t < T_B0 ? V.span(t, T_E0, T_E1) : 1 - V.span(t, T_B0, T_B1);
+
+    // range frames: hairlines spanning the data, ticks at round values or whole standard deviations
+    var yb = py(I0) + 40, xl = px(A0) - 40;
+    V.line(ctx, px(A0), yb, px(A1), yb, P.hair, 2);
+    V.line(ctx, xl, py(I0), xl, py(I1), P.hair, 2);
+    var tf = V.clamp(1 - 2 * zu, 0, 1) * V.clamp(1 - 2 * eu, 0, 1), tz = V.clamp(2 * zu - 1, 0, 1);   // the old ticks leave before the new ones arrive
+    [30, 45, 60].forEach(function (a) { if (a < A0 || a > A1) return; V.line(ctx, px(a), yb, px(a), yb + 10, V.rgba(P.hair, tf), 2); txt(ctx, String(a), px(a), yb + 44, P.dim, 28, "center", tf); });
+    [40000, 70000, 100000].forEach(function (m) { V.line(ctx, xl, py(m), xl - 10, py(m), V.rgba(P.hair, V.clamp(1 - 2 * zu, 0, 1)), 2); txt(ctx, money(m), xl - 16, py(m) + 9, P.dim, 28, "right", V.clamp(1 - 2 * zu, 0, 1)); });
+    [-2, -1, 0, 1, 2].forEach(function (z) {
+      var a = MA + SA * z, m = MI + SI * z;
+      if (a >= A0 && a <= A1) V.line(ctx, px(a), yb, px(a), yb + 10, V.rgba(P.hair, tz), 2);
+      if (m >= I0 && m <= I1) V.line(ctx, xl, py(m), xl - 10, py(m), V.rgba(P.hair, tz), 2);
+      if (a >= A0 && a <= A1) txt(ctx, String(z).replace("-", "−"), px(a), yb + 44, P.dim, 28, "center", tz);
+      if (m >= I0 && m <= I1) txt(ctx, String(z).replace("-", "−"), xl - 16, py(m) + 9, P.dim, 28, "right", tz);
+    });
+    txt(ctx, zu > 0.5 ? "age, standardized" : "age (years)", (px(A0) + px(A1)) / 2, yb + 86, P.dim, 28, "center", Math.abs(zu - 0.5) * 2 * (1 - eu));
+    txt(ctx, zu > 0.5 ? "income, standardized" : "income ($)", xl, py(I1) - 28, P.dim, 28, "center", Math.abs(zu - 0.5) * 2);
+    if (eu > 0.01) txt(ctx, "one year drawn as long as one dollar", px(MA) + 40, py(MI) + 9, P.dim, 28, "left", V.span(eu, 0.9, 1));
+
+    // the k-means borders, dashed
+    var bR = t < T3 ? V.span(t, T_B1, T_L1 + 0.6) : 1 - V.span(t, T3, T3 + 0.4);
+    var bZ = V.span(t, T_L2, T_L2 + 0.6);
+    [[BR, bR], [BZ, bZ]].forEach(function (b) {
+      if (b[1] <= 0.01) return;
+      var a = b[0][0], c = b[0][1];
+      V.line(ctx, px(a[0]), py(a[1]), V.lerp(px(a[0]), px(c[0]), b[1]), V.lerp(py(a[1]), py(c[1]), b[1]), P.amber, 3, [14, 10]);
+    });
+
+    // the points: neutral, then the raw clustering, then the standardized one
+    var kr = V.span(t, T_K1, T_K1 + 0.8), kz = V.span(t, T_K2, T_K2 + 0.8);
+    X.forEach(function (p, i) {
+      var x = px(p[0]), y = py(p[1]);
+      var nA = V.span(t, 0, 0.8) * (1 - kr);
+      if (nA > 0.01) V.dot(ctx, x, y, V.rgba(P.ink, nA), 5);
+      mark(ctx, x, y, KR.lab[i] === 0, kr * (1 - kz));
+      mark(ctx, x, y, KZ.lab[i] === 0, kz);
+    });
+
+    // what the squared distance is made of
+    var sh = zu > 0.5 ? 0.5 : SHARE_A, ra = V.span(t, 0.8, 1.6);
+    txt(ctx, "share of the variance k-means sees", 540, 1318, P.dim, 28, "center", ra);
+    var ss = shares(sh);
+    txt(ctx, "age " + ss[0] + "%      income " + ss[1] + "%", 540, 1362, P.ink, 34, "center", ra, 600);
+
+    V.tex(counter, "$\\text{step } " + step + "$");
+    var caps = [
+      "120 simulated customers in two age groups, about " + Math.round(GROUPMEAN[0]) + " and " + Math.round(GROUPMEAN[1]) +
+        " years old. Income is drawn the same way for both groups.",
+      "In raw units a &#36;" + GAP + " income gap counts as much as a " + GAP + "-year age gap, so k-means splits by income. Its filled cluster holds " +
+        MIX[0][0] + " younger and " + MIX[0][1] + " older customers.",
+      "Standardized, each feature has spread 1. Now k-means finds the age groups: " + HIT + " of " + N + " customers land with their own group."
+    ];
+    V.tex(cap, caps[step - 1]);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Scale before k-means", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

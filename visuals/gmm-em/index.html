@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gaussian mixture, fitted by EM</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, Gaussian mixtures and EM. 250 simulated points (seeded): 150 from
+   one normal and 100 from another, the module notebook's two groups (means
+   -2.0 and 1.5 along the first axis, weights 0.6 and 0.4) given a second
+   dimension and a tilt. EM starts, as in the notebook, from deliberately
+   mediocre guesses: means -1 and 1 on the first axis, unit spread, equal weights.
+   Each iteration: the E-step gives every point its responsibility r for each
+   component (a point is drawn filled in proportion to r for the solid
+   component, so an open point belongs to the dashed one); the M-step refits
+   each component's weight, mean and covariance to its weighted points (the
+   ellipses are the 1 and 2 standard-deviation contours). The log-likelihood
+   is computed after every M-step and drawn below; EM never lowers it. The
+   run stops when it rises by less than 0.01. All numbers computed here. */
+(function () {
+  var V = VIZ, P = V.P;
+  var S = 108, CX = 540, CY = 800, MX = -0.1, MY = 0.2;
+
+  // the data
+  var r = V.rng(8403), X = [];
+  function draw(n, m, s1, s2, ang) {
+    var c = Math.cos(ang), s = Math.sin(ang);
+    for (var i = 0; i < n; i++) { var u = s1 * V.normal(r), v = s2 * V.normal(r); X.push([m[0] + c * u - s * v, m[1] + s * u + c * v]); }
+  }
+  draw(150, [-2.0, -0.4], 0.85, 0.45, 0.6);
+  draw(100, [1.5, 0.7], 1.15, 0.55, -0.45);
+  var N = X.length;
+
+  // EM for two components
+  function pdf(x, th, k) {
+    var m = th.mu[k], C = th.S[k], det = C[0] * C[2] - C[1] * C[1];
+    var dx = x[0] - m[0], dy = x[1] - m[1];
+    var q = (C[2] * dx * dx - 2 * C[1] * dx * dy + C[0] * dy * dy) / det;
+    return Math.exp(-0.5 * q) / (2 * Math.PI * Math.sqrt(det));
+  }
+  function estep(th) {
+    return X.map(function (x) { var a = th.pi[0] * pdf(x, th, 0), b = th.pi[1] * pdf(x, th, 1); return a / (a + b); });
+  }
+  function loglik(th) {
+    var s = 0; X.forEach(function (x) { s += Math.log(th.pi[0] * pdf(x, th, 0) + th.pi[1] * pdf(x, th, 1)); }); return s;
+  }
+  function mstep(R) {
+    var th = { pi: [], mu: [], S: [] };
+    [0, 1].forEach(function (k) {
+      var w = R.map(function (q) { return k === 0 ? q : 1 - q; }), nk = 0, mx = 0, my = 0;
+      X.forEach(function (x, i) { nk += w[i]; mx += w[i] * x[0]; my += w[i] * x[1]; });
+      mx /= nk; my /= nk;
+      var a = 0, b = 0, c = 0;
+      X.forEach(function (x, i) { var dx = x[0] - mx, dy = x[1] - my; a += w[i] * dx * dx; b += w[i] * dx * dy; c += w[i] * dy * dy; });
+      th.pi.push(nk / N); th.mu.push([mx, my]); th.S.push([a / nk, b / nk, c / nk]);
+    });
+    return th;
+  }
+  var TH = [{ pi: [0.5, 0.5], mu: [[-1, 0], [1, 0]], S: [[1, 0, 1], [1, 0, 1]] }];
+  var R = [null], LL = [loglik(TH[0])];
+  for (var it = 1; it <= 200; it++) {
+    R.push(estep(TH[it - 1])); TH.push(mstep(R[it])); LL.push(loglik(TH[it]));
+    if (LL[it] - LL[it - 1] < 0.01) break;
+  }
+  var K = TH.length - 1;
+
+  // timeline: three slow iterations with the E and M steps apart, then faster
+  var T0 = 1.6, TS = [], tt = T0;
+  for (var k = 1; k <= K; k++) {
+    var d = k <= 3 ? 2.8 : k <= 7 ? 1.1 : Math.max(0.12, 4.5 / Math.max(1, K - 7));
+    TS.push([tt, d]); tt += d;
+  }
+  var T_END = tt, DUR = T_END + 3.2;
+  // E occupies the first 40 percent of an iteration, M the next 40 percent
+  function phase(t) {
+    if (t < T0) return { k: 0, e: 0, m: 0 };
+    for (var j = TS.length - 1; j >= 0; j--) if (t >= TS[j][0]) {
+      var u = (t - TS[j][0]) / TS[j][1];
+      return { k: j + 1, e: V.ease(u / 0.4), m: V.ease((u - 0.45) / 0.4) };
+    }
+  }
+  function lerpTh(a, b, u) {
+    function L(x, y) { return x.map(function (v, i) { return Array.isArray(v) ? L(v, y[i]) : V.lerp(v, y[i], u); }); }
+    return { pi: L(a.pi, b.pi), mu: L(a.mu, b.mu), S: L(a.S, b.S) };
+  }
+
+  function sx(x) { return CX + S * (x - MX); }
+  function sy(y) { return CY - S * (y - MY); }
+
+  function ellipse(ctx, m, C, rad, dash, w, alpha) {
+    var a = C[0], b = C[1], c = C[2], h = (a + c) / 2, q = Math.sqrt((a - c) * (a - c) / 4 + b * b);
+    var l1 = h + q, l2 = Math.max(1e-9, h - q), ang = 0.5 * Math.atan2(2 * b, a - c);
+    ctx.save(); ctx.strokeStyle = V.rgba(P.ink, alpha); ctx.lineWidth = w; if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.ellipse(sx(m[0]), sy(m[1]), rad * Math.sqrt(l1) * S, rad * Math.sqrt(l2) * S, -ang, 0, 2 * Math.PI); ctx.stroke(); ctx.restore();
+  }
+  function pie(ctx, x, y, f, a) {
+    ctx.save(); ctx.globalAlpha *= a;
+    V.dot(ctx, x, y, P.ground, 7);
+    if (f > 0.004) {
+      ctx.fillStyle = P.ink; ctx.beginPath(); ctx.moveTo(x, y);
+      ctx.arc(x, y, 7, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * Math.min(f, 1)); ctx.closePath(); ctx.fill();
+    }
+    V.ring(ctx, x, y, 7, P.ink, 1.6); ctx.restore();
+  }
+  function haloText(ctx, s, x, y, color, size, align, a) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a; ctx.font = "500 " + size + "px " + getComputedStyle(document.getElementById("stage")).fontFamily;
+    ctx.textAlign = align; ctx.lineJoin = "round"; ctx.strokeStyle = P.ground; ctx.lineWidth = 8; ctx.strokeText(s, x, y);
+    ctx.fillStyle = color; ctx.fillText(s, x, y); ctx.restore();
+  }
+
+  // the log-likelihood panel
+  var GX0 = 150, GX1 = 930, GB = 1372, GH = 150;
+  var LMIN = LL[0], LMAX = LL[K];
+  function gx(k) { return GX0 + (GX1 - GX0) * k / K; }
+  function gy(l) { return GB - 14 - (GH - 14) * (l - LMIN) / (LMAX - LMIN); }
+
+  var eq, counter, cap;
+  function setup() {
+    var A = "\\textcolor{" + P.amber + "}";
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("\\text{E: } r_{ik} \\propto \\pi_k\\, \\mathcal{N}(x_i \\mid \\mu_k, \\Sigma_k) \\quad \\text{M: } \\mu_k = \\frac{\\sum_i r_{ik} x_i}{\\sum_i r_{ik}}") + "</div>" +
+      "<div>" + katex.renderToString(A + "{\\ell = \\textstyle\\sum_i \\log \\sum_k \\pi_k\\, \\mathcal{N}(x_i \\mid \\mu_k, \\Sigma_k)}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "250 simulated points, 150 and 100 from two normals. Each point is filled in proportion to its responsibility for the solid component. The log-likelihood never falls.");
+  }
+
+  function render(t, ctx) {
+    var ph = phase(t), k = ph.k;
+    var a0 = V.span(t, 0, 0.8), aE = V.span(t, 0.6, 1.4);
+    // parameters on screen: between the previous fit and this one during the M-step
+    var th = k === 0 ? TH[0] : lerpTh(TH[k - 1], TH[k], ph.m);
+    // responsibilities on screen: from the previous E-step to this one
+    var rPrev = k === 0 ? null : k === 1 ? R[1] : R[k - 1], rNow = k === 0 ? null : R[k];
+
+    // the components: 2 sd contour faint, 1 sd contour firm; solid and dashed
+    [0, 1].forEach(function (c) {
+      var dash = c === 1 ? [14, 10] : null;
+      ctx.save(); ctx.globalAlpha = aE;
+      ellipse(ctx, th.mu[c], th.S[c], 2, dash, 2, 0.45);
+      ellipse(ctx, th.mu[c], th.S[c], 1, dash, 3.5, 1);
+      var m = th.mu[c], px = sx(m[0]), py = sy(m[1]);
+      V.line(ctx, px - 11, py, px + 11, py, P.ink, 3); V.line(ctx, px, py - 11, px, py + 11, P.ink, 3);
+      ctx.restore();
+    });
+
+    // the points
+    X.forEach(function (x, i) {
+      var px = sx(x[0]), py = sy(x[1]);
+      if (k === 0 || (k === 1 && ph.e < 1)) {
+        var e = k === 0 ? 0 : ph.e;
+        if (e < 1) V.dot(ctx, px, py, V.rgba(P.ink, a0 * (1 - e)), 4.5);
+        if (e > 0) pie(ctx, px, py, rNow[i], e);
+      } else pie(ctx, px, py, V.lerp(rPrev[i], rNow[i], ph.e), 1);
+    });
+
+    // the weights, with a sample of each component's line as its name
+    var WY = 1082;
+    ctx.save(); ctx.globalAlpha = aE;
+    V.line(ctx, 250, WY - 9, 310, WY - 9, P.ink, 3.5);
+    V.line(ctx, 590, WY - 9, 650, WY - 9, P.ink, 3.5, [14, 10]);
+    ctx.restore();
+    V.text(ctx, "π = " + th.pi[0].toFixed(2), 326, WY, V.rgba(P.ink, aE), 32, "left", 600);
+    V.text(ctx, "π = " + th.pi[1].toFixed(2), 666, WY, V.rgba(P.ink, aE), 32, "left", 600);
+
+    // the phase being shown, during the slow iterations
+    var lab = "", la = 0;
+    if (k >= 1 && k <= 3) {
+      var u = (t - TS[k - 1][0]) / TS[k - 1][1];
+      if (u < 0.43) { lab = "E-step: each point's responsibility r"; la = V.span(u, 0, 0.08) ; }
+      else { lab = "M-step: each component refitted to its weighted points"; la = V.span(u, 0.43, 0.5) * (1 - V.span(u, 0.94, 1.0) * (k === 3 ? 1 : 0)); }
+    }
+    if (k === 0) { lab = "the starting guesses"; la = V.span(t, 0.6, 1.2); }
+    haloText(ctx, lab, 540, 410, P.dim, 28, "center", la);
+
+    // the log-likelihood, one point per M-step
+    var shown = k === 0 ? 0 : (ph.m > 0.5 ? k : k - 1);
+    V.line(ctx, GX0, GB, GX1, GB, P.hair, 2);
+    var pts = [];
+    for (var j = 0; j <= shown; j++) pts.push([gx(j), gy(LL[j])]);
+    if (k >= 1 && ph.m > 0 && ph.m <= 0.5) pts.push([V.lerp(gx(k - 1), gx(k), ph.m * 2), V.lerp(gy(LL[k - 1]), gy(LL[k]), ph.m * 2)]);
+    ctx.save(); ctx.globalAlpha = aE;
+    if (pts.length > 1) V.path(ctx, pts, P.amber, 3);
+    pts.forEach(function (p, j) { if (j <= shown) V.dot(ctx, p[0], p[1], P.amber, j === shown ? 8 : 4); });
+    ctx.restore();
+    V.text(ctx, "log-likelihood ℓ", GX0, GB - GH - 62, V.rgba(P.dim, aE), 28);
+    V.text(ctx, LL[shown].toFixed(1).replace("-", "−"), GX0, GB - GH - 20, V.rgba(P.amber, aE), 36, "left", 600);
+
+    V.tex(counter, "$\\text{iteration } " + k + "$");
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Gaussian mixture, fitted by EM", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DBSCAN</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, DBSCAN. Two simulated moons built as the module notebook builds
+   them (make_moons: 300 points, noise 0.07) plus 15 points scattered at random
+   over the same box, all from the seeded generator. DBSCAN runs with the
+   notebook's settings, eps = 0.2 and min_samples = 5 (the point itself
+   counts, as in scikit-learn).
+   Step 1: three points have their eps-neighbourhood drawn and are named core,
+   border and noise; then every point takes its mark (filled dot = core, open
+   ring = border, grey cross = noise).
+   Step 2: clusters grow by reachability, hop by hop from a seed core point.
+   Each reached point gets a disc of radius eps/2, so two discs touch exactly
+   when their centres are within eps: a cluster is one connected form.
+   Step 3: k-means with k = 2 on the same points, for comparison; its border
+   is the dashed straight line. Every count on screen is computed here. */
+(function () {
+  var V = VIZ, P = V.P;
+  var EPS = 0.2, MINS = 5;
+  var S = 280, CX = 540, CY = 900, MX = 0.5, MY = 0.25;    // pixels per unit, data centre on stage
+
+  // the data: make_moons(n_samples=300, noise=0.07), then 15 scattered points
+  var r = V.rng(8302), X = [], i, j;
+  for (i = 0; i < 150; i++) { var a = Math.PI * i / 149; X.push([Math.cos(a) + 0.07 * V.normal(r), Math.sin(a) + 0.07 * V.normal(r)]); }
+  for (i = 0; i < 150; i++) { var b = Math.PI * i / 149; X.push([1 - Math.cos(b) + 0.07 * V.normal(r), 1 - Math.sin(b) - 0.5 + 0.07 * V.normal(r)]); }
+  var NSCAT = 15;
+  for (i = 0; i < NSCAT; i++) X.push([-1.1 + 3.2 * r(), -0.65 + 1.8 * r()]);
+  var N = X.length;
+  function dist(p, q) { return Math.sqrt((p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1])); }
+
+  // DBSCAN: neighbourhoods, core points, then clusters grown breadth first
+  var NB = X.map(function (p) { var l = []; X.forEach(function (q, k) { if (dist(p, q) <= EPS) l.push(k); }); return l; });
+  var CORE = NB.map(function (l) { return l.length >= MINS; });
+  var LAB = new Array(N).fill(-1), DEPTH = new Array(N).fill(0), PAR = new Array(N).fill(-1), CL = [];
+  function grow(seed, c) {
+    var q = [seed], members = [seed]; LAB[seed] = c;
+    while (q.length) {
+      var p = q.shift();
+      NB[p].forEach(function (k) {
+        if (LAB[k] !== -1) return;
+        LAB[k] = c; DEPTH[k] = DEPTH[p] + 1; PAR[k] = p; members.push(k);
+        if (CORE[k]) q.push(k);
+      });
+    }
+    return members;
+  }
+  // seeds: the leftmost core point, then the rightmost unclaimed one, then any left over
+  function pickSeed(right) {
+    var best = -1;
+    for (var k = 0; k < N; k++) if (CORE[k] && LAB[k] === -1 && (best < 0 || (right ? X[k][0] > X[best][0] : X[k][0] < X[best][0]))) best = k;
+    return best;
+  }
+  var sd = pickSeed(false);
+  while (sd >= 0) { CL.push(grow(sd, CL.length)); sd = pickSeed(CL.length === 1); }
+  var TYPE = X.map(function (_, k) { return CORE[k] ? "core" : LAB[k] >= 0 ? "border" : "noise"; });
+  var NNOISE = TYPE.filter(function (s) { return s === "noise"; }).length;
+
+  // k-means with k = 2 for comparison (k-means++ starts, ten runs, lowest inertia kept)
+  function d2(p, q) { return (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); }
+  function kmeans2(rr) {
+    var C = [X[Math.floor(rr() * N)].slice()];
+    var D = X.map(function (p) { return d2(p, C[0]); }), tot = D.reduce(function (s, x) { return s + x; }, 0), u = rr() * tot, k = 0;
+    while (k < N - 1 && (u -= D[k]) > 0) k++;
+    C.push(X[k].slice());
+    var lab = new Array(N).fill(0);
+    for (var it = 0; it < 100; it++) {
+      lab = X.map(function (p) { return d2(p, C[0]) <= d2(p, C[1]) ? 0 : 1; });
+      C = C.map(function (c, m) {
+        var sx = 0, sy = 0, n = 0; X.forEach(function (p, k2) { if (lab[k2] === m) { sx += p[0]; sy += p[1]; n++; } });
+        return n ? [sx / n, sy / n] : c;
+      });
+    }
+    var J = 0; X.forEach(function (p, k2) { J += d2(p, C[lab[k2]]); });
+    return { C: C, lab: lab, J: J };
+  }
+  var KM = null, rk = V.rng(77);
+  for (i = 0; i < 10; i++) { var f = kmeans2(rk); if (!KM || f.J < KM.J) KM = f; }
+  // points DBSCAN put in its two clusters that k-means puts with the other moon (best matching of labels)
+  var agree = 0, cross = 0;
+  for (i = 0; i < N; i++) if (LAB[i] === 0 || LAB[i] === 1) { if (LAB[i] === KM.lab[i]) agree++; else cross++; }
+  var SPLIT = Math.min(agree, cross);
+
+  function sx(p) { return CX + S * (p[0] - MX); }
+  function sy(p) { return CY - S * (p[1] - MY); }
+  var EPX = EPS * S;
+
+  // the three points whose neighbourhoods are drawn
+  function nearest(pred, tx, ty) {
+    var best = -1, bd = 1e9;
+    for (var k = 0; k < N; k++) if (pred(k)) { var dd = dist(X[k], [tx, ty]); if (dd < bd) { bd = dd; best = k; } }
+    return best;
+  }
+  var EX_CORE = nearest(function (k) { return CORE[k] && LAB[k] === 0; }, -0.05, 1.05);
+  var EX_BORDER = nearest(function (k) { return TYPE[k] === "border"; }, 1.0, -0.8);   // on the underside of the lower moon
+  var EX_NOISE = -1;                                       // the lowest noise point, labelled below itself
+  for (i = 0; i < N; i++) if (TYPE[i] === "noise" && (EX_NOISE < 0 || X[i][1] < X[EX_NOISE][1])) EX_NOISE = i;
+  var EX = [EX_CORE, EX_BORDER, EX_NOISE].filter(function (k) { return k >= 0; });
+
+  // timeline
+  var T_EX = [1.0, 3.3, 5.6], EXD = 2.3;          // the three neighbourhoods, one at a time
+  var T_ALL0 = 7.9, T_ALL1 = 9.3;                   // every other point takes its mark, left to right
+  var T_GROW = 9.8, T_GROW_D = [3.6, 2.8], T_K = 17.2, DUR = 22.5;
+  var xs = X.map(function (p) { return p[0]; }), xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+  var TCLASS = X.map(function (p, k) {
+    var e = EX.indexOf(k);
+    if (e >= 0) return T_EX[e] + 0.9;
+    return T_ALL0 + (T_ALL1 - T_ALL0 - 0.3) * (p[0] - xmin) / (xmax - xmin);
+  });
+  // reach times: hop depth mapped so the first hops are slow and the rest accelerate
+  var TREACH = new Array(N).fill(Infinity), CEND = [];
+  (function () {
+    var t0 = T_GROW;
+    CL.forEach(function (mem, c) {
+      var dur = c < T_GROW_D.length ? T_GROW_D[c] : 0.5, maxD = 1;
+      mem.forEach(function (k) { maxD = Math.max(maxD, DEPTH[k]); });
+      mem.forEach(function (k) { TREACH[k] = t0 + dur * Math.pow(DEPTH[k] / maxD, 0.75); });
+      t0 += dur + 0.25; CEND.push(t0);
+    });
+  })();
+  var T_STEP2 = T_GROW - 0.3, T_STEP3 = T_K - 0.4;
+
+  // marks
+  function mark(ctx, x, y, type, a) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a;
+    if (type === "core") V.dot(ctx, x, y, P.ink, 6.5);
+    else if (type === "border") { V.dot(ctx, x, y, P.ground, 6.5); V.ring(ctx, x, y, 6.5, P.ink, 2.5); }
+    else { var h = 7; V.line(ctx, x - h, y - h, x + h, y + h, P.amber, 2.5); V.line(ctx, x - h, y + h, x + h, y - h, P.amber, 2.5); }
+    ctx.restore();
+  }
+  function haloText(ctx, s, x, y, color, size, align, a) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a; ctx.font = "500 " + size + "px " + getComputedStyle(document.getElementById("stage")).fontFamily;
+    var w = ctx.measureText(s).width, x0 = align === "center" ? x - w / 2 : align === "right" ? x - w : x;
+    x += Math.max(0, 72 - x0) - Math.max(0, x0 + w - (V.W - 72));                  // keep inside the side margins
+    ctx.textAlign = align; ctx.lineJoin = "round"; ctx.strokeStyle = P.ground; ctx.lineWidth = 8; ctx.strokeText(s, x, y);
+    ctx.fillStyle = color; ctx.fillText(s, x, y); ctx.restore();
+  }
+  function leader(ctx, x1, y1, x2, y2, a) {
+    if (a <= 0.01) return;
+    ctx.save(); ctx.globalAlpha *= a; V.line(ctx, x1, y1, x2, y2, V.rgba(P.dim, 0.8), 1.5); ctx.restore();
+  }
+  // the cluster forms: discs of radius eps/2 drawn opaque off screen, laid down once
+  var off = null;
+  function forms(ctx, t) {
+    if (!off) { off = document.createElement("canvas"); off.width = V.W; off.height = V.H; }
+    var o = off.getContext("2d"); o.setTransform(1, 0, 0, 1, 0, 0); o.clearRect(0, 0, V.W, V.H); o.fillStyle = P.form;
+    var any = false;
+    for (var k = 0; k < N; k++) {
+      var g = V.span(t, TREACH[k], TREACH[k] + 0.35);
+      if (g <= 0) continue; any = true;
+      o.beginPath(); o.arc(sx(X[k]), sy(X[k]), EPX / 2 * g, 0, 7); o.fill();
+    }
+    if (any) ctx.drawImage(off, 0, 0);
+  }
+
+  var KMN = "<span style=\"white-space:nowrap\">k-means</span>";
+  var eq, counter, cap;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("N_\\varepsilon(x) = \\{\\, x' : \\lVert x' - x \\rVert \\le \\varepsilon \\,\\}, \\quad \\varepsilon = 0.2") + "</div>" +
+      "<div>" + katex.renderToString("x \\text{ is core if } |N_\\varepsilon(x)| \\ge \\texttt{min\\_samples} = 5") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "");
+  }
+
+  function render(t, ctx) {
+    var step = t < T_STEP2 ? 1 : t < T_STEP3 ? 2 : 3;
+
+    // step 2: the cluster forms and the reachability edges
+    forms(ctx, t);
+    for (var k = 0; k < N; k++) {
+      if (PAR[k] < 0) continue;
+      var g = V.span(t, TREACH[k] - 0.05, TREACH[k] + 0.3);
+      if (g <= 0) continue;
+      var p = X[PAR[k]], q = X[k];
+      V.line(ctx, sx(p), sy(p), V.lerp(sx(p), sx(q), g), V.lerp(sy(p), sy(q), g), V.rgba(P.ink, 0.45), 1.3);
+    }
+
+    // step 1: the three neighbourhoods
+    EX.forEach(function (k, e) {
+      var a = V.span(t, T_EX[e], T_EX[e] + 0.5), out = 1 - V.span(t, T_EX[e] + EXD - 0.2, T_EX[e] + EXD + 0.4);
+      var c = X[k], rr = EPX * a;
+      if (a * out > 0.01) {
+        ctx.save(); ctx.globalAlpha = out;
+        ctx.fillStyle = V.rgba(P.form, 0.9); ctx.beginPath(); ctx.arc(sx(c), sy(c), rr, 0, 7); ctx.fill();
+        V.ring(ctx, sx(c), sy(c), rr, P.ink, 2.5);
+        var cn = V.span(t, T_EX[e] + 0.4, T_EX[e] + 0.8);
+        NB[k].forEach(function (n) { if (n !== k) V.line(ctx, sx(c), sy(c), V.lerp(sx(c), sx(X[n]), cn), V.lerp(sy(c), sy(X[n]), cn), V.rgba(P.ink, 0.6), 2, [8, 8]); });
+        ctx.restore();
+      }
+    });
+
+    // the points
+    for (k = 0; k < N; k++) {
+      var x = sx(X[k]), y = sy(X[k]);
+      var c1 = V.span(t, TCLASS[k], TCLASS[k] + 0.3), a0 = V.span(t, 0, 0.8);
+      if (c1 < 1) V.dot(ctx, x, y, V.rgba(P.amber, a0 * (1 - c1)), 4);
+      mark(ctx, x, y, TYPE[k], c1);
+    }
+
+    // direct labels on the three named points: they stay, as the key to the marks
+    EX.forEach(function (k, e) {
+      var c = X[k], n = NB[k].length, a = V.span(t, T_EX[e] + 0.8, T_EX[e] + 1.2);
+      var x = sx(c), y = sy(c), ty;
+      if (TYPE[k] === "core") { ty = y - EPX - 22; haloText(ctx, n + " within ε: core", x, ty, P.dim, 28, "center", a); leader(ctx, x, ty + 8, x, y - 10, a); }
+      else if (TYPE[k] === "border") { ty = y + EPX + 40; haloText(ctx, n + " within ε, one of them core: border", x, ty, P.dim, 28, "center", a); leader(ctx, x, ty - 28, x, y + 10, a); }
+      else { ty = y + EPX + 40; haloText(ctx, n + " within ε: noise", x, ty, P.dim, 28, "center", a); leader(ctx, x, ty - 28, x, y + 12, a); }
+    });
+
+    // cluster labels as each cluster completes
+    CL.forEach(function (mem, c) {
+      if (c > 1) return;
+      var a = V.span(t, CEND[c] - 0.2, CEND[c] + 0.3), ext = null;
+      mem.forEach(function (m) { if (!ext || (c === 0 ? X[m][1] < X[ext][1] : X[m][1] < X[ext][1])) ext = m; });
+      // cluster 1 is labelled inside its arch, cluster 2 below its lowest point
+      if (c === 0) haloText(ctx, "cluster 1", sx([-0.55, 0]), sy([0, 0.1]), P.ink, 30, "center", a);
+      else haloText(ctx, "cluster 2", sx([0.45, 0]), sy([0, -0.74]), P.ink, 30, "center", a);
+    });
+
+    // step 3: k-means with k = 2, its straight border dashed
+    var ka = V.span(t, T_K, T_K + 1.2);
+    if (ka > 0.01) {
+      var c0 = KM.C[0], c1b = KM.C[1], mx = (c0[0] + c1b[0]) / 2, my = (c0[1] + c1b[1]) / 2;
+      var dx = -(c1b[1] - c0[1]), dy = c1b[0] - c0[0], L = Math.sqrt(dx * dx + dy * dy); dx /= L; dy /= L;
+      // clip the border to the band y in [-0.75, 1.3] in data units
+      var tA = (1.3 - my) / dy, tB = (-0.75 - my) / dy;
+      var pA = [mx + dx * tA, my + dy * tA], pB = [mx + dx * tB, my + dy * tB];
+      var pe = [V.lerp(pA[0], pB[0], ka), V.lerp(pA[1], pB[1], ka)];
+      V.line(ctx, sx(pA), sy(pA), sx(pe), sy(pe), P.amber, 3, [14, 10]);
+      ctx.save(); ctx.globalAlpha = V.span(t, T_K + 0.8, T_K + 1.4);
+      KM.C.forEach(function (cc) { V.ring(ctx, sx(cc), sy(cc), 14, P.amber, 3); V.dot(ctx, sx(cc), sy(cc), P.amber, 5); });
+      ctx.restore();
+      haloText(ctx, "k-means, k = 2", sx(pA) + 16, sy(pA) + 10, P.amber, 28, "left", V.span(t, T_K + 0.8, T_K + 1.4));
+    }
+
+    V.tex(counter, "$\\text{step } " + step + "$");
+    var caps = [
+      "A core point has at least min_samples = 5 points within ε, itself included. A border point lies within ε of a core point. The rest is noise.",
+      "A cluster grows from a core point to every point within ε of it, then on from each core point it reaches. The number of clusters falls out.",
+      "Simulated: two moons of 300 points, as in the module notebook, and " + NSCAT + " scattered points. DBSCAN finds " + CL.length + " clusters and " + NNOISE +
+        " noise points; " + KMN + " with k = 2 cuts " + SPLIT + " points away from their moon."
+    ];
+    V.tex(cap, caps[step - 1]);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "DBSCAN", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>
