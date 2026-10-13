@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bagging</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 7, bagging (bootstrap aggregating). One hundred simulated points
+   (seeded) of two classes, filled and open, around a rising, wavy true boundary,
+   with noisy labels near it. Each tree is grown on a bootstrap sample (100 draws with
+   replacement) with the notes' Gini criterion until every leaf is pure, so it
+   draws a jagged boundary that chases the noise. The forest averages the
+   trees' votes (a tie goes to the open class, as scikit-learn's argmax does).
+   Top: one forest; each tree's boundary as a grey line, the share of its
+   trees voting filled as grey shade, and the forest's boundary (a majority
+   of the votes) in black.
+   Bottom: five forests built from independent bootstraps of the same data;
+   the shaded area is where they disagree, and its share of the plane is
+   computed on the page's grid. The counter steps B = 1, 2, 5, 10, 50, 100. */
+(function () {
+  var V = VIZ, P = V.P;
+  var PX0 = 150, PX1 = 930, AY0 = 400, AY1 = 840, BY0 = 935, BY1 = 1375, CELL = 5;
+  var GX = (PX1 - PX0) / CELL, GY = (AY1 - AY0) / CELL;     // 156 x 88 cells per panel
+  var LO = -0.03, HI = 1.03;
+  var BS = [1, 2, 5, 10, 50, 100], NF = 5, NT = 100, N = 100;
+
+  // simulate: the filled class lies above the rising curve x2 = 0.2 + 0.6 x1 + 0.1 sin(6 x1), with noisy labels
+  var r = V.rng(7207), X = [], Y = [];
+  function truth(x1) { return 0.2 + 0.6 * x1 + 0.1 * Math.sin(6 * x1); }
+  for (var i = 0; i < N; i++) {
+    var u = [r(), r()], p = 1 / (1 + Math.exp(-(u[1] - truth(u[0])) / 0.08));
+    X.push(u); Y.push(r() < p ? 1 : 0);
+  }
+
+  function gini(n1, n) { if (!n) return 0; var q = n1 / n; return 1 - q * q - (1 - q) * (1 - q); }
+  // a deep tree: split on the lowest weighted Gini (every feature, every midpoint) until each leaf is pure
+  function grow(idx, box, leaves) {
+    var n = idx.length, n1 = 0; idx.forEach(function (k) { n1 += Y[k]; });
+    var g = gini(n1, n), best = null;
+    if (g > 0) for (var f = 0; f < 2; f++) {
+      var s = idx.slice().sort(function (a, b) { return X[a][f] - X[b][f]; }), l1 = 0;
+      for (var k = 1; k < n; k++) {
+        l1 += Y[s[k - 1]];
+        var a = X[s[k - 1]][f], b = X[s[k]][f]; if (a === b) continue;
+        var w = (k * gini(l1, k) + (n - k) * gini(n1 - l1, n - k)) / n;
+        if (!best || w < best.w - 1e-12) best = { f: f, thr: (a + b) / 2, w: w };
+      }
+    }
+    if (!best) { leaves.push({ box: box, y: n1 * 2 > n ? 1 : 0 }); return; }
+    var bl = box.slice(), br = box.slice();
+    if (best.f === 0) { bl[1] = best.thr; br[0] = best.thr; } else { bl[3] = best.thr; br[2] = best.thr; }
+    grow(idx.filter(function (k) { return X[k][best.f] <= best.thr; }), bl, leaves);
+    grow(idx.filter(function (k) { return X[k][best.f] > best.thr; }), br, leaves);
+  }
+  function cu(c) { return LO + (HI - LO) * (c + 0.5) / GX; }        // cell centre in data units
+  function cv(c) { return LO + (HI - LO) * (GY - c - 0.5) / GY; }
+  // a tree's labels on the grid, filled leaf by leaf
+  function treeGrid(leaves) {
+    var G = new Uint8Array(GX * GY);
+    leaves.forEach(function (L) {
+      if (!L.y) return;
+      for (var cy = 0; cy < GY; cy++) {
+        var v = cv(cy); if (v <= L.box[2] || v > L.box[3]) continue;
+        for (var cx = 0; cx < GX; cx++) { var w = cu(cx); if (w > L.box[0] && w <= L.box[1]) G[cy * GX + cx] = 1; }
+      }
+    });
+    return G;
+  }
+  // five forests of 100 trees, each tree on its own bootstrap sample
+  var TREES = [];                                            // TREES[f][b] = grid of labels
+  for (var f = 0; f < NF; f++) {
+    var rb = V.rng(9100 + f), T = [];
+    for (var b = 0; b < NT; b++) {
+      var idx = []; for (var k = 0; k < N; k++) idx.push(Math.floor(rb() * N));
+      var leaves = []; grow(idx, [-Infinity, Infinity, -Infinity, Infinity], leaves);
+      T.push(treeGrid(leaves));
+    }
+    TREES.push(T);
+  }
+  function forestGrid(f, B) {
+    var S = new Uint16Array(GX * GY), G = new Uint8Array(GX * GY);
+    for (var b = 0; b < B; b++) { var T = TREES[f][b]; for (var k = 0; k < S.length; k++) S[k] += T[k]; }
+    for (var k2 = 0; k2 < S.length; k2++) G[k2] = S[k2] * 2 > B ? 1 : 0;
+    G.S = S; return G;
+  }
+  // the edges between cells of different label, as one path in panel coordinates
+  function edges(G, y0) {
+    var p = new Path2D();
+    for (var cy = 0; cy < GY; cy++) for (var cx = 0; cx < GX; cx++) {
+      var g = G[cy * GX + cx], x = PX0 + cx * CELL, y = y0 + cy * CELL;
+      if (cx + 1 < GX && G[cy * GX + cx + 1] !== g) { p.moveTo(x + CELL, y); p.lineTo(x + CELL, y + CELL); }
+      if (cy + 1 < GY && G[(cy + 1) * GX + cx] !== g) { p.moveTo(x, y + CELL); p.lineTo(x + CELL, y + CELL); }
+    }
+    return p;
+  }
+  function cells(G, y0) {                                    // the cells where G is 1, as one path
+    var p = new Path2D();
+    for (var cy = 0; cy < GY; cy++) {
+      var run = -1;
+      for (var cx = 0; cx <= GX; cx++) {
+        var on = cx < GX && G[cy * GX + cx];
+        if (on && run < 0) run = cx;
+        if (!on && run >= 0) { p.rect(PX0 + run * CELL, y0 + cy * CELL, (cx - run) * CELL, CELL); run = -1; }
+      }
+    }
+    return p;
+  }
+  // the share of trees voting filled, one pixel per cell, as a small image scaled up without smoothing
+  function voteField(G, B) {
+    var c = document.createElement("canvas"); c.width = GX; c.height = GY;
+    var cx = c.getContext("2d"), im = cx.createImageData(GX, GY), n = parseInt(P.amber.slice(1), 16);
+    for (var k = 0; k < GX * GY; k++) {
+      im.data[4 * k] = n >> 16 & 255; im.data[4 * k + 1] = n >> 8 & 255; im.data[4 * k + 2] = n & 255;
+      im.data[4 * k + 3] = Math.round(255 * 0.42 * G.S[k] / B);
+    }
+    cx.putImageData(im, 0, 0); return c;
+  }
+  var TREE_EDGE = TREES[0].map(function (G) { return edges(G, AY0); });
+  var LEVEL = BS.map(function (B) {
+    var F = []; for (var f = 0; f < NF; f++) F.push(forestGrid(f, B));
+    var D = new Uint8Array(GX * GY), nd = 0;
+    for (var k = 0; k < D.length; k++) {
+      var s = 0; for (var f2 = 0; f2 < NF; f2++) s += F[f2][k];
+      if (s > 0 && s < NF) { D[k] = 1; nd++; }
+    }
+    return { B: B, field: voteField(F[0], B), edgeA: edges(F[0], AY0),
+             edgeB: F.map(function (G) { return edges(G, BY0); }), dis: cells(D, BY0), pct: 100 * nd / D.length };
+  });
+
+  function sx(v) { return PX0 + (PX1 - PX0) * (v - LO) / (HI - LO); }
+  function sy(v) { return AY1 - (AY1 - AY0) * (v - LO) / (HI - LO); }
+
+  // timeline: each B held long enough to read, the first ones longest; a crossfade into each
+  var HOLD = [3.0, 2.6, 2.4, 2.4, 2.4, 3.4], ST = [], tt = 0.9, XF = 0.6;
+  HOLD.forEach(function (h) { ST.push(tt); tt += h; });
+  var DUR = tt;
+
+  var eq, counter, cap, la, lb, lp;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("\\hat f_{\\mathrm{bag}}(x) = \\frac{1}{B}\\textstyle\\sum_{b=1}^{B} \\hat f^{*b}(x)") + "</div>" +
+      '<div style="color:' + P.amber + '">' + katex.renderToString("\\hat f^{*b}\\text{: a deep tree on bootstrap sample } b") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "One hundred simulated points; each tree is grown deep on its own bootstrap sample. The averaged vote shades off gradually, and separate forests agree more closely.");
+    la = V.el("label", "one forest: shade = share of trees voting filled", { left: PX0 + "px", top: (AY0 - 46) + "px" });
+    lb = V.el("label", "five forests from different bootstraps", { left: PX0 + "px", top: (BY0 - 46) + "px" });
+    lp = V.el("label", "", { right: (1080 - PX1) + "px", top: (BY1 + 8) + "px", color: P.ink });
+  }
+
+  function drawLevel(ctx, L, a, treeA) {
+    if (a <= 0.005) return;
+    ctx.save(); ctx.globalAlpha = a;
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(L.field, PX0, AY0, PX1 - PX0, AY1 - AY0);
+    ctx.fillStyle = P.form; ctx.fill(L.dis);
+    ctx.restore();
+    // the trees of forest one, in grey, then the forest's boundary in black
+    if (L.B > 1) {
+      ctx.save(); ctx.strokeStyle = V.rgba(P.amber, a * Math.min(0.6, Math.max(0.03, 1.2 / L.B)));
+      ctx.lineWidth = 1.6; ctx.lineCap = "square";
+      for (var b = 0; b < L.B; b++) ctx.stroke(TREE_EDGE[b]);
+      ctx.restore();
+    }
+    ctx.save(); ctx.lineCap = "square";
+    ctx.strokeStyle = V.rgba(P.ink, a); ctx.lineWidth = 3.5; ctx.stroke(L.edgeA);
+    ctx.strokeStyle = V.rgba(P.ink, a * 0.8); ctx.lineWidth = 2;
+    L.edgeB.forEach(function (e) { ctx.stroke(e); });
+    ctx.restore();
+  }
+
+  function render(t, ctx) {
+    var k = 0; for (var j = 0; j < ST.length; j++) if (t >= ST[j]) k = j;
+    var x = t < ST[0] ? 1 : V.span(t, ST[k], ST[k] + XF);
+    var intro = V.span(t, 0, 0.8);
+    ctx.save(); ctx.globalAlpha = intro;
+    if (k > 0 && x < 1) drawLevel(ctx, LEVEL[k - 1], 1 - x);
+    drawLevel(ctx, LEVEL[k], x);
+    // panel frames
+    ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5;
+    ctx.strokeRect(PX0, AY0, PX1 - PX0, AY1 - AY0); ctx.strokeRect(PX0, BY0, PX1 - PX0, BY1 - BY0);
+    // the data, over the top panel
+    X.forEach(function (p, i) {
+      if (Y[i]) V.dot(ctx, sx(p[0]), sy(p[1]), P.ink, 6.5);
+      else { V.dot(ctx, sx(p[0]), sy(p[1]), P.ground, 6.5); V.ring(ctx, sx(p[0]), sy(p[1]), 5.8, P.ink, 2); }
+    });
+    ctx.restore();
+    var kk = x > 0.5 || k === 0 ? k : k - 1;
+    V.tex(counter, "$B = " + BS[kk] + "$");
+    lp.textContent = "shaded: they disagree on " + Math.round(LEVEL[kk].pct) + "% of the plane";
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Bagging", mark: "DATASCI 207", course: "module 7" });
+})();
+</script>
+</body></html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Growing a decision tree</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 7, decision trees. Forty simulated points (seeded, uniform on the
+   unit square) of two classes, filled and open. The page grows a tree with
+   the module notes' splitting criterion, Gini(S) = 1 - sum p_i^2 (CART): at
+   each step it takes, over every leaf, both features and every midpoint
+   threshold, the axis-aligned cut that most lowers the weighted Gini of the
+   two children, and it stops when every leaf is pure. Each split is drawn on
+   the plane and in the tree below, whose nodes show their class counts and
+   Gini impurity. */
+(function () {
+  var V = VIZ, P = V.P;
+  var PX0 = 190, PX1 = 890, PY0 = 395, PY1 = 885;          // the plane: x1 across, x2 up
+  var LV = [1012, 1122, 1232, 1342];                        // tree level baselines
+  var TX0 = 170, TX1 = 910;
+
+  // simulate: forty points, filled when (x1 < 0.45 and x2 < 0.7) or (x1 > 0.68 and x2 > 0.42)
+  var r = V.rng(1), X = [], Y = [];
+  for (var i = 0; i < 40; i++) {
+    var u = [r(), r()]; X.push(u);
+    Y.push((u[0] < 0.45 && u[1] < 0.7) || (u[0] > 0.68 && u[1] > 0.42) ? 1 : 0);
+  }
+
+  function gini(n1, n) { if (!n) return 0; var p = n1 / n; return 1 - p * p - (1 - p) * (1 - p); }
+  function count(idx) { var n1 = 0; idx.forEach(function (i) { n1 += Y[i]; }); return n1; }
+  function bestSplit(idx) {                                  // CART: every feature, every midpoint
+    var n = idx.length, n1 = count(idx), best = null;
+    for (var f = 0; f < 2; f++) {
+      var s = idx.slice().sort(function (a, b) { return X[a][f] - X[b][f]; }), l1 = 0;
+      for (var k = 1; k < n; k++) {
+        l1 += Y[s[k - 1]];
+        var a = X[s[k - 1]][f], b = X[s[k]][f]; if (a === b) continue;
+        var w = (k * gini(l1, k) + (n - k) * gini(n1 - l1, n - k)) / n;
+        if (!best || w < best.w - 1e-12) best = { f: f, thr: (a + b) / 2, w: w };
+      }
+    }
+    return best;
+  }
+  function node(idx, d, box) {
+    var n1 = count(idx);
+    return { idx: idx, d: d, box: box, n1: n1, n0: idx.length - n1, g: gini(n1, idx.length) };
+  }
+  // grow: at each step split the leaf whose best cut lowers the total weighted Gini the most
+  var root = node(X.map(function (_, i) { return i; }), 0, [-0.035, 1.035, -0.035, 1.035]), leaves = [root], SPL = [];
+  while (true) {
+    var bl = null, bs = null, bd = 0;
+    leaves.forEach(function (L) {
+      if (L.g === 0) return;
+      var s = bestSplit(L.idx), dec = L.idx.length * (L.g - s.w);
+      if (dec > bd) { bd = dec; bl = L; bs = s; }
+    });
+    if (!bl) break;
+    var bxL = bl.box.slice(), bxR = bl.box.slice();
+    if (bs.f === 0) { bxL[1] = bs.thr; bxR[0] = bs.thr; } else { bxL[3] = bs.thr; bxR[2] = bs.thr; }
+    bl.f = bs.f; bl.thr = bs.thr;
+    bl.l = node(bl.idx.filter(function (i) { return X[i][bs.f] <= bs.thr; }), bl.d + 1, bxL);
+    bl.r = node(bl.idx.filter(function (i) { return X[i][bs.f] > bs.thr; }), bl.d + 1, bxR);
+    bl.step = SPL.length; SPL.push(bl);
+    leaves = leaves.filter(function (x) { return x !== bl; }).concat([bl.l, bl.r]);
+  }
+
+  // tree layout: leaves spread in order, each parent centred over its children
+  var order = [];
+  (function walk(n) { if (n.l) { walk(n.l); walk(n.r); } else order.push(n); })(root);
+  order.forEach(function (n, k) { n.x = TX0 + (TX1 - TX0) * (k + 0.5) / order.length; });
+  (function place(n) { if (n.l) { place(n.l); place(n.r); n.x = (n.l.x + n.r.x) / 2; } })(root);
+
+  function sx(v) { return PX0 + (PX1 - PX0) * (v + 0.035) / 1.07; }   // the plane runs a little past the unit square
+  function sy(v) { return PY1 - (PY1 - PY0) * (v + 0.035) / 1.07; }
+
+  // timeline: a short look at the root, then one split at a time, slower first
+  var SD = [3.3, 2.9, 2.6, 2.6], SS = [], tt = 1.4;
+  SD.forEach(function (d) { SS.push(tt); tt += d; });
+  var DUR = tt + 2.6;
+  // progress of split j at time t, in [0, 1]
+  function prog(j, t) { return V.clamp((t - SS[j]) / SD[j], 0, 1); }
+
+  var eq, counter, cap, lx1, lx2;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("\\mathrm{Gini}(S) = 1 - \\textstyle\\sum_i p_i^{2}") + "</div>" +
+      "<div>" + katex.renderToString("\\text{split: } \\min\\; \\tfrac{|S_L|}{|S|}\\,\\mathrm{Gini}(S_L) + \\tfrac{|S_R|}{|S|}\\,\\mathrm{Gini}(S_R)") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Forty simulated points, filled or open. Each split is the axis-aligned cut that most lowers the children's weighted Gini impurity. Shaded regions predict filled.");
+    lx1 = V.el("label", "$x_1$", { left: ((PX0 + PX1) / 2 - 10) + "px", top: (PY1 + 14) + "px" });
+    lx2 = V.el("label", "$x_2$", { left: (PX0 - 52) + "px", top: ((PY0 + PY1) / 2 - 18) + "px" });
+  }
+
+  function majority(n) { return n.n1 > n.n0; }
+  function fillBox(ctx, b, a) {
+    if (a <= 0.005) return;
+    ctx.save(); ctx.fillStyle = V.rgba(P.form, a);
+    ctx.fillRect(sx(b[0]), sy(b[3]), sx(b[1]) - sx(b[0]), sy(b[2]) - sy(b[3])); ctx.restore();
+  }
+
+  function counts(ctx, n, x, y, a) {
+    var s1 = String(n.n1), s0 = String(n.n0);
+    ctx.save(); ctx.font = "500 27px " + getComputedStyle(document.getElementById("stage")).fontFamily;
+    var w1 = ctx.measureText(s1).width, w0 = ctx.measureText(s0).width; ctx.restore();
+    var W = 18 + 8 + w1 + 22 + 18 + 8 + w0, x0 = x - W / 2;
+    V.dot(ctx, x0 + 9, y - 9, V.rgba(P.ink, a), 8);
+    V.text(ctx, s1, x0 + 26, y, V.rgba(P.ink, a), 27, "left", 500);
+    var xr = x0 + 26 + w1 + 22;
+    V.ring(ctx, xr + 9, y - 9, 7.5, V.rgba(P.ink, a), 2.5);
+    V.text(ctx, s0, xr + 26, y, V.rgba(P.ink, a), 27, "left", 500);
+  }
+  // the rule of a split node, x_f <= threshold, with an italic x and a lowered index
+  function rule(ctx, n, x, y, a) {
+    var fam = getComputedStyle(document.getElementById("stage")).fontFamily, rest = " ≤ " + n.thr.toFixed(2);
+    ctx.save(); ctx.fillStyle = V.rgba(P.ink, a); ctx.textAlign = "left";
+    ctx.font = "italic 600 31px " + fam; var wx = ctx.measureText("x").width;
+    ctx.font = "600 21px " + fam; var ws = ctx.measureText("1").width;
+    ctx.font = "600 30px " + fam; var wr = ctx.measureText(rest).width;
+    var x0 = x - (wx + ws + 2 + wr) / 2;
+    ctx.font = "italic 600 31px " + fam; ctx.fillText("x", x0, y);
+    ctx.font = "600 21px " + fam; ctx.fillText(String(n.f + 1), x0 + wx + 1, y + 8);
+    ctx.font = "600 30px " + fam; ctx.fillText(rest, x0 + wx + ws + 3, y);
+    ctx.restore();
+  }
+
+  function render(t, ctx) {
+    var intro = V.span(t, 0, 0.8);
+    ctx.save(); ctx.globalAlpha = intro;
+
+    // plane: shading of the current leaves, crossfading at each split
+    var all = [root]; SPL.forEach(function (n) { all.push(n.l, n.r); });
+    all.forEach(function (n) {
+      var a = majority(n) ? 1 : 0;
+      if (n !== root) { var j = SPL.indexOf(parentOf(n)); a *= V.span(prog(j, t), 0.4, 0.65); }
+      if (n.l) a *= 1 - V.span(prog(n.step, t), 0.4, 0.65);
+      fillBox(ctx, n.box, a);
+    });
+    // frame of the plane
+    ctx.save(); ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5; ctx.strokeRect(PX0, PY0, PX1 - PX0, PY1 - PY0); ctx.restore();
+
+    // the cuts made so far, each drawn across its region
+    SPL.forEach(function (n, j) {
+      var u = prog(j, t); if (u <= 0) return;
+      var g = V.span(u, 0.1, 0.42), b = n.box;
+      if (n.f === 0) V.line(ctx, sx(n.thr), sy(b[2]), sx(n.thr), V.lerp(sy(b[2]), sy(b[3]), g), P.ink, 3);
+      else V.line(ctx, sx(b[0]), sy(n.thr), V.lerp(sx(b[0]), sx(b[1]), g), sy(n.thr), P.ink, 3);
+    });
+    // the region being split: a dashed outline while its cut is made
+    SPL.forEach(function (n, j) {
+      var u = prog(j, t), a = V.span(u, 0, 0.1) * (1 - V.span(u, 0.8, 0.98));
+      if (a <= 0.01) return;
+      var b = n.box;
+      ctx.save(); ctx.strokeStyle = V.rgba(P.ink, 0.75 * a); ctx.lineWidth = 2; ctx.setLineDash([8, 8]);
+      ctx.strokeRect(sx(b[0]) + 5, sy(b[3]) + 5, sx(b[1]) - sx(b[0]) - 10, sy(b[2]) - sy(b[3]) - 10); ctx.restore();
+    });
+    // points
+    X.forEach(function (p, i) {
+      if (Y[i]) V.dot(ctx, sx(p[0]), sy(p[1]), P.ink, 8.5);
+      else { V.dot(ctx, sx(p[0]), sy(p[1]), P.ground, 8.5); V.ring(ctx, sx(p[0]), sy(p[1]), 7.5, P.ink, 2.5); }
+    });
+
+    // tree: highlight, edges, then node labels
+    SPL.forEach(function (n, j) {
+      var u = prog(j, t), a = V.span(u, 0, 0.1) * (1 - V.span(u, 0.8, 0.98));
+      if (a > 0.01) { ctx.save(); ctx.fillStyle = V.rgba(P.form, a); roundRect(ctx, n.x - 92, LV[n.d] - 34, 184, 82, 14); ctx.fill(); ctx.restore(); }
+    });
+    SPL.forEach(function (n, j) {
+      var g = V.span(prog(j, t), 0.45, 0.72); if (g <= 0) return;
+      [n.l, n.r].forEach(function (c) {
+        var x0 = n.x, y0 = LV[n.d] + 50, x1 = c.x, y1 = LV[c.d] - 40;
+        V.line(ctx, x0, y0, V.lerp(x0, x1, g), V.lerp(y0, y1, g), P.ink, 2);
+      });
+    });
+    all.forEach(function (n) {
+      var a = 1;
+      if (n !== root) a = V.span(prog(SPL.indexOf(parentOf(n)), t), 0.62, 0.88);
+      if (a <= 0.01) return;
+      var y = LV[n.d], sw = n.l ? V.span(prog(n.step, t), 0.45, 0.65) : 0;
+      if (sw < 1) counts(ctx, n, n.x, y, a * (1 - sw));
+      if (sw > 0) rule(ctx, n, n.x, y, a * sw);
+      V.text(ctx, "Gini " + n.g.toFixed(2), n.x, y + 36, V.rgba(P.dim, a), 26, "center", 400);
+    });
+    ctx.restore();
+
+    var leavesNow = 1; SPL.forEach(function (n, j) { if (prog(j, t) >= 0.5) leavesNow++; });
+    V.tex(counter, "$\\text{leaves} = " + leavesNow + "$");
+  }
+  function parentOf(c) { for (var k = 0; k < SPL.length; k++) if (SPL[k].l === c || SPL[k].r === c) return SPL[k]; return null; }
+  function roundRect(ctx, x, y, w, h, rr) {
+    ctx.beginPath(); ctx.moveTo(x + rr, y); ctx.arcTo(x + w, y, x + w, y + h, rr); ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr); ctx.arcTo(x, y, x + w, y, rr); ctx.closePath();
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Growing a decision tree", mark: "DATASCI 207", course: "module 7" });
+})();
+</script>
+</body></html>

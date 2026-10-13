@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gradient boosting</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 7, gradient boosting. Sixty simulated points (seeded) of a 1D
+   regression, y = 1.2 sin(2 pi x) + 0.6 x + noise (sd 0.25). Following the
+   module notes: start from the mean (F_0), compute the residuals, fit a
+   shallow regression tree to them, add its predictions scaled by the
+   learning rate, repeat. The trees have max_depth = 3 and the learning rate
+   is 0.1, the values in the module notebook's GradientBoostingClassifier
+   (n_estimators = 100); each leaf keeps at least five points
+   (min_samples_leaf = 5, one of the notes' regularizers). With squared
+   error, the negative gradient is the residual itself. Top: the data and the prediction F_m (black), with the
+   prediction before the latest step dashed in grey. Bottom: the residuals and
+   the tree h_m fitted to them. The counter steps the number of trees through
+   0, 1, 2, 3, 5, 10, 20, 50, 100; between milestones every tree is fitted and
+   added in turn. The mean squared residual is computed on the page. */
+(function () {
+  var V = VIZ, P = V.P;
+  var PX0 = 150, PX1 = 930, AY0 = 400, AY1 = 860, BY0 = 950, BY1 = 1350;
+  var N = 60, ETA = 0.1, DEPTH = 3, MINLEAF = 5, M = 100, NG = 390;
+
+  // simulate
+  var r = V.rng(707), X = [], Y = [];
+  for (var i = 0; i < N; i++) X.push(r());
+  X.sort(function (a, b) { return a - b; });
+  X.forEach(function (x) { Y.push(1.2 * Math.sin(2 * Math.PI * x) + 0.6 * x + 0.25 * V.normal(r)); });
+
+  // a regression tree on 1D data: split at the midpoint that most lowers the squared error, to depth 3,
+  // with at least five points in a leaf (min_samples_leaf = 5)
+  function fit(idx, R, d, lo, hi, out) {
+    var n = idx.length, s = 0; idx.forEach(function (k) { s += R[k]; });
+    var mean = s / n, best = null;
+    if (d < DEPTH && n > 1) {
+      var ls = 0;
+      for (var j = 1; j < n; j++) {
+        ls += R[idx[j - 1]];
+        if (j < MINLEAF || n - j < MINLEAF || X[idx[j - 1]] === X[idx[j]]) continue;
+        var gain = ls * ls / j + (s - ls) * (s - ls) / (n - j);      // larger gain = lower squared error
+        if (!best || gain > best.g + 1e-12) best = { j: j, g: gain, thr: (X[idx[j - 1]] + X[idx[j]]) / 2 };
+      }
+    }
+    if (!best) { out.push({ lo: lo, hi: hi, v: mean }); return; }
+    fit(idx.slice(0, best.j), R, d + 1, lo, best.thr, out);
+    fit(idx.slice(best.j), R, d + 1, best.thr, hi, out);
+  }
+  function evalTree(T, x) { for (var k = 0; k < T.length; k++) if (x <= T[k].hi || k === T.length - 1) return T[k].v; }
+
+  // boosting: F[m] on the data and on a grid of NG x values; TREES[m] is h_m (m >= 1)
+  var GX = []; for (var g = 0; g < NG; g++) GX.push(g / (NG - 1));
+  var mean0 = Y.reduce(function (a, b) { return a + b; }, 0) / N;
+  var Fd = [Y.map(function () { return mean0; })], Fg = [GX.map(function () { return mean0; })], TREES = [null];
+  var all = X.map(function (_, k) { return k; });
+  for (var m = 1; m <= M; m++) {
+    var R = Y.map(function (y, k) { return y - Fd[m - 1][k]; }), T = [];
+    fit(all, R, 0, -Infinity, Infinity, T);
+    TREES.push(T);
+    Fd.push(Fd[m - 1].map(function (f, k) { return f + ETA * evalTree(T, X[k]); }));
+    Fg.push(Fg[m - 1].map(function (f, k) { return f + ETA * evalTree(T, GX[k]); }));
+  }
+
+  var YLO = -1.75, YHI = 2.05, K = (AY1 - AY0) / (YHI - YLO), BZ = (BY0 + BY1) / 2;   // one vertical scale for both panels
+  function sx(x) { return PX0 + (PX1 - PX0) * x; }
+  function sy(y) { return AY1 - K * (y - YLO); }
+  function ry(v) { return BZ - K * v; }
+
+  // timeline: milestones of the tree count; the first three trees one at a time, slowly
+  var MS = [0, 1, 2, 3, 5, 10, 20, 50, 100], SEG = [], tt = 1.5;
+  for (var q = 1; q < MS.length; q++) {
+    var single = MS[q] - MS[q - 1] === 1 && MS[q] <= 3, mv = single ? 1.8 : 1.5, hd = single ? 0.75 : 0.6;
+    if (q === MS.length - 1) hd = 2.2;
+    SEG.push({ a: MS[q - 1], b: MS[q], t0: tt, t1: tt + mv, t2: tt + mv + hd, single: single });
+    tt += mv + hd;
+  }
+  var DUR = tt;
+
+  // the model at time t: m whole trees plus a fraction f of tree m + 1, and the tree on show
+  function state(t) {
+    if (t < SEG[0].t0) return { m: 0, f: 0, tree: 0, treeA: 0, cnt: 0, ghost: null };
+    for (var q = 0; q < SEG.length; q++) {
+      var S = SEG[q];
+      if (t >= S.t2 && q < SEG.length - 1) continue;
+      if (t >= S.t1) return { m: S.b, f: 0, tree: S.b, treeA: 1 - V.span(t, S.t2 - 0.35, S.t2), cnt: S.b, ghost: S.single ? S.a : null, ghostA: 1 - V.span(t, S.t1 + 0.2, S.t2 - 0.05) };
+      var u = (t - S.t0) / (S.t1 - S.t0);
+      if (S.single) {                      // the tree draws in first, then the prediction steps
+        return { m: S.a, f: V.span(u, 0.42, 0.95), tree: S.b, treeA: 1, draw: V.span(u, 0, 0.38), cnt: S.a, ghost: S.a, ghostA: V.span(u, 0.4, 0.5) };
+      }
+      var s = (S.b - S.a) * V.ease(u), m = Math.min(S.b - 1, S.a + Math.floor(s));
+      return { m: m, f: s - (m - S.a), tree: m + 1, treeA: 1, cnt: S.a, ghost: null };
+    }
+  }
+
+  var eq, counter, cap, la, lb, lm;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("F_m(x) = F_{m-1}(x) + \\eta\\, h_m(x), \\quad \\eta = 0.1") + "</div>" +
+      '<div style="color:' + P.amber + '">' + katex.renderToString("h_m \\text{ fits } r_i = y_i - F_{m-1}(x_i)") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Sixty simulated points. Each tree, of depth 3, fits the current residuals; its predictions, scaled by the learning rate 0.1 of the module notebook, are added in.");
+    la = V.el("label", "data and the prediction $F_m$", { left: PX0 + "px", top: (AY0 - 46) + "px" });
+    lb = V.el("label", "residuals $r_i$ and the tree $h_m$ fitted to them", { left: PX0 + "px", top: (BY0 - 46) + "px" });
+    lm = V.el("label", "", { right: (1080 - PX1) + "px", top: (BY1 + 4) + "px", color: P.ink });
+  }
+
+  function predGrid(m, f) { var A = Fg[m], B = Fg[Math.min(m + 1, M)]; return A.map(function (a, k) { return a + f * (B[k] - a); }); }
+  function predData(m, f) { var A = Fd[m], B = Fd[Math.min(m + 1, M)]; return A.map(function (a, k) { return a + f * (B[k] - a); }); }
+
+  function render(t, ctx) {
+    var S = state(t), intro = V.span(t, 0, 0.8);
+    ctx.save(); ctx.globalAlpha = intro;
+    // range frames: a zero line for the residuals
+    V.line(ctx, PX0, BZ, PX1, BZ, P.hair, 1.5);
+    // top: the prediction before this step (dashed grey), the prediction now (black), the data
+    if (S.ghost !== null && S.ghostA > 0.01) {
+      ctx.save(); ctx.globalAlpha *= S.ghostA;
+      V.path(ctx, Fg[S.ghost].map(function (y, k) { return [sx(GX[k]), sy(y)]; }), P.amber, 2.5, 1, [8, 8]);
+      ctx.restore();
+    }
+    var pg = predGrid(S.m, S.f), pd = predData(S.m, S.f);
+    V.path(ctx, pg.map(function (y, k) { return [sx(GX[k]), sy(y)]; }), P.ink, 4);
+    X.forEach(function (x, k) { V.dot(ctx, sx(x), sy(Y[k]), P.ink, 6.5); });
+    // bottom: residuals now, and the tree fitted to the residuals it was given
+    if (S.tree > 0 && S.treeA > 0.01) {
+      var T = TREES[S.tree], pts = [];
+      GX.forEach(function (x) { pts.push([sx(x), ry(evalTree(T, x))]); });
+      ctx.save(); ctx.globalAlpha *= S.treeA;
+      V.path(ctx, pts, P.ink, 3, S.draw === undefined ? 1 : Math.max(0.01, S.draw));
+      ctx.restore();
+    }
+    X.forEach(function (x, k) {
+      var v = Y[k] - pd[k];
+      V.dot(ctx, sx(x), ry(v), P.ground, 6.5); V.ring(ctx, sx(x), ry(v), 6, P.amber, 2.2);
+    });
+    ctx.restore();
+    var msr = 0; pd.forEach(function (f, k) { msr += (Y[k] - f) * (Y[k] - f); }); msr /= N;
+    lm.textContent = "mean squared residual " + msr.toFixed(3);
+    V.tex(counter, "$\\text{trees} = " + S.cnt + "$");
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "Gradient boosting", mark: "DATASCI 207", course: "module 7" });
+})();
+</script>
+</body></html>
