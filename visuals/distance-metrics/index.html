@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What counts as near</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 7, k-nearest neighbors: the notes' two distance metrics, Euclidean
+   d(x, y) = sqrt(sum (x_i - y_i)^2) and Manhattan d(x, y) = sum |x_i - y_i|,
+   and the notes' warning that KNN "requires feature scaling".
+   Data (simulated, seeded): twenty-eight points with two standard-normal features,
+   filled when x2 plus noise (sd 0.3) exceeds 0.2, then standardized so each
+   feature has mean 0 and standard deviation 1. One query point at
+   (0.15, 0.55). k = 5 throughout (the module's own figure turns k).
+   1. Euclidean: the circle grows from the query until it holds the 5 nearest.
+   2. Manhattan: the diamond grows the same way; the neighbour set changes.
+   3. Euclidean again, with x1 multiplied by 10, 100, then 1,000 (a change of
+      units). The points are drawn where they were; in those units the ball
+      d = r is an ellipse whose half-width along x1 is r divided by the
+      factor, so the neighbourhood thins to a strip and only x1 decides it.
+   4. Standardization, z = (x - mu) / sigma, undoes any rescaling of a
+      feature, so the neighbourhood returns to the first one.
+   The vote line is computed from the lit neighbours at every frame. */
+(function () {
+  var V = VIZ, P = V.P;
+  var N = 28, K = 5, Q = [0.15, 0.55];
+  var PX0 = 150, PX1 = 930, PY0 = 400, PY1 = 1180, LO = -2.6, HI = 2.6;
+
+  // simulate
+  var r = V.rng(423), X = [], Y = [];
+  for (var i = 0; i < N; i++) { var x = [V.normal(r), V.normal(r)]; X.push(x); Y.push(x[1] + 0.3 * V.normal(r) > 0.2 ? 1 : 0); }
+  [0, 1].forEach(function (j) {
+    var mu = 0, sd = 0; X.forEach(function (x) { mu += x[j]; }); mu /= N;
+    X.forEach(function (x) { sd += (x[j] - mu) * (x[j] - mu); }); sd = Math.sqrt(sd / N);
+    X.forEach(function (x) { x[j] = (x[j] - mu) / sd; });
+  });
+
+  // distances: Euclidean with x1 scaled by s, and Manhattan
+  function dE(x, s) { return Math.hypot(s * (x[0] - Q[0]), x[1] - Q[1]); }
+  function dM(x) { return Math.abs(x[0] - Q[0]) + Math.abs(x[1] - Q[1]); }
+  function kth(ds) { return ds.slice().sort(function (a, b) { return a - b; })[K - 1]; }
+  var DE = X.map(function (x) { return dE(x, 1); }), DM = X.map(dM);
+  var RE = kth(DE), RM = kth(DM);
+
+  function sx(v) { return PX0 + (PX1 - PX0) * (v - LO) / (HI - LO); }
+  function sy(v) { return PY1 - (PY1 - PY0) * (v - LO) / (HI - LO); }
+  var U = (PX1 - PX0) / (HI - LO);                                 // pixels per unit
+  // the query's label goes where it is farthest from every point
+  var QL = [[24, -20], [24, 44], [-100, -20], [-100, 44]].reduce(function (best, o) {
+    var bx = sx(Q[0]) + o[0] + 35, by = sy(Q[1]) + o[1] - 9, m = 1e9;
+    X.forEach(function (x) { m = Math.min(m, Math.hypot((sx(x[0]) - bx) / 1.6, sy(x[1]) - by)); });
+    return m > best.m ? { o: o, m: m } : best;
+  }, { o: null, m: -1 }).o;
+
+  // timeline
+  var T1 = 0.8, T2 = 4.6, T3 = 8.4, T4 = 15.0, DUR = 19.6;
+  var SC = [[9.1, 9.9, 1, 10], [10.7, 11.5, 10, 100], [12.3, 13.1, 100, 1000], [T4, T4 + 1.8, 1000, 1]];
+  function scaleAt(t) {                                            // the factor on x1, moved geometrically
+    var s = 1;
+    SC.forEach(function (c) { if (t >= c[0]) s = Math.exp(V.lerp(Math.log(c[2]), Math.log(c[3]), V.span(t, c[0], c[1]))); });
+    return s;
+  }
+
+  var eq, counter, cap, vote, diff, lx1, lx2, eqKey = "";
+  function setup() {
+    eq = V.el("eq", "");
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Twenty-eight simulated points, k = 5 throughout. Multiplying $x_1$ by 1,000 stretches every distance along it and the neighbourhood thins to a strip; standardizing restores it.");
+    vote = V.el("label", "", { left: "0", right: "0", textAlign: "center", top: (PY1 + 30) + "px", color: P.ink });
+    diff = V.el("label", "", { left: "0", right: "0", textAlign: "center", top: (PY1 + 76) + "px" });
+    lx1 = V.el("label", "$x_1$", { left: (PX1 - 44) + "px", top: (PY1 - 44) + "px" });
+    lx2 = V.el("label", "$x_2$", { left: (PX0 + 16) + "px", top: (PY0 + 10) + "px" });
+  }
+  function setEq(act) {                                            // act: "E", "M" or "Z"; the active formula in black
+    if (eqKey === act) return; eqKey = act;
+    var g = P.amber;
+    function c(on, s) { return on ? s : "\\color{" + g + "}{" + s + "}"; }
+    eq.innerHTML = "<div>" + katex.renderToString(
+      c(act !== "M", "d_2 = \\sqrt{\\textstyle\\sum_j (x_j - q_j)^2}") + "\\qquad " + c(act === "M", "d_1 = \\textstyle\\sum_j |x_j - q_j|")) + "</div>" +
+      "<div>" + katex.renderToString(c(act === "Z", "z_j = (x_j - \\mu_j)\\,/\\,\\sigma_j")) + "</div>";
+  }
+
+  function render(t, ctx) {
+    var intro = V.span(t, 0, 0.7), cx = sx(Q[0]), cy = sy(Q[1]);
+    var s = scaleAt(t);
+    ctx.save(); ctx.globalAlpha = intro;
+    ctx.save(); ctx.beginPath(); ctx.rect(PX0, PY0, PX1 - PX0, PY1 - PY0); ctx.clip();
+
+    // which metric is live, and the radius its shape has reached
+    var mode, rad, lit = [];
+    var gE = V.span(t, T1, T1 + 2.0), gM = V.span(t, T2, T2 + 2.0);
+    if (t < T2) { mode = "E"; rad = RE * gE; }
+    else if (t < T3) { mode = "M"; rad = RM * gM; }
+    else { mode = "E"; rad = kth(X.map(function (x) { return dE(x, s); })); }
+
+    // the comparison outline: the Euclidean circle, dashed, while the diamond grows
+    var cmpA = (t >= T2 && t < T3 + 0.6) ? V.span(t, T2, T2 + 0.4) * (1 - V.span(t, T3, T3 + 0.6)) : 0;
+    // the Manhattan diamond fades out as step 3 brings the circle back
+    var dmA = t >= T3 ? 1 - V.span(t, T3, T3 + 0.6) : 1;
+    if (mode === "M" || (t >= T3 && dmA > 0)) {
+      var rr = (mode === "M" ? rad : RM) * U;
+      ctx.save(); ctx.globalAlpha *= mode === "M" ? 1 : dmA;
+      ctx.beginPath(); ctx.moveTo(cx + rr, cy); ctx.lineTo(cx, cy - rr); ctx.lineTo(cx - rr, cy); ctx.lineTo(cx, cy + rr); ctx.closePath();
+      ctx.fillStyle = P.form; ctx.fill(); ctx.strokeStyle = P.ink; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    }
+    if (mode === "E" && rad > 0) {
+      var ca = t >= T3 ? V.span(t, T3, T3 + 0.6) : 1;
+      ctx.save(); ctx.globalAlpha *= ca;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rad * U / s, rad * U, 0, 0, 7);
+      ctx.fillStyle = P.form; ctx.fill(); ctx.strokeStyle = P.ink; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    }
+    if (cmpA > 0) {
+      ctx.save(); ctx.globalAlpha *= cmpA * 0.6; ctx.setLineDash([8, 8]);
+      ctx.beginPath(); ctx.arc(cx, cy, RE * U, 0, 7); ctx.strokeStyle = P.ink; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+    }
+    ctx.restore();
+    ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5; ctx.strokeRect(PX0, PY0, PX1 - PX0, PY1 - PY0);
+
+    // neighbours: inside the live shape (a hair of slack for the k-th point on the edge)
+    X.forEach(function (x, i) {
+      var d = mode === "M" ? DM[i] : dE(x, s);
+      lit.push(rad > 0 && d <= rad * (1 + 1e-9));
+    });
+    X.forEach(function (x, i) {
+      if (!lit[i]) return;
+      V.line(ctx, cx, cy, sx(x[0]), sy(x[1]), V.rgba(P.ink, 0.6), 2, [8, 8]);
+    });
+    X.forEach(function (x, i) {
+      var c = lit[i] ? P.ink : P.amber, rd = lit[i] ? 9 : 7, px = sx(x[0]), py = sy(x[1]);
+      if (Y[i]) V.dot(ctx, px, py, c, rd);
+      else { V.dot(ctx, px, py, P.ground, rd); V.ring(ctx, px, py, rd - 1.2, c, lit[i] ? 3 : 2.2); }
+    });
+    // the query: a ring around a small dot
+    V.dot(ctx, cx, cy, P.ground, 15); V.ring(ctx, cx, cy, 14, P.ink, 3); V.dot(ctx, cx, cy, P.ink, 4);
+    V.text(ctx, "query", cx + QL[0], cy + QL[1], P.ink, 28, "left", 500);
+    ctx.restore();
+
+    // vote of the lit neighbours
+    var nf = 0, n = 0; lit.forEach(function (l, i) { if (l) { n++; nf += Y[i]; } });
+    if (n === 0) vote.textContent = "the k = 5 nearest neighbours vote";
+    else V.tex(vote, "the " + n + " nearest: " + nf + " filled, " + (n - nf) + " open" + (n === K ? "  →  predict " + (nf * 2 > K ? "filled" : "open") : ""));
+    vote.style.opacity = intro;
+    // once the shape holds five, how many differ from the first (Euclidean, unscaled) five
+    var nd = 0; if (n === K) lit.forEach(function (l, i) { if (l && DE[i] > RE * (1 + 1e-9)) nd++; });
+    diff.textContent = nd ? (nd === 1 ? "one neighbour differs from the first five" : ["", "", "two", "three", "four", "all five"][nd] + " neighbours differ from the first five") : "";
+    diff.style.opacity = intro;
+
+    // counter and equation
+    if (t < T2) { V.tex(counter, "$\\text{Euclidean}$"); setEq("E"); }
+    else if (t < T3) { V.tex(counter, "$\\text{Manhattan}$"); setEq("M"); }
+    else if (t < T4 + 0.9) {
+      var f = 1; SC.slice(0, 3).forEach(function (c) { if (t >= (c[0] + c[1]) / 2) f = c[3]; });
+      V.tex(counter, f === 1 ? "$\\text{Euclidean}$" : "$x_1 \\times " + (f === 1000 ? "1{,}000" : f) + "$"); setEq("E");
+    } else { V.tex(counter, "$\\text{standardized}$"); setEq("Z"); }
+  }
+
+  VIZ.run({ duration: DUR, poster: 14.5, setup: setup, render: render,
+            title: "What counts as near", mark: "DATASCI 207", course: "module 7" });
+})();
+</script>
+</body></html>

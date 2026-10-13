@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How deep to grow a tree</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 7, preventing overfitting in trees. The notes' hyperparameter table:
+   max_depth, "effect when increased: more complex, more overfitting".
+   Data (simulated, seeded): 150 training points uniform on the unit square,
+   filled inside an ellipse centred at (0.5, 0.52) with half-widths 0.36 and
+   0.3, open outside, and one label in eight flipped at random. A held-out set
+   of 2,000 points is drawn the same way, so its best possible accuracy is
+   about 0.88. The page grows a CART tree with the notes' Gini impurity (every
+   feature, every midpoint threshold), splitting a node while it is impure and
+   shallower than max_depth, and predicts each leaf's majority (a tie goes to
+   the open class, as scikit-learn's argmax does). It fits a tree at every
+   depth from 1 to the full depth (max_depth = None) and scores each on the
+   training and held-out sets. The counter steps max_depth = 1, 2, 3, 5, 8,
+   None; the curves pass through every depth in between. */
+(function () {
+  var V = VIZ, P = V.P;
+  var PX0 = 170, PX1 = 910, PY0 = 395, PY1 = 935;              // the plane
+  var AX0 = 230, AX1 = 720, AY0 = 1085, AY1 = 1335;             // the accuracy panel
+  var A_LO = 0.55, A_HI = 1.0;
+  var NTR = 150, NTE = 2000, FLIP = 0.125;
+
+  // simulate
+  var r = V.rng(147);
+  function truth(u) { var dx = (u[0] - 0.5) / 0.36, dy = (u[1] - 0.52) / 0.3; return dx * dx + dy * dy < 1 ? 1 : 0; }
+  function sim(n) {
+    var X = [], Y = [];
+    for (var i = 0; i < n; i++) { var u = [r(), r()], y = truth(u); if (r() < FLIP) y = 1 - y; X.push(u); Y.push(y); }
+    return [X, Y];
+  }
+  var TR = sim(NTR), X = TR[0], Y = TR[1], TE = sim(NTE), XT = TE[0], YT = TE[1];
+
+  function gini(n1, n) { if (!n) return 0; var p = n1 / n; return 1 - p * p - (1 - p) * (1 - p); }
+  function grow(idx, d, maxd, box, leaves) {
+    var n = idx.length, n1 = 0; idx.forEach(function (i) { n1 += Y[i]; });
+    var node = { n1: n1, n: n, box: box, d: d };
+    if (gini(n1, n) === 0 || d >= maxd) { node.leaf = true; leaves.push(node); return node; }
+    var best = null;
+    for (var f = 0; f < 2; f++) {
+      var s = idx.slice().sort(function (a, b) { return X[a][f] - X[b][f]; }), l1 = 0;
+      for (var k = 1; k < n; k++) {
+        l1 += Y[s[k - 1]];
+        var a = X[s[k - 1]][f], b = X[s[k]][f]; if (a === b) continue;
+        var w = (k * gini(l1, k) + (n - k) * gini(n1 - l1, n - k)) / n;
+        if (!best || w < best.w - 1e-12) best = { f: f, thr: (a + b) / 2, w: w };
+      }
+    }
+    if (!best) { node.leaf = true; leaves.push(node); return node; }
+    var bl = box.slice(), br = box.slice();
+    if (best.f === 0) { bl[1] = best.thr; br[0] = best.thr; } else { bl[3] = best.thr; br[2] = best.thr; }
+    node.f = best.f; node.thr = best.thr;
+    node.l = grow(idx.filter(function (i) { return X[i][best.f] <= best.thr; }), d + 1, maxd, bl, leaves);
+    node.r = grow(idx.filter(function (i) { return X[i][best.f] > best.thr; }), d + 1, maxd, br, leaves);
+    return node;
+  }
+  function cls(L) { return 2 * L.n1 > L.n ? 1 : 0; }
+  function predict(nd, u) { while (!nd.leaf) nd = u[nd.f] <= nd.thr ? nd.l : nd.r; return cls(nd); }
+  function depthOf(nd) { return nd.leaf ? nd.d : Math.max(depthOf(nd.l), depthOf(nd.r)); }
+  function acc(tree, Xs, Ys) { var c = 0; Xs.forEach(function (u, i) { c += predict(tree, u) === Ys[i] ? 1 : 0; }); return c / Xs.length; }
+
+  var ALL = X.map(function (_, i) { return i; }), BOX = [-0.02, 1.02, -0.02, 1.02];
+  var DFULL = depthOf(grow(ALL, 0, 1e9, BOX, []));
+  var FIT = [];                                                  // FIT[d - 1]: the tree with max_depth d
+  for (var d = 1; d <= DFULL; d++) {
+    var lv = [], tr = grow(ALL, 0, d, BOX, lv);
+    FIT.push({ d: d, leaves: lv, train: acc(tr, X, Y), test: acc(tr, XT, YT) });
+  }
+  var PEAK = 0; FIT.forEach(function (F, i) { if (F.test > FIT[PEAK].test) PEAK = i; });
+
+  function sx(v) { return PX0 + (PX1 - PX0) * (v - BOX[0]) / (BOX[1] - BOX[0]); }
+  function sy(v) { return PY1 - (PY1 - PY0) * (v - BOX[2]) / (BOX[3] - BOX[2]); }
+  function ax(d) { return AX0 + (AX1 - AX0) * (d - 1) / (DFULL - 1); }
+  function ay(a) { return AY1 - (AY1 - AY0) * (a - A_LO) / (A_HI - A_LO); }
+
+  // each depth's regions drawn once, off screen: shaded leaves that predict filled, and the boundary
+  function regions(F) {
+    var c = document.createElement("canvas"); c.width = V.W; c.height = V.H;
+    var o = c.getContext("2d");
+    o.fillStyle = P.form;
+    F.leaves.forEach(function (L) {
+      if (!cls(L)) return;
+      var x0 = Math.round(sx(L.box[0])), x1 = Math.round(sx(L.box[1])), y0 = Math.round(sy(L.box[3])), y1 = Math.round(sy(L.box[2]));
+      o.fillRect(x0, y0, x1 - x0, y1 - y0);
+    });
+    // every leaf's edges as hairlines, so a split shows even where both sides predict the same
+    o.strokeStyle = P.hair; o.lineWidth = 1.5;
+    F.leaves.forEach(function (L) {
+      var x0 = sx(L.box[0]), x1 = sx(L.box[1]), y0 = sy(L.box[3]), y1 = sy(L.box[2]);
+      o.strokeRect(x0, y0, x1 - x0, y1 - y0);
+    });
+    // boundary: the shared edge of every two touching leaves that predict differently
+    o.strokeStyle = P.ink; o.lineWidth = 2.5; o.lineCap = "square"; o.beginPath();
+    F.leaves.forEach(function (A) {
+      F.leaves.forEach(function (B) {
+        if (cls(A) !== 1 || cls(B) !== 0) return;
+        var a = A.box, b = B.box, lo, hi;
+        [[a[1], b[0]], [a[0], b[1]]].forEach(function (e) {        // a vertical shared edge
+          if (e[0] !== e[1]) return;
+          lo = Math.max(a[2], b[2]); hi = Math.min(a[3], b[3]);
+          if (hi > lo) { o.moveTo(sx(e[0]), sy(lo)); o.lineTo(sx(e[0]), sy(hi)); }
+        });
+        [[a[3], b[2]], [a[2], b[3]]].forEach(function (e) {        // a horizontal shared edge
+          if (e[0] !== e[1]) return;
+          lo = Math.max(a[0], b[0]); hi = Math.min(a[1], b[1]);
+          if (hi > lo) { o.moveTo(sx(lo), sy(e[0])); o.lineTo(sx(hi), sy(e[0])); }
+        });
+      });
+    });
+    o.stroke();
+    return c;
+  }
+
+  var SHOW = [1, 2, 3, 5, 8, DFULL];
+  var HOLD = [2.8, 2.7, 2.6, 2.7, 2.7, 3.6], ST = [], tt = 1.0, XF = 0.9;
+  HOLD.forEach(function (h) { ST.push(tt); tt += h; });
+  var DUR = tt;
+  var IMG = {};
+
+  var eq, counter, cap, lx1, lx2, lplane, ltr, lte, lpk, ticks = [];
+  function setup() {
+    SHOW.forEach(function (d) { IMG[d] = regions(FIT[d - 1]); });
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("\\text{accuracy} = \\tfrac{1}{n}\\textstyle\\sum_i \\mathbb{1}[\\,\\hat y_i = y_i\\,]") + "</div>" +
+      '<div style="color:' + P.amber + '">' + katex.renderToString("\\texttt{max\\_depth}\\uparrow\\text{: more complex, more overfitting}") + "</div>";
+    counter = V.el("counter", "", { fontSize: "96px", top: "1455px" });   // "max_depth = None" is wide
+    cap = V.el("caption", "150 simulated training points, one label in eight flipped. Held-out accuracy is scored on 2,000 fresh simulated points. Shaded regions predict filled.");
+    lx1 = V.el("label", "$x_1$", { left: ((PX0 + PX1) / 2 - 10) + "px", top: (PY1 + 10) + "px" });
+    lx2 = V.el("label", "$x_2$", { left: (PX0 - 52) + "px", top: ((PY0 + PY1) / 2 - 18) + "px" });
+    lplane = V.el("label", "", { right: (1080 - PX1) + "px", top: (PY0 - 44) + "px", color: P.ink });
+    ltr = V.el("label", "", { color: P.ink }); lte = V.el("label", "", { color: P.amber });
+    lpk = V.el("label", "", { color: P.amber });
+    V.el("label", "max_depth", { left: (AX0 - 4) + "px", top: (AY1 + 54) + "px" });
+    [1, 2, 3, 5, 8, DFULL].forEach(function (d) {
+      ticks.push(V.el("label", String(d), { left: (ax(d) - 30) + "px", width: "60px", textAlign: "center", top: (AY1 + 14) + "px" }));
+    });
+    [0.6, 0.8, 1.0].forEach(function (a) {
+      V.el("label", a.toFixed(1), { right: (1080 - AX0 + 22) + "px", top: (ay(a) - 17) + "px" });
+    });
+  }
+
+  function render(t, ctx) {
+    var k = 0; for (var j = 0; j < ST.length; j++) if (t >= ST[j]) k = j;
+    var intro = V.span(t, 0, 0.8), x = t < ST[0] ? V.span(t, 0.4, 1.0) : V.span(t, ST[k], ST[k] + XF);
+    var dNow = t < ST[0] ? 1 : V.lerp(k ? SHOW[k - 1] : 1, SHOW[k], x);      // the depth the curves have reached
+
+    ctx.save(); ctx.globalAlpha = intro;
+    // regions: crossfade from the previous depth's tree to this one
+    if (k > 0 && x < 1) { ctx.save(); ctx.globalAlpha = intro * (1 - x); ctx.drawImage(IMG[SHOW[k - 1]], 0, 0); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha = intro * x; ctx.drawImage(IMG[SHOW[k]], 0, 0); ctx.restore();
+    ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5; ctx.strokeRect(PX0, PY0, PX1 - PX0, PY1 - PY0);
+    X.forEach(function (p, i) {
+      if (Y[i]) V.dot(ctx, sx(p[0]), sy(p[1]), P.ink, 6.5);
+      else { V.dot(ctx, sx(p[0]), sy(p[1]), P.ground, 6.5); V.ring(ctx, sx(p[0]), sy(p[1]), 5.8, P.ink, 2); }
+    });
+
+    // accuracy panel: range-frame axes, then the two curves up to dNow
+    V.line(ctx, AX0, AY1 + 6, AX1, AY1 + 6, P.hair, 1.5);
+    SHOW.forEach(function (d) { V.line(ctx, ax(d), AY1 + 6, ax(d), AY1 + 14, P.hair, 1.5); });
+    V.line(ctx, AX0 - 12, ay(0.6), AX0 - 12, ay(1.0), P.hair, 1.5);
+    [0.6, 0.8, 1.0].forEach(function (a) { V.line(ctx, AX0 - 20, ay(a), AX0 - 12, ay(a), P.hair, 1.5); });
+    function curve(key) {
+      var pts = [], dn = Math.floor(dNow);
+      for (var d = 1; d <= dn; d++) pts.push([ax(d), ay(FIT[d - 1][key])]);
+      if (dNow > dn && dn < DFULL) {
+        var u = dNow - dn, a = FIT[dn - 1][key], b = FIT[dn][key];
+        pts.push([ax(dNow), ay(V.lerp(a, b, u))]);
+      }
+      return pts;
+    }
+    function valAt(key) {
+      var dn = Math.floor(dNow), u = dNow - dn;
+      return dn >= DFULL ? FIT[DFULL - 1][key] : V.lerp(FIT[dn - 1][key], FIT[dn][key], u);
+    }
+    var ctr = curve("train"), cte = curve("test");
+    if (ctr.length > 1) { V.path(ctx, cte, P.amber, 3.5); V.path(ctx, ctr, P.ink, 3.5); }
+    // the held-out peak, once the curve has passed it
+    var pkA = V.span(dNow, PEAK + 1.6, PEAK + 2.2);
+    if (pkA > 0) V.ring(ctx, ax(PEAK + 1), ay(FIT[PEAK].test), 13, V.rgba(P.amber, pkA), 2.5);
+    lpk.style.opacity = pkA;
+    lpk.textContent = "best held out: depth " + (PEAK + 1);
+    lpk.style.left = (ax(PEAK + 1) - 60) + "px"; lpk.style.top = (ay(FIT[PEAK].test) + 66) + "px";
+    var vtr = valAt("train"), vte = valAt("test"), ytr = ay(vtr), yte = ay(vte), xd = ax(dNow);
+    V.line(ctx, xd, AY0 - 10, xd, AY1 + 6, V.rgba(P.ink, 0.6), 1.5, [8, 8]);
+    V.dot(ctx, xd, yte, P.amber, 8); V.dot(ctx, xd, ytr, P.ink, 8);
+    // labels beside the moving dots, pushed apart when they would touch
+    var l1 = ytr, l2 = yte, gap = 36;
+    if (Math.abs(l1 - l2) < gap) { var m = (l1 + l2) / 2, s = l1 <= l2 ? -1 : 1; l1 = m + s * gap / 2; l2 = m - s * gap / 2; }
+    ltr.textContent = "training " + vtr.toFixed(2); lte.textContent = "held out " + vte.toFixed(2);
+    ltr.style.left = lte.style.left = (xd + 22) + "px";
+    ltr.style.top = (l1 - 17) + "px"; lte.style.top = (l2 - 17) + "px";
+    ctx.restore();
+
+    var kk = x > 0.5 || k === 0 ? k : k - 1, F = FIT[SHOW[kk] - 1];
+    lplane.textContent = (kk === SHOW.length - 1 ? "grown to depth " + DFULL + ", " : "") + F.leaves.length + " leaves";
+    [ltr, lte, lplane].forEach(function (e) { e.style.opacity = intro; });
+    V.tex(counter, "$\\text{max\\_depth} = \\text{" + (kk === SHOW.length - 1 ? "None" : SHOW[kk]) + "}$");
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "How deep to grow a tree", mark: "DATASCI 207", course: "module 7" });
+})();
+</script>
+</body></html>
