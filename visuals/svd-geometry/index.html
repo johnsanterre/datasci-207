@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What a matrix does to a circle</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, the SVD as geometry. A fixed 2 x 2 matrix A is factored by the
+   page into U Sigma V^T (both rotations, since det A > 0). The unit circle and
+   its two right singular vectors go through the three factors in turn: V^T
+   turns v1 and v2 onto the axes, Sigma stretches the axes by sigma1 and
+   sigma2, and U turns the result onto the ellipse A makes. The dashed
+   outline is A applied in one step, so the three moves visibly land on it.
+   The factor being applied is black in the equation; the others are grey. */
+(function () {
+  var V = VIZ, P = V.P;
+  var A = [[1.40, 0.90], [0.30, 1.10]];
+  var CX = 540, CY = 880, S = 205;                     // origin on stage, pixels per unit
+  var T0 = 1.0, T1 = 2.0, T2 = 4.6, T3 = 5.6, T4 = 8.2, T5 = 9.2, T6 = 11.8, DUR = 16.5;
+
+  // the SVD of a 2 x 2 matrix: V from the eigenvectors of A^T A, then U = A V / sigma
+  var a = A[0][0], b = A[0][1], c = A[1][0], d = A[1][1];
+  var p = a * a + c * c, q = a * b + c * d, r = b * b + d * d;     // A^T A = [[p, q], [q, r]]
+  var tv = 0.5 * Math.atan2(2 * q, p - r);                         // angle of v1
+  var mid = (p + r) / 2, rad = Math.sqrt(((p - r) / 2) * ((p - r) / 2) + q * q);
+  var s1 = Math.sqrt(mid + rad), s2 = Math.sqrt(mid - rad);
+  var v1 = [Math.cos(tv), Math.sin(tv)], v2 = [-Math.sin(tv), Math.cos(tv)];   // V is a rotation by tv
+  var u1 = [(a * v1[0] + b * v1[1]) / s1, (c * v1[0] + d * v1[1]) / s1];
+  var tu = Math.atan2(u1[1], u1[0]);                               // U is a rotation by tu (det A > 0)
+
+  function rot(x, th) { var cs = Math.cos(th), sn = Math.sin(th); return [cs * x[0] - sn * x[1], sn * x[0] + cs * x[1]]; }
+  // where a point of the unit circle is at time t
+  function place(x, t) {
+    var y = rot(x, -tv * V.span(t, T1, T2));                       // V^T, eased
+    var k = V.span(t, T3, T4);
+    y = [y[0] * V.lerp(1, s1, k), y[1] * V.lerp(1, s2, k)];        // Sigma
+    return rot(y, tu * V.span(t, T5, T6));                         // U
+  }
+  function sx(x) { return CX + S * x; }
+  function sy(y) { return CY - S * y; }
+
+  function f2(x) { return (Math.abs(x) < 0.005 ? 0 : x).toFixed(2); }
+  function mat(m) { return "\\begin{bmatrix}" + f2(m[0][0]) + " & " + f2(m[0][1]) + "\\\\ " + f2(m[1][0]) + " & " + f2(m[1][1]) + "\\end{bmatrix}"; }
+  var Um = [[Math.cos(tu), -Math.sin(tu)], [Math.sin(tu), Math.cos(tu)]];
+  var Sm = [[s1, 0], [0, s2]];
+  var Vt = [[Math.cos(tv), Math.sin(tv)], [-Math.sin(tv), Math.cos(tv)]];
+
+  var eq1, eq2, counter, cap, lab1, lab2, step;
+  function setup() {
+    eq1 = V.el("eq", ""); eq2 = V.el("eq", "", { top: "240px", fontSize: "34px" });
+    counter = V.el("counter", "");
+    step = V.el("label", "", { width: "1080px", left: "0", textAlign: "center", top: "1612px" });
+    cap = V.el("caption", "Every 2 × 2 matrix turns the circle into an ellipse in three moves: a turn, a stretch along the axes, and a second turn. The two stretches are the singular values.");
+    lab1 = V.el("label", ""); lab2 = V.el("label", "", { color: P.amber });
+  }
+  var lastStage = -1;
+  function stageOf(t) { return t < T2 ? (t < T1 ? 0 : 1) : t < T4 ? (t < T3 ? 1 : 2) : t < T6 ? (t < T5 ? 2 : 3) : 4; }
+
+  function render(t, ctx) {
+    var intro = V.span(t, 0, T0), st = stageOf(t), done = V.span(t, T6, T6 + 0.7);
+    if (st !== lastStage) {
+      lastStage = st;
+      var on = function (k) { return st >= k ? "" : "\\color{" + P.amber + "}"; };
+      var hot = function (k) { return st === k || st === 4 ? "" : "\\color{" + P.amber + "}"; };
+      V.tex(eq1, "$A\\mathbf{x} \\;=\\; {" + on(3) + "U}\\,{" + on(2) + "\\Sigma}\\,{" + on(1) + "V^{\\top}}\\mathbf{x}$");
+      V.tex(eq2, "$" + mat(A) + " = {" + hot(3) + mat(Um) + "}{" + hot(2) + mat(Sm) + "}{" + hot(1) + mat(Vt) + "}$");
+      V.tex(counter, ["$\\mathbf{x}$", "$V^{\\top}\\mathbf{x}$", "$\\Sigma V^{\\top}\\mathbf{x}$", "$U\\Sigma V^{\\top}\\mathbf{x}$", "$A\\mathbf{x}$"][st]);
+      step.textContent = ["the unit circle", "turn: Vᵀ", "stretch: Σ", "turn: U", "the same ellipse as A in one step"][st];
+    }
+
+    // a short hairline cross at the origin, the only reference
+    V.line(ctx, sx(-2.3), sy(0), sx(2.3), sy(0), P.hair, 2);
+    V.line(ctx, sx(0), sy(-2.0), sx(0), sy(2.0), P.hair, 2);
+
+    // the target: A applied in one step, a dashed grey ellipse
+    var tgt = [], cur = [];
+    for (var k = 0; k <= 160; k++) {
+      var ph = 2 * Math.PI * k / 160, x = [Math.cos(ph), Math.sin(ph)];
+      tgt.push([sx(a * x[0] + b * x[1]), sy(c * x[0] + d * x[1])]);
+      var y = place(x, t); cur.push([sx(y[0]), sy(y[1])]);
+    }
+    ctx.save(); ctx.globalAlpha = intro; V.path(ctx, tgt, V.rgba(P.amber, 0.8), 2, 1, [8, 8]); ctx.restore();
+    V.form(ctx, cur, 0.95 * intro);
+    ctx.save(); ctx.globalAlpha = intro; V.path(ctx, cur, P.ink, 3); ctx.restore();
+
+    // twelve marked points ride along, so the turns can be seen
+    for (k = 0; k < 12; k++) {
+      var y2 = place([Math.cos(Math.PI * k / 6), Math.sin(Math.PI * k / 6)], t);
+      V.dot(ctx, sx(y2[0]), sy(y2[1]), V.rgba(P.ink, 0.55 * intro), 5);
+    }
+
+    // v1 (black) and v2 (grey) and where they go
+    var e1 = place(v1, t), e2 = place(v2, t);
+    ctx.save(); ctx.globalAlpha = intro;
+    V.line(ctx, sx(0), sy(0), sx(e1[0]), sy(e1[1]), P.ink, 5); V.dot(ctx, sx(e1[0]), sy(e1[1]), P.ink, 9);
+    V.line(ctx, sx(0), sy(0), sx(e2[0]), sy(e2[1]), P.amber, 5); V.dot(ctx, sx(e2[0]), sy(e2[1]), P.amber, 9);
+    ctx.restore();
+
+    // name the vectors: v at the start, sigma u at the end
+    var nm1 = t < T6 ? (t < T1 ? "v₁" : "") : "σ₁ = " + s1.toFixed(2);
+    var nm2 = t < T6 ? (t < T1 ? "v₂" : "") : "σ₂ = " + s2.toFixed(2);
+    lab1.textContent = nm1; lab2.textContent = nm2;
+    var o1 = [e1[0] / Math.hypot(e1[0], e1[1]), e1[1] / Math.hypot(e1[0], e1[1])];
+    var o2 = [e2[0] / Math.hypot(e2[0], e2[1]), e2[1] / Math.hypot(e2[0], e2[1])];
+    lab1.style.left = (sx(e1[0]) + 24 * o1[0] + (o1[0] < 0 ? 0 : 6)) + "px"; lab1.style.transform = o1[0] < 0 ? "translateX(-100%)" : "none"; lab1.style.top = (sy(e1[1]) - 30 * o1[1] - 22) + "px";
+    lab2.style.left = (sx(e2[0]) + 24 * o2[0] + (o2[0] < 0 ? 0 : 6)) + "px"; lab2.style.transform = o2[0] < 0 ? "translateX(-100%)" : "none"; lab2.style.top = (sy(e2[1]) - 30 * o2[1] - 22) + "px";
+    V.fade(lab1, t < T1 ? intro : done); V.fade(lab2, t < T1 ? intro : done);
+  }
+
+  VIZ.run({ duration: DUR, poster: DUR - 0.4, setup: setup, render: render,
+            title: "What a matrix does to a circle", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

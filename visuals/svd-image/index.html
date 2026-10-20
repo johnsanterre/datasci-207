@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A picture from its first k components</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, the SVD as compression. The page draws a 96 x 128 grayscale
+   picture (a lake, hills, a sun and a tree), reads its pixels into a matrix A,
+   and factors it (eigenvectors of A^T A by cyclic Jacobi, then u = A v / s).
+   The loop rebuilds the picture from the first k layers, k = 1, 2, 3, 5, 8,
+   12, 20, 32, beside the singular values and two counts: the share of
+   sum sigma^2 kept, which is the explained-variance ratio of module 8 on
+   uncentred pixels, and the numbers a rank-k copy stores, k (m + n + 1). */
+(function () {
+  var V = VIZ, P = V.P;
+  var M = 96, N = 128;
+  var KS = [0, 1, 2, 3, 5, 8, 12, 20, 32];
+
+  // draw the picture off screen and read its pixels (0 = black, 1 = white)
+  function picture() {
+    var c = document.createElement("canvas"); c.width = N; c.height = M;
+    var g = c.getContext("2d");
+    var sky = g.createLinearGradient(0, 0, 0, 56); sky.addColorStop(0, "#9a9a9a"); sky.addColorStop(1, "#f2f2f2");
+    g.fillStyle = sky; g.fillRect(0, 0, N, 58);
+    g.fillStyle = "#ffffff"; g.beginPath(); g.arc(92, 20, 9, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = "#6e6e6e"; g.beginPath(); g.moveTo(0, 58); g.lineTo(0, 40); g.lineTo(22, 26); g.lineTo(40, 38); g.lineTo(58, 22); g.lineTo(82, 44); g.lineTo(104, 34); g.lineTo(128, 46); g.lineTo(128, 58); g.fill();
+    g.fillStyle = "#3c3c3c"; g.beginPath(); g.moveTo(0, 58); g.lineTo(0, 50); g.lineTo(30, 44); g.lineTo(60, 52); g.lineTo(96, 46); g.lineTo(128, 54); g.lineTo(128, 58); g.fill();
+    var lake = g.createLinearGradient(0, 58, 0, 96); lake.addColorStop(0, "#c8c8c8"); lake.addColorStop(1, "#505050");
+    g.fillStyle = lake; g.fillRect(0, 58, N, 38);
+    g.fillStyle = "#e8e8e8"; for (var i = 0; i < 6; i++) g.fillRect(84 + (i % 2) * 3, 62 + 4 * i, 16 - 2 * i, 1);   // the sun on the water
+    g.fillStyle = "#1a1a1a"; g.fillRect(24, 48, 3, 30);                                                              // the tree
+    g.beginPath(); g.moveTo(25.5, 22); g.lineTo(13, 52); g.lineTo(38, 52); g.fill();
+    g.beginPath(); g.moveTo(25.5, 32); g.lineTo(10, 64); g.lineTo(41, 64); g.fill();
+    var d = g.getImageData(0, 0, N, M).data, A = [];
+    for (var y = 0; y < M; y++) { A.push([]); for (var x = 0; x < N; x++) A[y].push(d[4 * (y * N + x)] / 255); }
+    return A;
+  }
+  var A0 = picture(), MU = [], A = [];
+  for (var x0 = 0; x0 < N; x0++) { var m0 = 0; for (var y0 = 0; y0 < M; y0++) m0 += A0[y0][x0] / M; MU.push(m0); }
+  for (y0 = 0; y0 < M; y0++) A.push(A0[y0].map(function (v, x) { return v - MU[x]; }));   // centre each column, as PCA does
+
+  function jacobi(S) {
+    var n = S.length, a = S.map(function (row) { return row.slice(); }), v = [];
+    for (var i = 0; i < n; i++) { v.push(new Float64Array(n)); v[i][i] = 1; }
+    for (var sweep = 0; sweep < 40; sweep++) {
+      var off = 0; for (i = 0; i < n; i++) for (var j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+      if (off < 1e-18) break;
+      for (var p = 0; p < n; p++) for (var q = p + 1; q < n; q++) {
+        if (Math.abs(a[p][q]) < 1e-14) continue;
+        var th = 0.5 * Math.atan2(2 * a[p][q], a[q][q] - a[p][p]), c = Math.cos(th), s = Math.sin(th);
+        for (var k = 0; k < n; k++) { var akp = a[k][p], akq = a[k][q]; a[k][p] = c * akp - s * akq; a[k][q] = s * akp + c * akq; }
+        for (k = 0; k < n; k++) { var apk = a[p][k], aqk = a[q][k]; a[p][k] = c * apk - s * aqk; a[q][k] = s * apk + c * aqk; }
+        for (k = 0; k < n; k++) { var vkp = v[k][p], vkq = v[k][q]; v[k][p] = c * vkp - s * vkq; v[k][q] = s * vkp + c * vkq; }
+      }
+    }
+    var idx = []; for (i = 0; i < n; i++) idx.push(i);
+    idx.sort(function (x, y) { return a[y][y] - a[x][x]; });
+    return idx.map(function (i) { return { val: a[i][i], vec: Array.from(v, function (row) { return row[i]; }) }; });
+  }
+  var AtA = []; for (var i = 0; i < N; i++) { AtA.push([]); for (var j = 0; j < N; j++) { var s = 0; for (var y = 0; y < M; y++) s += A[y][i] * A[y][j]; AtA[i].push(s); } }
+  var E = jacobi(AtA).slice(0, M), SIG = [], UU = [], VV = [];
+  E.forEach(function (e) {
+    var sg = Math.sqrt(Math.max(0, e.val)), u = [];
+    for (var y = 0; y < M; y++) { var t = 0; for (var x = 0; x < N; x++) t += A[y][x] * e.vec[x]; u.push(sg > 1e-9 ? t / sg : 0); }
+    SIG.push(sg); UU.push(u); VV.push(e.vec);
+  });
+  var TOT = SIG.reduce(function (t, x) { return t + x * x; }, 0);
+  function kept(k) { var t = 0; for (var i = 0; i < k; i++) t += SIG[i] * SIG[i]; return t / TOT; }
+
+  // the rebuilt pictures, one canvas per k
+  var PIC = {};
+  KS.forEach(function (k) {
+    var c = document.createElement("canvas"); c.width = N; c.height = M;
+    var g = c.getContext("2d"), im = g.createImageData(N, M);
+    for (var y = 0; y < M; y++) for (var x = 0; x < N; x++) {
+      var t = MU[x]; for (var q = 0; q < k; q++) t += SIG[q] * UU[q][y] * VV[q][x];
+      var b = Math.round(255 * Math.max(0, Math.min(1, t))), o = 4 * (y * N + x);
+      im.data[o] = im.data[o + 1] = im.data[o + 2] = b; im.data[o + 3] = 255;
+    }
+    g.putImageData(im, 0, 0); PIC[k] = c;
+  });
+
+  // timing: each k held, early ones longer; cross-fade between them
+  var T_IN = 0.8, SLOTS = [], tt = T_IN;
+  KS.forEach(function (k, n) { var len = n < 3 ? 2.0 : 1.5; SLOTS.push([tt, tt + len]); tt += len; });
+  var DUR = tt + 1.6;
+  function slot(t) { for (var n = KS.length - 1; n >= 0; n--) if (t >= SLOTS[n][0]) return n; return 0; }
+
+  var IX = 108, IY = 400, IW = 864, IH = 648;          // the picture, 6.75 px per pixel
+  var GX0 = 240, GX1 = 1000, GY = 1340, GH = 190;      // singular values, the first 32 of 96
+
+  var eq, counter, cap, lk, ls, lsig;
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("A_k = \\bar{A} + \\textstyle\\sum_{i \\le k} \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^{\\top}") + "</div>" +
+      "<div>" + katex.renderToString("\\text{explained} = \\textstyle\\sum_{i \\le k} \\sigma_i^2 \\big/ \\sum_i \\sigma_i^2") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "A 96 \u00d7 128 picture drawn by the page, centred column by column as PCA does. Each layer adds one column u, one row v and one number \u03c3.");
+    lk = V.el("label", "", { left: IX + "px", top: (IY + IH + 18) + "px" });
+    ls = V.el("label", "", { left: (IX + IW) + "px", top: (IY + IH + 18) + "px", transform: "translateX(-100%)" });
+    lsig = V.el("label", "", { left: "72px", top: (GY - 64) + "px", whiteSpace: "normal", lineHeight: "1.25" });
+    lsig.innerHTML = "singular<br>values";
+  }
+
+  function render(t, ctx) {
+    var intro = V.span(t, 0, T_IN), n = slot(t), k = KS[n];
+    var fadeIn = V.span(t, SLOTS[n][0], SLOTS[n][0] + 0.5);
+    ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = intro;
+    if (n > 0 && fadeIn < 1) ctx.drawImage(PIC[KS[n - 1]], IX, IY, IW, IH);
+    ctx.globalAlpha = intro * (n > 0 ? fadeIn : 1);
+    ctx.drawImage(PIC[k], IX, IY, IW, IH);
+    ctx.restore();
+    ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5; ctx.strokeRect(IX, IY, IW, IH);
+
+    lk.innerHTML = "variance explained <b style='color:#000'>" + (100 * kept(k)).toFixed(1) + "%</b>";
+    var stored = k * (M + N + 1) + N, full = M * N;   // the column means count too
+    ls.innerHTML = "numbers stored <b style='color:#000'>" + stored.toLocaleString("en-US") + "</b> of " + full.toLocaleString("en-US");
+    V.fade(lk, intro); V.fade(ls, intro); V.fade(lsig, intro);
+
+    // the first 32 singular values, filled up to k
+    var SHOW = 32, bw = (GX1 - GX0) / SHOW;
+    V.line(ctx, GX0, GY, GX1, GY, P.hair, 2);
+    ctx.save(); ctx.globalAlpha = intro;
+    for (var q = 0; q < SHOW; q++) {
+      var h = Math.max(2, GH * SIG[q] / SIG[0]), bx = GX0 + q * bw + 3;
+      if (q < k) { ctx.fillStyle = P.ink; ctx.fillRect(bx, GY - h, bw - 6, h); }
+      else { ctx.strokeStyle = P.amber; ctx.lineWidth = 1.5; ctx.strokeRect(bx, GY - h, bw - 6, h); }
+    }
+    V.text(ctx, SIG[0].toFixed(1), GX0 + bw / 2, GY - GH - 10, P.ink, 22, "center");
+    V.text(ctx, "1", GX0 + bw / 2, GY + 30, P.dim, 22, "center");
+    V.text(ctx, "32", GX1 - bw / 2, GY + 30, P.dim, 22, "center");
+    ctx.restore();
+
+    V.tex(counter, "$k = " + k + "$");
+  }
+
+  VIZ.run({ duration: DUR, poster: SLOTS[6][0] + 1.0, setup: setup, render: render,
+            title: "A picture from its first k components", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>

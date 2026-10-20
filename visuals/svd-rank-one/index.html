@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A matrix as a sum of rank-one layers</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<link rel="stylesheet" href="../../lib/viz.css">
+<script src="../../lib/viz.js"></script>
+<script data-goatcounter="https://johnsanterre.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head><body>
+<div id="stage"></div>
+<script>
+/* Module 8, the SVD as a sum of layers. A simulated 8 x 12 table of ratings
+   (8 viewers, 12 films, three hidden tastes plus noise, rounded to whole
+   stars) is factored by the page. Each step adds one layer sigma_k u_k v_k^T:
+   the outer product of a column u_k (bars, left) and a row v_k (bars, top),
+   scaled by sigma_k. The big table is the running sum A_k with its numbers;
+   the small tables are the layer, the target A and the residual A - A_k.
+   Black cells are positive, grey cells negative, darker means larger. */
+(function () {
+  var V = VIZ, P = V.P;
+  var M = 8, N = 12;
+
+  // simulate: three tastes, ratings 1 to 5 in whole stars (seeded)
+  var r = V.rng(2079), A = [];
+  var Ut = [], Vt = [];
+  for (var i = 0; i < M; i++) Ut.push([V.normal(r), V.normal(r), V.normal(r)]);
+  for (var j = 0; j < N; j++) Vt.push([V.normal(r), V.normal(r), V.normal(r)]);
+  for (i = 0; i < M; i++) { A.push([]); for (j = 0; j < N; j++) {
+    var z = 3 + 0.75 * Ut[i][0] * Vt[j][0] + 0.55 * Ut[i][1] * Vt[j][1] + 0.4 * Ut[i][2] * Vt[j][2] + 0.25 * V.normal(r);
+    A[i].push(Math.max(1, Math.min(5, Math.round(z))));
+  } }
+
+  // the SVD: eigenvectors of A^T A by cyclic Jacobi, then u = A v / sigma
+  function jacobi(S) {
+    var n = S.length, a = S.map(function (row) { return row.slice(); }), v = [];
+    for (var i = 0; i < n; i++) { v.push([]); for (var j = 0; j < n; j++) v[i].push(i === j ? 1 : 0); }
+    for (var sweep = 0; sweep < 60; sweep++) {
+      var off = 0; for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) off += a[i][j] * a[i][j];
+      if (off < 1e-22) break;
+      for (var p = 0; p < n; p++) for (var q = p + 1; q < n; q++) {
+        if (Math.abs(a[p][q]) < 1e-30) continue;
+        var th = 0.5 * Math.atan2(2 * a[p][q], a[q][q] - a[p][p]), c = Math.cos(th), s = Math.sin(th);
+        for (var k = 0; k < n; k++) { var akp = a[k][p], akq = a[k][q]; a[k][p] = c * akp - s * akq; a[k][q] = s * akp + c * akq; }
+        for (k = 0; k < n; k++) { var apk = a[p][k], aqk = a[q][k]; a[p][k] = c * apk - s * aqk; a[q][k] = s * apk + c * aqk; }
+        for (k = 0; k < n; k++) { var vkp = v[k][p], vkq = v[k][q]; v[k][p] = c * vkp - s * vkq; v[k][q] = s * vkp + c * vkq; }
+      }
+    }
+    var idx = []; for (i = 0; i < n; i++) idx.push(i);
+    idx.sort(function (x, y) { return a[y][y] - a[x][x]; });
+    return idx.map(function (i) { return { val: a[i][i], vec: v.map(function (row) { return row[i]; }) }; });
+  }
+  var AtA = []; for (i = 0; i < N; i++) { AtA.push([]); for (j = 0; j < N; j++) { var sm = 0; for (var k = 0; k < M; k++) sm += A[k][i] * A[k][j]; AtA[i].push(sm); } }
+  var E = jacobi(AtA).slice(0, M), SIG = [], UU = [], VV = [];
+  E.forEach(function (e) {
+    var sg = Math.sqrt(Math.max(0, e.val)), u = [];
+    for (var i = 0; i < M; i++) { var s = 0; for (var j = 0; j < N; j++) s += A[i][j] * e.vec[j]; u.push(s / sg); }
+    var sum = u.reduce(function (x, y) { return x + y; }, 0), f = sum < 0 ? -1 : 1;   // a sign choice: mostly positive u
+    SIG.push(sg); UU.push(u.map(function (x) { return f * x; })); VV.push(e.vec.map(function (x) { return f * x; }));
+  });
+  function layer(k) { var L = []; for (var i = 0; i < M; i++) { L.push([]); for (var j = 0; j < N; j++) L[i].push(SIG[k] * UU[k][i] * VV[k][j]); } return L; }
+  var LAY = SIG.map(function (_, k) { return layer(k); });
+  var PART = [];                                     // PART[k] = A_k, the sum of the first k layers
+  var Z = []; for (i = 0; i < M; i++) { Z.push([]); for (j = 0; j < N; j++) Z[i].push(0); }
+  PART.push(Z);
+  for (k = 0; k < M; k++) PART.push(PART[k].map(function (row, i) { return row.map(function (x, j) { return x + LAY[k][i][j]; }); }));
+  var NA = Math.sqrt(A.reduce(function (s, row) { return s + row.reduce(function (t, x) { return t + x * x; }, 0); }, 0));
+  function relErr(k) { var s = 0; for (var i = 0; i < M; i++) for (var j = 0; j < N; j++) { var d = A[i][j] - PART[k][i][j]; s += d * d; } return Math.sqrt(s) / NA; }
+
+  // timing: the first three layers slowly, then faster, then hold
+  var T_IN = 1.0, STEPS = [], t = T_IN;
+  for (k = 0; k < M; k++) { var len = k < 3 ? 2.6 : 1.1; STEPS.push([t, t + len]); t += len; }
+  var DUR = t + 2.8;
+  function phase(tt) {                                // which layer, and how far it has merged
+    for (var k = M - 1; k >= 0; k--) if (tt >= STEPS[k][0]) { var u = (tt - STEPS[k][0]) / (STEPS[k][1] - STEPS[k][0]); return { k: k, show: V.span(u, 0, 0.35), merge: V.span(u, 0.4, 0.9) }; }
+    return { k: -1, show: 0, merge: 0 };
+  }
+
+  // drawing helpers: a table of signed values; black for positive, grey for negative
+  function cell(ctx, x, y, w, h, val, scale) {
+    var a = Math.min(1, Math.abs(val) / scale);
+    if (a < 0.02) return;
+    ctx.fillStyle = V.rgba(val >= 0 ? P.ink : P.amber, val >= 0 ? 0.85 * a : a); ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+  }
+  function table(ctx, x, y, cs, T, scale, alpha) {
+    ctx.save(); ctx.globalAlpha = alpha;
+    for (var i = 0; i < M; i++) for (var j = 0; j < N; j++) cell(ctx, x + j * cs, y + i * cs, cs, cs, T[i][j], scale);
+    ctx.strokeStyle = P.hair; ctx.lineWidth = 1.5; ctx.strokeRect(x, y, N * cs, M * cs);
+    ctx.restore();
+  }
+  function mixT(T1, T2, u) { return T1.map(function (row, i) { return row.map(function (x, j) { return x + (T2[i][j] - x) * u; }); }); }
+
+  var BX = 180, BY = 410, BC = 60;                    // the big table A_k
+  var SC = 20, RY = 990;                              // the small tables
+  var LX = 72 + 64, AX = 488, RX = 776;              // layer (after its u bars), A, residual
+  var GX0 = 300, GX1 = 1000, GY = 1400, GH = 150;      // singular values
+
+  var eq, counter, cap, labs = {};
+  function setup() {
+    eq = V.el("eq", "");
+    eq.innerHTML = "<div>" + katex.renderToString("A = \\sigma_1\\mathbf{u}_1\\mathbf{v}_1^{\\top} + \\sigma_2\\mathbf{u}_2\\mathbf{v}_2^{\\top} + \\cdots + \\sigma_r\\mathbf{u}_r\\mathbf{v}_r^{\\top}") + "</div>" +
+      "<div>" + katex.renderToString("A_k = \\textstyle\\sum_{i \\le k} \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^{\\top}") + "</div>";
+    counter = V.el("counter", "");
+    cap = V.el("caption", "Ratings by eight viewers of twelve films, simulated with three hidden tastes. The first layer is the overall level; after three layers the error is " + (100 * relErr(3)).toFixed(0) + " percent.");
+    labs.big = V.el("label", "", { left: BX + "px", top: (BY - 44) + "px", color: P.ink });
+    labs.lay = V.el("label", "", { left: (LX) + "px", top: (RY + M * SC + 14) + "px" });
+    labs.a = V.el("label", "A", { left: AX + "px", top: (RY + M * SC + 14) + "px" });
+    labs.res = V.el("label", "A − Aₖ", { left: RX + "px", top: (RY + M * SC + 14) + "px" });
+    labs.sig = V.el("label", "", { left: "72px", top: (GY - 64) + "px", whiteSpace: "normal", lineHeight: "1.25" }); labs.sig.innerHTML = "singular<br>values";
+    labs.err = V.el("label", "", { left: (GX1) + "px", top: (GY - GH - 30) + "px", textAlign: "right", transform: "translateX(-100%)" });
+  }
+
+  function render(tt, ctx) {
+    var intro = V.span(tt, 0, T_IN), ph = phase(tt), k = ph.k;
+    var done = k < 0 ? 0 : k;                          // layers fully merged before this one
+    var cur = k < 0 ? PART[0] : mixT(PART[k], PART[k + 1], ph.merge);
+    var shown = k < 0 ? 0 : k + (ph.merge > 0.5 ? 1 : 0);
+
+    // the big table: A_k with its numbers
+    table(ctx, BX, BY, BC, cur, 5, intro);
+    ctx.save(); ctx.globalAlpha = intro;
+    for (var i = 0; i < M; i++) for (var j = 0; j < N; j++) {
+      var x = cur[i][j];
+      V.text(ctx, x.toFixed(1), BX + j * BC + BC / 2, BY + i * BC + BC / 2 + 9, Math.abs(x) / 5 > 0.45 ? "#ffffff" : P.dim, 22, "center", 500);
+    }
+    ctx.restore();
+    labs.big.textContent = "A" + (shown === 0 ? "₀" : "₁₂₃₄₅₆₇₈"[shown - 1]) + ",  8 viewers × 12 films";
+
+    // the current layer: u_k as bars on the left, v_k as bars on top, their outer product
+    var kk = Math.max(0, k), show = k < 0 ? 0 : ph.show * (1 - 0.6 * ph.merge);
+    var uMax = 0.75, vMax = 0.75;
+    ctx.save(); ctx.globalAlpha = intro;
+    for (i = 0; i < M; i++) {                          // u bars, centred on a hairline
+      var yy = RY + i * SC + SC / 2, w = 40 * UU[kk][i] / uMax * show;
+      V.line(ctx, LX - 32, yy, LX - 32 + w, yy, UU[kk][i] >= 0 ? P.ink : P.amber, 6);
+    }
+    V.line(ctx, LX - 32, RY, LX - 32, RY + M * SC, P.hair, 1.5);
+    for (j = 0; j < N; j++) {                          // v bars
+      var xx = LX + j * SC + SC / 2, hgt = 40 * VV[kk][j] / vMax * show;
+      V.line(ctx, xx, RY - 32, xx, RY - 32 - hgt, VV[kk][j] >= 0 ? P.ink : P.amber, 6);
+    }
+    V.line(ctx, LX, RY - 32, LX + N * SC, RY - 32, P.hair, 1.5);
+    ctx.restore();
+    table(ctx, LX, RY, SC, LAY[kk], 3, intro * Math.max(show, 0.15));
+    labs.lay.textContent = k < 0 ? "layer" : "layer " + (kk + 1) + ":  σ = " + SIG[kk].toFixed(1);
+
+    // the target and the residual
+    table(ctx, AX, RY, SC, A, 5, intro);
+    table(ctx, RX, RY, SC, A.map(function (row, i) { return row.map(function (x, j) { return x - cur[i][j]; }); }), 5, intro);
+
+    // the singular values: filled once their layer is in
+    var bw = (GX1 - GX0) / M;
+    V.line(ctx, GX0, GY, GX1, GY, P.hair, 2);
+    for (var q = 0; q < M; q++) {
+      var h = GH * SIG[q] / SIG[0], bx = GX0 + q * bw + 8, in_ = q < shown;
+      ctx.save(); ctx.globalAlpha = intro;
+      if (in_) { ctx.fillStyle = P.ink; ctx.fillRect(bx, GY - h, bw - 16, h); }
+      else { ctx.strokeStyle = P.amber; ctx.lineWidth = 2; ctx.strokeRect(bx, GY - h, bw - 16, h); }
+      V.text(ctx, SIG[q].toFixed(1), bx + (bw - 16) / 2, GY - h - 10, in_ ? P.ink : P.amber, 22, "center", 500);
+      ctx.restore();
+    }
+    var err = relErr(shown);
+    labs.err.innerHTML = "error ‖A − Aₖ‖ / ‖A‖ &nbsp;<b style='color:#000'>" + (100 * err).toFixed(1) + "%</b>";
+    V.fade(labs.err, intro);
+
+    V.tex(counter, "$k = " + shown + "$");
+  }
+
+  VIZ.run({ duration: DUR, poster: STEPS[2][1] - 0.05, setup: setup, render: render,
+            title: "A matrix as a sum of rank-one layers", mark: "DATASCI 207", course: "module 8" });
+})();
+</script>
+</body></html>
