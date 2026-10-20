@@ -218,6 +218,131 @@ print(f"Total variance explained: {sum(explained):.2%}")
 
 
 # =============================================================================
+# PART 4B: GOING DEEPER WITH HIERARCHICAL CLUSTERING
+# =============================================================================
+
+# PCA finds the best straight axes. Some data lies along a curve instead: here
+# every point on a spiral is set by one hidden number t, but the spiral wraps
+# around itself, so no straight axis can follow it. Hierarchical clustering
+# builds one tree, and cutting that tree deeper splits the spiral into short
+# pieces. Each piece is nearly straight, so a small PCA fits it, and chaining
+# the pieces in order recovers t. Watch for two things: the moment recovery
+# switches on, and the point where a deeper cut starts fitting noise.
+
+print("\n=== Part 4b: Going Deeper - Subdividing a Curved Space ===\n")
+
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import linkage, fcluster
+from scipy.sparse.csgraph import minimum_spanning_tree, shortest_path
+from scipy.stats import spearmanr
+
+# A spiral: every point is set by ONE hidden number t (how far along the curve it sits),
+# but in the plane the curve wraps around itself, so no single straight axis can follow it.
+np.random.seed(8)
+n, noise = 600, 0.35
+t = np.sort(np.random.uniform(1.5 * np.pi, 4.5 * np.pi, n))
+X_spiral = np.c_[t * np.cos(t), t * np.sin(t)] + np.random.randn(n, 2) * noise
+
+# Global PCA: the best single straight axis
+X_c = X_spiral - X_spiral.mean(axis=0)
+pc1 = np.linalg.eigh(np.cov(X_c.T))[1][:, -1]
+rho_pca = abs(spearmanr(X_c @ pc1, t)[0])
+print(f"Global PCA, one straight axis: rank correlation with the hidden t = {rho_pca:.2f}")
+
+
+def local_lines(X, labels):
+    """For each cluster: its centroid, its own first principal direction (a local PCA),
+    and the mean squared distance of all points from their cluster's line."""
+    cents, dirs, sq = {}, {}, 0.0
+    for c in np.unique(labels):
+        P = X[labels == c]
+        mu = P.mean(axis=0)
+        d = np.linalg.eigh(np.cov((P - mu).T))[1][:, -1] if len(P) > 2 else np.array([1.0, 0.0])
+        r = (P - mu) - np.outer((P - mu) @ d, d)
+        cents[c], dirs[c], sq = mu, d, sq + (r ** 2).sum()
+    return cents, dirs, sq / len(X)
+
+
+def unroll(X, labels):
+    """Recover one coordinate: link the cluster centroids into a chain (a minimum
+    spanning tree), measure distance along the chain from one end, then place each
+    point along its own cluster's local line."""
+    cents, dirs, _ = local_lines(X, labels)
+    ids = sorted(cents)
+    C = np.array([cents[c] for c in ids])
+    D = np.linalg.norm(C[:, None] - C[None], axis=2)
+    tree = minimum_spanning_tree(D)
+    end = np.argmax(shortest_path(tree, directed=False)[0])     # one end of the chain
+    along = shortest_path(tree, directed=False, indices=end)
+    nbrs = (tree + tree.T).tolil().rows
+    s = np.zeros(len(X))
+    for i, c in enumerate(ids):
+        # point the local line the way the chain runs: toward a neighbour further along
+        j = max(nbrs[i], key=lambda q: along[q])
+        step = (C[j] - C[i]) * np.sign(along[j] - along[i])
+        d = dirs[c] if dirs[c] @ step >= 0 else -dirs[c]
+        m = labels == c
+        s[m] = along[i] + (X[m] - C[i]) @ d
+    return s
+
+
+# ONE Ward tree; cut it at deeper and deeper levels
+Z = linkage(X_spiral, method="ward")
+depths = [2, 4, 8, 12, 16, 20, 24, 32, 48, 64, 96, 150]
+print(f"\nNoise floor (variance of the noise across the curve): {noise ** 2:.3f}\n")
+print(f"{'clusters':>8} {'piecewise-linear error':>24} {'rank corr. with t':>18}")
+results = {}
+for k in depths:
+    labels = fcluster(Z, k, criterion="maxclust")
+    _, _, err = local_lines(X_spiral, labels)
+    rho = abs(spearmanr(unroll(X_spiral, labels), t)[0])
+    results[k] = (labels, err, rho)
+    print(f"{k:>8} {err:>24.3f} {rho:>18.4f}")
+
+# Pictures: four cuts of the same tree, each cluster with its own straight line
+fig, axes = plt.subplots(2, 3, figsize=(13, 8.5))
+for ax, k in zip(axes.flat, [4, 8, 16, 20]):
+    labels, err, rho = results[k]
+    cents, dirs, _ = local_lines(X_spiral, labels)
+    ax.scatter(X_spiral[:, 0], X_spiral[:, 1], c=labels % 20, cmap="tab20", s=6)
+    for c in cents:
+        proj = (X_spiral[labels == c] - cents[c]) @ dirs[c]
+        a, b = cents[c] + proj.min() * dirs[c], cents[c] + proj.max() * dirs[c]
+        ax.plot([a[0], b[0]], [a[1], b[1]], "k-", lw=1.5)
+    ax.set_title(f"{k} clusters: error {err:.2f}, rank corr. {rho:.2f}")
+    ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+
+ax = axes.flat[4]
+ax.plot(depths, [results[k][1] for k in depths], "k.-", label="piecewise-linear error")
+ax.axhline(noise ** 2, color="gray", ls="--", label="noise floor")
+ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("clusters (depth of the cut)")
+ax2 = ax.twinx()
+ax2.plot(depths, [results[k][2] for k in depths], "o-", color="tab:blue", label="rank corr. with t")
+ax2.set_ylim(0, 1.05); ax2.set_ylabel("rank correlation with t", color="tab:blue")
+ax.legend(loc="lower left", fontsize=8); ax.set_title("Deeper cuts: error falls, then recovery jumps")
+
+s20 = unroll(X_spiral, results[20][0])
+ax = axes.flat[5]
+ax.scatter(t, s20 if np.corrcoef(s20, t)[0, 1] > 0 else -s20, s=6, c="k")
+ax.set_xlabel("hidden t (position along the spiral)")
+ax.set_ylabel("recovered coordinate, 20 clusters")
+ax.set_title("The chain of local lines recovers t")
+plt.tight_layout()
+plt.show()
+
+print("""
+One straight axis (global PCA) cannot follow a curve that wraps around itself.
+Cutting the same dendrogram deeper splits the spiral into short pieces; each piece
+is nearly straight, so a local line fits it (a local PCA), and chaining the pieces
+in order recovers the single hidden number t that generated the data.
+Recovery switches on once the pieces are shorter than the gap between the spiral's
+arms: before that, the chain of centroids takes shortcuts across arms. Past the noise floor, a deeper cut
+keeps lowering the error only by fitting lines to the noise in a few points each,
+which is overfitting, not more structure.
+""")
+
+
+# =============================================================================
 # PART 5: SCIKIT-LEARN COMPARISON
 # =============================================================================
 
